@@ -8,7 +8,7 @@ package main
 import (
 	"fmt"
 
-	ui "github.com/prospero78/gotv/tv"
+	ui "github.com/prospero78/goTV/tv"
 )
 
 // number of columns in a table
