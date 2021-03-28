@@ -19,4 +19,11 @@ type ( // Алисы типов для контроля данных
 
 	// AEventType -- тип события, генерируемое виджетом
 	AEventType int
+
+	// ABorderStyle -- встроенный виджет: auto, none, thin, and thick
+	ABorderStyle int
+
+	// ASortOrder -- путь сортировки записей в TableView
+	ASortOrder int
+	ADragType  int
 )

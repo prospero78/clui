@@ -1,21 +1,22 @@
-package tv
+// Package composer -- операции с компоновщиком
+package composer
+
 
 import (
 	"sync"
 
 	term "github.com/nsf/termbox-go"
 	"github.com/prospero78/goTV/tv/types"
-	"github.com/prospero78/goTV/tv/widgets/window"
 	"github.com/sirupsen/logrus"
 )
 
-// Composer is a service object that manages Views and console, processes
+// TPacker -- is a service object that manages Views and console, processes
 // events, and provides service methods. One application must have only
 // one object of this type
-type Composer struct {
+type TPacker struct {
 	// list of visible Views
 	windows      []types.IWidget
-	windowBorder BorderStyle
+	windowBorder types.ABorderStyle
 	consumer     types.IWidget
 	// last pressed key - to make repeatable actions simpler, e.g, at first
 	// one presses Ctrl+S and then just repeatedly presses arrow lest to
@@ -27,19 +28,19 @@ type Composer struct {
 	// last processed coordinates: e.g, for mouse move
 	lastX, lastY int
 	// Type of dragging
-	dragType DragType
+	dragType types.ADragType
 	// For safe Window manipulations
 	mtx sync.RWMutex
 }
 
 var (
-	comp *Composer
+	comp *TPacker
 )
 
 func initComposer() {
-	comp = new(Composer)
+	comp = new(TPacker)
 	comp.windows = make([]types.IWidget, 0)
-	comp.windowBorder = BorderAuto
+	comp.windowBorder = types.ABorderAuto
 	comp.consumer = nil
 	comp.lastKey = term.KeyEsc
 }
@@ -48,7 +49,7 @@ func initComposer() {
 // your own risk because it provides an access to some low level Window
 // manipulations.
 // Note: Now it is not thread safe to call Composer methods from a few threads.
-func WindowManager() *Composer {
+func WindowManager() *TPacker {
 	return comp
 }
 
@@ -66,8 +67,8 @@ func ReleaseEvents() {
 	comp.consumer = nil
 }
 
-func termboxEventToLocal(ev term.Event) Event {
-	e := Event{Type: EventType(ev.Type), Ch: ev.Ch,
+func termboxEventToLocal(ev term.Event) types.Event {
+	e := types.Event{Type: EventType(ev.Type), Ch: ev.Ch,
 		Key: ev.Key, Err: ev.Err, X: ev.MouseX, Y: ev.MouseY,
 		Mod: ev.Mod, Width: ev.Width, Height: ev.Height}
 	return e
@@ -83,7 +84,7 @@ func RefreshScreen() {
 
 	windows := comp.getWindowList()
 	for _, wnd := range windows {
-		v := wnd.(*window.TWindow)
+		v := wnd.(*Window)
 		if v.Visible() {
 			wnd.Draw()
 
@@ -124,12 +125,12 @@ func AddWindow(posX, posY, width, height int, title string) *Window {
 }
 
 // Border returns the default window border
-func (c *Composer) BorderStyle() BorderStyle {
+func (c *TPacker) BorderStyle() BorderStyle {
 	return c.windowBorder
 }
 
 // SetBorder changes the default window border
-func (c *Composer) SetBorder(border BorderStyle) {
+func (c *TPacker) SetBorder(border BorderStyle) {
 	c.windowBorder = border
 }
 
@@ -139,7 +140,7 @@ func (c *Composer) SetBorder(border BorderStyle) {
 // OnSelectItem handler of ListBox)
 // Note: Do not lock for a long time because while the lock is on the screen is
 // not updated
-func (c *Composer) BeginUpdate() {
+func (c *TPacker) BeginUpdate() {
 	c.mtx.Lock()
 }
 
@@ -147,11 +148,11 @@ func (c *Composer) BeginUpdate() {
 // Useful only in multithreading application if you create a new Window in
 // some thread that is not main one (e.g, create new Window inside
 // OnSelectItem handler of ListBox)
-func (c *Composer) EndUpdate() {
+func (c *TPacker) EndUpdate() {
 	c.mtx.Unlock()
 }
 
-func (c *Composer) getWindowList() []types.IWidget {
+func (c *TPacker) getWindowList() []types.IWidget {
 	c.mtx.RLock()
 	defer c.mtx.RUnlock()
 
@@ -160,7 +161,7 @@ func (c *Composer) getWindowList() []types.IWidget {
 	return arr_copy
 }
 
-func (c *Composer) checkWindowUnderMouse(screenX, screenY int) (types.IWidget, HitResult) {
+func (c *TPacker) checkWindowUnderMouse(screenX, screenY int) (types.IWidget, HitResult) {
 	windows := c.getWindowList()
 	if len(windows) == 0 {
 		return nil, HitOutside
@@ -177,7 +178,7 @@ func (c *Composer) checkWindowUnderMouse(screenX, screenY int) (types.IWidget, H
 	return nil, HitOutside
 }
 
-func (c *Composer) activateWindow(window types.IWidget) bool {
+func (c *TPacker) activateWindow(window types.IWidget) bool {
 	windows := c.getWindowList()
 	if c.topWindow() == window {
 		for _, v := range windows {
@@ -210,7 +211,7 @@ func (c *Composer) activateWindow(window types.IWidget) bool {
 	return true
 }
 
-func (c *Composer) moveActiveWindowToBottom() bool {
+func (c *TPacker) moveActiveWindowToBottom() bool {
 	windows := c.getWindowList()
 	if len(windows) < 2 {
 		return false
@@ -244,7 +245,7 @@ func (c *Composer) moveActiveWindowToBottom() bool {
 		c.windows[0] = last
 		c.EndUpdate()
 
-		v := c.topWindow().(*window.TWindow)
+		v := c.topWindow().(*Window)
 		if v.Visible() {
 			if !c.activateWindow(c.topWindow()) {
 				return false
@@ -261,7 +262,7 @@ func (c *Composer) moveActiveWindowToBottom() bool {
 	return true
 }
 
-func (c *Composer) sendEventToActiveWindow(ev Event) bool {
+func (c *TPacker) sendEventToActiveWindow(ev Event) bool {
 	view := c.topWindow()
 	if view != nil {
 		return view.ProcessEvent(ev)
@@ -270,7 +271,7 @@ func (c *Composer) sendEventToActiveWindow(ev Event) bool {
 	return false
 }
 
-func (c *Composer) topWindow() types.IWidget {
+func (c *TPacker) topWindow() types.IWidget {
 	windows := c.getWindowList()
 
 	if len(windows) == 0 {
@@ -280,13 +281,13 @@ func (c *Composer) topWindow() types.IWidget {
 	return windows[len(windows)-1]
 }
 
-func (c *Composer) resizeTopWindow(ev types.IWidget) bool {
+func (c *TPacker) resizeTopWindow(ev types.IWidget) bool {
 	view := c.topWindow()
 	if view == nil {
 		return false
 	}
 
-	topwindow, ok := view.(*window.TWindow)
+	topwindow, ok := view.(*Window)
 	if ok && !topwindow.Sizable() {
 		return false
 	}
@@ -315,10 +316,10 @@ func (c *Composer) resizeTopWindow(ev types.IWidget) bool {
 	return true
 }
 
-func (c *Composer) moveTopWindow(ev Event) bool {
+func (c *TPacker) moveTopWindow(ev Event) bool {
 	view := c.topWindow()
 	if view != nil {
-		topwindow, ok := view.(*window.TWindow)
+		topwindow, ok := view.(*Window)
 		if ok && !topwindow.Movable() {
 			return false
 		}
@@ -350,7 +351,7 @@ func (c *Composer) moveTopWindow(ev Event) bool {
 	return false
 }
 
-func (c *Composer) closeTopWindow() {
+func (c *TPacker) closeTopWindow() {
 	if len(c.windows) > 1 {
 		view := c.topWindow()
 		event := Event{Type: EventClose, X: 1}
@@ -369,7 +370,7 @@ func (c *Composer) closeTopWindow() {
 	}
 }
 
-func (c *Composer) processWindowDrag(ev Event) {
+func (c *TPacker) processWindowDrag(ev Event) {
 	if ev.Mod != term.ModMotion || c.dragType == DragNone {
 		return
 	}
@@ -498,7 +499,7 @@ func (c *Composer) processWindowDrag(ev Event) {
 	}
 }
 
-func (c *Composer) processMouse(ev Event) {
+func (c *TPacker) processMouse(ev Event) {
 	if c.consumer != nil {
 		tmp := c.consumer
 		tmp.ProcessEvent(ev)
@@ -536,7 +537,7 @@ func (c *Composer) processMouse(ev Event) {
 			case HitButtonBottom:
 				c.moveActiveWindowToBottom()
 			case HitButtonMaximize:
-				v := c.topWindow().(*window.TWindow)
+				v := c.topWindow().(*Window)
 				maximized := v.Maximized()
 				v.SetMaximized(!maximized)
 			case HitTop:
@@ -594,7 +595,7 @@ func Stop() {
 }
 
 // DestroyWindow removes the Window from the list of managed Windows
-func (c *Composer) DestroyWindow(view types.IWidget) {
+func (c *TPacker) DestroyWindow(view types.IWidget) {
 	ev := Event{Type: EventClose}
 	c.sendEventToActiveWindow(ev)
 
@@ -629,7 +630,7 @@ func IsDeadKey(key term.Key) bool {
 	return false
 }
 
-func (c *Composer) processKey(ev Event) {
+func (c *TPacker) processKey(ev Event) {
 	if ev.Key == term.KeyEsc {
 		if IsDeadKey(c.lastKey) {
 			c.lastKey = term.KeyEsc
@@ -683,7 +684,7 @@ func (c *Composer) processKey(ev Event) {
 		case term.KeyCtrlH:
 			c.moveActiveWindowToBottom()
 		case term.KeyCtrlM:
-			w := c.topWindow().(*window.TWindow)
+			w := c.topWindow().(*Window)
 			if w.Sizable() && (w.TitleButtons()&ButtonMaximize == ButtonMaximize) {
 				maxxed := w.Maximized()
 				w.SetMaximized(!maxxed)
@@ -714,7 +715,7 @@ func ProcessEvent(ev Event) {
 	case EventResize:
 		SetScreenSize(ev.Width, ev.Height)
 		for _, c := range comp.windows {
-			wnd := c.(*window.TWindow)
+			wnd := c.(*Window)
 			if wnd.Maximized() {
 				wnd.SetSize(ev.Width, ev.Height)
 				wnd.ResizeChildren()

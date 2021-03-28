@@ -1,43 +1,44 @@
 package main
 
 import (
-	ui "github.com/prospero78/goTV/tv"
+	"github.com/prospero78/goTV/tv"
+	"github.com/prospero78/goTV/tv/types"
 )
 
 func createView() {
-	view := ui.AddWindow(0, 0, 30, 7, "File select")
-	view.SetPack(ui.Vertical)
+	view := tv.AddWindow(0, 0, 30, 7, "File select")
+	view.SetPack(tv.Vertical)
 	view.SetGaps(0, 1)
 	view.SetPaddings(2, 2)
 
-	frmPath := ui.CreateFrame(view, 1, 1, ui.BorderNone, ui.Fixed)
-	frmPath.SetPack(ui.Horizontal)
-	ui.CreateLabel(frmPath, ui.AutoSize, ui.AutoSize, "Initial path", ui.Fixed)
-	edPath := ui.CreateEditField(frmPath, 16, "", 1)
+	frmPath := tv.CreateFrame(view, 1, 1, tv.BorderNone, types.Fixed)
+	frmPath.SetPack(tv.Horizontal)
+	tv.CreateLabel(frmPath, types.AutoSize, types.AutoSize, "Initial path", types.Fixed)
+	edPath := tv.CreateEditField(frmPath, 16, "", 1)
 
-	frmMask := ui.CreateFrame(view, 1, 1, ui.BorderNone, ui.Fixed)
-	frmMask.SetPack(ui.Horizontal)
-	ui.CreateLabel(frmMask, ui.AutoSize, ui.AutoSize, "File masks", ui.Fixed)
-	edMasks := ui.CreateEditField(frmMask, 16, "*", 1)
+	frmMask := tv.CreateFrame(view, 1, 1, tv.BorderNone, types.Fixed)
+	frmMask.SetPack(tv.Horizontal)
+	tv.CreateLabel(frmMask, types.AutoSize, types.AutoSize, "File masks", types.Fixed)
+	edMasks := tv.CreateEditField(frmMask, 16, "*", 1)
 
-	frmOpts := ui.CreateFrame(view, 1, 1, ui.BorderNone, ui.Fixed)
-	frmOpts.SetPack(ui.Horizontal)
-	cbDir := ui.CreateCheckBox(frmOpts, ui.AutoSize, "Select directory", ui.Fixed)
-	cbMust := ui.CreateCheckBox(frmOpts, ui.AutoSize, "Must exists", ui.Fixed)
-	ui.CreateFrame(frmOpts, 1, 1, ui.BorderNone, 1)
+	frmOpts := tv.CreateFrame(view, 1, 1, tv.BorderNone, types.Fixed)
+	frmOpts.SetPack(tv.Horizontal)
+	cbDir := tv.CreateCheckBox(frmOpts, types.AutoSize, "Select directory", types.Fixed)
+	cbMust := tv.CreateCheckBox(frmOpts, types.AutoSize, "Must exists", types.Fixed)
+	tv.CreateFrame(frmOpts, 1, 1, tv.BorderNone, 1)
 
-	lblSelected := ui.CreateLabel(view, 30, 5, "Selected:", ui.Fixed)
+	lblSelected := tv.CreateLabel(view, 30, 5, "Selected:", types.Fixed)
 	lblSelected.SetMultiline(true)
 
-	frmBtns := ui.CreateFrame(view, 1, 1, ui.BorderNone, ui.Fixed)
-	frmBtns.SetPack(ui.Horizontal)
-	btnSet := ui.CreateButton(frmBtns, ui.AutoSize, 4, "Select", ui.Fixed)
-	btnQuit := ui.CreateButton(frmBtns, ui.AutoSize, 4, "Quit", ui.Fixed)
-	ui.CreateFrame(frmBtns, 1, 1, ui.BorderNone, 1)
+	frmBtns := tv.CreateFrame(view, 1, 1, tv.BorderNone, types.Fixed)
+	frmBtns.SetPack(tv.Horizontal)
+	btnSet := tv.CreateButton(frmBtns, types.AutoSize, 4, "Select", types.Fixed)
+	btnQuit := tv.CreateButton(frmBtns, types.AutoSize, 4, "Quit", types.Fixed)
+	tv.CreateFrame(frmBtns, 1, 1, tv.BorderNone, 1)
 
-	ui.ActivateControl(view, edMasks)
+	tv.ActivateControl(view, edMasks)
 
-	btnSet.OnClick(func(ev ui.Event) {
+	btnSet.OnClick(func(ev tv.Event) {
 		s := "Select "
 		if cbDir.State() == 1 {
 			s += "directory"
@@ -47,7 +48,7 @@ func createView() {
 		if cbMust.State() == 1 {
 			s += "[X]"
 		}
-		dlg := ui.CreateFileSelectDialog(
+		dlg := tv.CreateFileSelectDialog(
 			s,
 			edMasks.Title(),
 			edPath.Title(),
@@ -77,21 +78,21 @@ func createView() {
 		})
 	})
 
-	btnQuit.OnClick(func(ev ui.Event) {
-		go ui.Stop()
+	btnQuit.OnClick(func(ev tv.Event) {
+		go tv.Stop()
 	})
 }
 
 func mainLoop() {
 	// Every application must create a single Composer and
 	// call its intialize method
-	ui.InitLibrary()
-	defer ui.DeinitLibrary()
+	tv.InitLibrary()
+	defer tv.DeinitLibrary()
 
 	createView()
 
 	// start event processing loop - the main core of the library
-	ui.MainLoop()
+	tv.MainLoop()
 }
 
 func main() {

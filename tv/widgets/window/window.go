@@ -1,15 +1,20 @@
-package tv
+package window
 
 import (
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+
+	"github.com/prospero78/goTV/tv"
+	"github.com/prospero78/goTV/tv/types"
+	"github.com/prospero78/goTV/tv/widgets/event"
+	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 )
 
-// Window is an implementation of View managed by Composer.
-type Window struct {
-	TBaseControl
+// TWindow is an implementation of View managed by Composer.
+type TWindow struct {
+	widgetbase.TWidgetBase
 
-	buttons   ViewButton
+	buttons   tv.ViewButton
 	maximized bool
 	// maximization support
 	origWidth  int
@@ -19,22 +24,22 @@ type Window struct {
 	hidden     bool
 	immovable  bool
 	fixedSize  bool
-	border     BorderStyle
+	border     types.ABorderStyle
 
-	onClose        func(Event) bool
-	onScreenResize func(Event)
+	onClose        func(event.TEvent) bool
+	onScreenResize func(event.TEvent)
 
 	onKeyDown *keyDownCb
 }
 
 type keyDownCb struct {
 	data interface{}
-	fn   func(evt Event, data interface{}) bool
+	fn   func(evt event.TEvent, data interface{}) bool
 }
 
-func CreateWindow(x, y, w, h int, title string) *Window {
-	wnd := new(Window)
-	wnd.TBaseControl = NewBaseControl()
+func CreateWindow(x, y, w, h int, title string) *TWindow {
+	wnd := new(TWindow)
+	wnd.TWidgetBase = widgetbase.New()
 
 	if w == AutoSize || w < 1 || w > 1000 {
 		w = 10
@@ -57,7 +62,7 @@ func CreateWindow(x, y, w, h int, title string) *Window {
 	return wnd
 }
 
-func (wnd *Window) buttonCount() (left, right int) {
+func (wnd *TWindow) buttonCount() (left, right int) {
 	if wnd.buttons&ButtonClose == ButtonClose {
 		right += 1
 	}
@@ -71,7 +76,7 @@ func (wnd *Window) buttonCount() (left, right int) {
 	return left, right
 }
 
-func (wnd *Window) drawFrame() {
+func (wnd *TWindow) drawFrame() {
 	PushAttributes()
 	defer PopAttributes()
 
@@ -91,7 +96,7 @@ func (wnd *Window) drawFrame() {
 	DrawFrame(wnd.x, wnd.y, wnd.width, wnd.height, bs)
 }
 
-func (wnd *Window) drawTitle() {
+func (wnd *TWindow) drawTitle() {
 	PushAttributes()
 	defer PopAttributes()
 
@@ -118,7 +123,7 @@ func (wnd *Window) drawTitle() {
 	DrawText(wnd.x+xshift, wnd.y, fitTitle)
 }
 
-func (wnd *Window) drawButtons() {
+func (wnd *TWindow) drawButtons() {
 	lb, rb := wnd.buttonCount()
 	if lb+rb == 0 {
 		return
@@ -155,7 +160,7 @@ func (wnd *Window) drawButtons() {
 }
 
 // Draw repaints the control on the screen
-func (wnd *Window) Draw() {
+func (wnd *TWindow) Draw() {
 	WindowManager().BeginUpdate()
 	defer WindowManager().EndUpdate()
 	PushAttributes()
@@ -179,7 +184,7 @@ func (wnd *Window) Draw() {
 // HitTest returns type of a Window region at a given screen coordinates. The
 // method is used to detect if a mouse cursor on a window border or outside,
 // which window icon is under cursor etc
-func (c *Window) HitTest(x, y int) HitResult {
+func (c *TWindow) HitTest(x, y int) HitResult {
 	if x > c.x && x < c.x+c.width-1 &&
 		y > c.y && y < c.y+c.height-1 {
 		return HitInside
@@ -253,7 +258,7 @@ func (c *Window) HitTest(x, y int) HitResult {
 	return hResult
 }
 
-func (c *Window) ProcessEvent(ev Event) bool {
+func (c *TWindow) ProcessEvent(ev Event) bool {
 	switch ev.Type {
 	case EventMove:
 		c.PlaceChildren()
@@ -323,13 +328,13 @@ func (c *Window) ProcessEvent(ev Event) bool {
 }
 
 // OnClose sets the callback that is called when the Window is about to destroy
-func (w *Window) OnClose(fn func(Event) bool) {
+func (w *TWindow) OnClose(fn func(Event) bool) {
 	w.onClose = fn
 }
 
 // OnKeyDown sets the callback that is called when a user presses a key
 // while the Window is active
-func (w *Window) OnKeyDown(fn func(Event, interface{}) bool, data interface{}) {
+func (w *TWindow) OnKeyDown(fn func(Event, interface{}) bool, data interface{}) {
 	if fn == nil {
 		w.onKeyDown = nil
 	} else {
@@ -338,23 +343,23 @@ func (w *Window) OnKeyDown(fn func(Event, interface{}) bool, data interface{}) {
 }
 
 // OnScreenResize sets the callback that is called when size of terminal changes
-func (w *Window) OnScreenResize(fn func(Event)) {
+func (w *TWindow) OnScreenResize(fn func(Event)) {
 	w.onScreenResize = fn
 }
 
 // Border returns the default window border
-func (w *Window) Border() BorderStyle {
+func (w *TWindow) Border() BorderStyle {
 	return w.border
 }
 
 // SetBorder changes the default window border
-func (w *Window) SetBorder(border BorderStyle) {
+func (w *TWindow) SetBorder(border BorderStyle) {
 	w.border = border
 }
 
 // SetMaximized opens the view to full screen or restores its
 // previous size
-func (w *Window) SetMaximized(maximize bool) {
+func (w *TWindow) SetMaximized(maximize bool) {
 	if maximize == w.maximized {
 		return
 	}
@@ -376,18 +381,18 @@ func (w *Window) SetMaximized(maximize bool) {
 }
 
 // Maximized returns if the view is in full screen mode
-func (w *Window) Maximized() bool {
+func (w *TWindow) Maximized() bool {
 	return w.maximized
 }
 
 // Visible returns if the window must be drawn on the screen
-func (w *Window) Visible() bool {
+func (w *TWindow) Visible() bool {
 	return !w.hidden
 }
 
 // SetVisible allows to temporarily remove the window from screen
 // and show it later without reconstruction
-func (w *Window) SetVisible(visible bool) {
+func (w *TWindow) SetVisible(visible bool) {
 	if w.hidden != visible {
 		return
 	}
@@ -404,33 +409,33 @@ func (w *Window) SetVisible(visible bool) {
 }
 
 // Movable returns if the Window can be moved with mouse or keyboard
-func (w *Window) Movable() bool {
+func (w *TWindow) Movable() bool {
 	return !w.immovable
 }
 
 // Sizable returns if size of the Window can be changed with mouse or keyboard
-func (w *Window) Sizable() bool {
+func (w *TWindow) Sizable() bool {
 	return !w.fixedSize
 }
 
 // SetMovable turns on and off ability to change Window position with mouse
 // or keyboard
-func (w *Window) SetMovable(movable bool) {
+func (w *TWindow) SetMovable(movable bool) {
 	w.immovable = !movable
 }
 
 // SetSizable turns on and off ability to change Window size with mouse
 // or keyboard
-func (w *Window) SetSizable(sizable bool) {
+func (w *TWindow) SetSizable(sizable bool) {
 	w.fixedSize = !sizable
 }
 
 // TitleButtons returns a set of buttons shown in the Window title bar
-func (w *Window) TitleButtons() ViewButton {
+func (w *TWindow) TitleButtons() ViewButton {
 	return w.buttons
 }
 
 // SetTitleButtons sets the title bar buttons available for a user
-func (w *Window) SetTitleButtons(buttons ViewButton) {
+func (w *TWindow) SetTitleButtons(buttons ViewButton) {
 	w.buttons = buttons
 }

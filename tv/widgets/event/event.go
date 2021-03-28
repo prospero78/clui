@@ -1,16 +1,17 @@
 // Package event -- структура для хранения информации о событии
-package types
+package event
 
 import (
 	mTerm "github.com/nsf/termbox-go"
+	"github.com/prospero78/goTV/tv/types"
 )
 
-type Event struct {
+type TEvent struct {
 	X, Y int
 	// Err is error got from termbox library
 	// Event type - the first events are mapped to termbox Event and then a few
 	// own events added to the end
-	Type AEventType
+	Type types.AEventType
 	// Mod - is a key modifier. Only Alt modifier is supported
 	Mod mTerm.Modifier
 	// Msg is a text part of the event. Used by few events: e.g, ListBox click

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	ui "github.com/prospero78/goTV/tv"
+	"github.com/prospero78/goTV/tv/types"
 )
 
 func createView() *ui.SparkChart {
@@ -13,13 +14,13 @@ func createView() *ui.SparkChart {
 	bch := ui.CreateSparkChart(view, 25, 12, 1)
 	bch.SetTop(20)
 
-	frmChk := ui.CreateFrame(view, 8, 5, ui.BorderNone, ui.Fixed)
+	frmChk := ui.CreateFrame(view, 8, 5, ui.BorderNone, types.Fixed)
 	frmChk.SetPack(ui.Vertical)
-	chkValues := ui.CreateCheckBox(frmChk, ui.AutoSize, "Show Values", ui.Fixed)
+	chkValues := ui.CreateCheckBox(frmChk, types.AutoSize, "Show Values", types.Fixed)
 	chkValues.SetState(0)
-	chkHilite := ui.CreateCheckBox(frmChk, ui.AutoSize, "Hilite peaks", ui.Fixed)
+	chkHilite := ui.CreateCheckBox(frmChk, types.AutoSize, "Hilite peaks", types.Fixed)
 	chkHilite.SetState(1)
-	chkAuto := ui.CreateCheckBox(frmChk, ui.AutoSize, "Auto scale", ui.Fixed)
+	chkAuto := ui.CreateCheckBox(frmChk, types.AutoSize, "Auto scale", types.Fixed)
 	chkAuto.SetState(1)
 
 	ui.ActivateControl(view, chkValues)

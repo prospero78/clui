@@ -16,6 +16,7 @@ import (
 
 	term "github.com/nsf/termbox-go"
 	ui "github.com/prospero78/goTV/tv"
+	"github.com/prospero78/goTV/tv/types"
 )
 
 func updateProgress(value string, pb *ui.ProgressBar) {
@@ -61,33 +62,33 @@ func createView() {
 
 	frmLeft := ui.CreateFrame(view, 8, 4, ui.BorderNone, 1)
 	frmLeft.SetPack(ui.Vertical)
-	frmLeft.SetGaps(ui.KeepValue, 1)
+	frmLeft.SetGaps(types.KeepValue, 1)
 	frmLeft.SetPaddings(1, 1)
 
-	frmTheme := ui.CreateFrame(frmLeft, 8, 1, ui.BorderNone, ui.Fixed)
-	frmTheme.SetGaps(1, ui.KeepValue)
-	checkBox := ui.CreateCheckBox(frmTheme, ui.AutoSize, "Use ListBox", ui.Fixed)
-	btnTheme := ui.CreateButton(frmTheme, ui.AutoSize, 4, "Select theme", ui.Fixed)
+	frmTheme := ui.CreateFrame(frmLeft, 8, 1, ui.BorderNone, types.Fixed)
+	frmTheme.SetGaps(1, types.KeepValue)
+	checkBox := ui.CreateCheckBox(frmTheme, types.AutoSize, "Use ListBox", types.Fixed)
+	btnTheme := ui.CreateButton(frmTheme, types.AutoSize, 4, "Select theme", types.Fixed)
 	ui.CreateFrame(frmLeft, 1, 1, ui.BorderNone, 1)
 
-	frmPb := ui.CreateFrame(frmLeft, 8, 1, ui.BorderNone, ui.Fixed)
-	ui.CreateLabel(frmPb, 1, 1, "[", ui.Fixed)
+	frmPb := ui.CreateFrame(frmLeft, 8, 1, ui.BorderNone, types.Fixed)
+	ui.CreateLabel(frmPb, 1, 1, "[", types.Fixed)
 	pb := ui.CreateProgressBar(frmPb, 20, 1, 1)
 	pb.SetLimits(0, 10)
 	pb.SetTitle("{{value}} of {{max}}")
-	ui.CreateLabel(frmPb, 1, 1, "]", ui.Fixed)
+	ui.CreateLabel(frmPb, 1, 1, "]", types.Fixed)
 
-	edit := ui.CreateEditField(frmLeft, 5, "0", ui.Fixed)
+	edit := ui.CreateEditField(frmLeft, 5, "0", types.Fixed)
 
-	frmEdit := ui.CreateFrame(frmLeft, 8, 1, ui.BorderNone, ui.Fixed)
+	frmEdit := ui.CreateFrame(frmLeft, 8, 1, ui.BorderNone, types.Fixed)
 	frmEdit.SetPaddings(1, 1)
-	frmEdit.SetGaps(1, ui.KeepValue)
-	btnSet := ui.CreateButton(frmEdit, ui.AutoSize, 4, "Set", ui.Fixed)
-	btnStep := ui.CreateButton(frmEdit, ui.AutoSize, 4, "Step", ui.Fixed)
+	frmEdit.SetGaps(1, types.KeepValue)
+	btnSet := ui.CreateButton(frmEdit, types.AutoSize, 4, "Set", types.Fixed)
+	btnStep := ui.CreateButton(frmEdit, types.AutoSize, 4, "Step", types.Fixed)
 	ui.CreateFrame(frmEdit, 1, 1, ui.BorderNone, 1)
-	btnQuit := ui.CreateButton(frmEdit, ui.AutoSize, 4, "Quit", ui.Fixed)
+	btnQuit := ui.CreateButton(frmEdit, types.AutoSize, 4, "Quit", types.Fixed)
 
-	logBox := ui.CreateListBox(view, 28, 5, ui.Fixed)
+	logBox := ui.CreateListBox(view, 28, 5, types.Fixed)
 
 	ui.ActivateControl(view, edit)
 

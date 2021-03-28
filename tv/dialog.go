@@ -2,6 +2,8 @@ package tv
 
 import (
 	term "github.com/nsf/termbox-go"
+
+	"github.com/prospero78/goTV/tv/widgets/window"
 )
 
 // ConfirmationDialog is a simple dialog to get a user
@@ -11,7 +13,7 @@ import (
 // The dialog is modal, so a user cannot interact other
 // Views until the user closes the dialog
 type ConfirmationDialog struct {
-	View    *Window
+	View    *window.TWindow
 	result  int
 	onClose func()
 }
@@ -22,7 +24,7 @@ type ConfirmationDialog struct {
 // The dialog is modal, so a user cannot interact other
 // Views until the user closes the dialog
 type SelectDialog struct {
-	View      *Window
+	View      *window.TWindow
 	result    int
 	value     int
 	edtResult string

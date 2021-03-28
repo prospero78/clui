@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/prospero78/goTV/tv"
+	"github.com/prospero78/goTV/tv/types"
 )
 
 func createView() {
@@ -10,26 +11,26 @@ func createView() {
 	view.SetGaps(0, 1)
 	view.SetPaddings(2, 2)
 
-	frmOpts := tv.CreateFrame(view, 1, 1, tv.BorderNone, tv.Fixed)
+	frmOpts := tv.CreateFrame(view, 1, 1, tv.BorderNone, types.Fixed)
 	frmOpts.SetPack(tv.Horizontal)
-	cbCheck := tv.CreateCheckBox(frmOpts, tv.AutoSize, "Use callback to test data", tv.Fixed)
+	cbCheck := tv.CreateCheckBox(frmOpts, types.AutoSize, "Use callback to test data", types.Fixed)
 
-	tv.CreateLabel(view, tv.AutoSize, tv.AutoSize, "Correct credentials", tv.Fixed)
+	tv.CreateLabel(view, types.AutoSize, types.AutoSize, "Correct credentials", types.Fixed)
 
-	frmCreds := tv.CreateFrame(view, 1, 1, tv.BorderNone, tv.Fixed)
+	frmCreds := tv.CreateFrame(view, 1, 1, tv.BorderNone, types.Fixed)
 	frmCreds.SetPack(tv.Horizontal)
 	frmCreds.SetGaps(1, 0)
-	tv.CreateLabel(frmCreds, tv.AutoSize, tv.AutoSize, "Username", tv.Fixed)
+	tv.CreateLabel(frmCreds, types.AutoSize, types.AutoSize, "Username", types.Fixed)
 	edUser := tv.CreateEditField(frmCreds, 8, "", 1)
-	tv.CreateLabel(frmCreds, tv.AutoSize, tv.AutoSize, "Password", tv.Fixed)
+	tv.CreateLabel(frmCreds, types.AutoSize, types.AutoSize, "Password", types.Fixed)
 	edPass := tv.CreateEditField(frmCreds, 8, "", 1)
 
-	lbRes := tv.CreateLabel(view, tv.AutoSize, tv.AutoSize, "Result:", tv.Fixed)
+	lbRes := tv.CreateLabel(view, types.AutoSize, types.AutoSize, "Result:", types.Fixed)
 
-	frmBtns := tv.CreateFrame(view, 1, 1, tv.BorderNone, tv.Fixed)
+	frmBtns := tv.CreateFrame(view, 1, 1, tv.BorderNone, types.Fixed)
 	frmBtns.SetPack(tv.Horizontal)
-	btnDlg := tv.CreateButton(frmBtns, tv.AutoSize, 4, "Login", tv.Fixed)
-	btnQuit := tv.CreateButton(frmBtns, tv.AutoSize, 4, "Quit", tv.Fixed)
+	btnDlg := tv.CreateButton(frmBtns, types.AutoSize, 4, "Login", types.Fixed)
+	btnQuit := tv.CreateButton(frmBtns, types.AutoSize, 4, "Quit", types.Fixed)
 	tv.CreateFrame(frmBtns, 1, 1, tv.BorderNone, 1)
 
 	tv.ActivateControl(view, edUser)

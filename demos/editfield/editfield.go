@@ -2,20 +2,21 @@ package main
 
 import (
 	ui "github.com/prospero78/goTV/tv"
+	"github.com/prospero78/goTV/tv/types"
 )
 
 func createView() {
 	view := ui.AddWindow(0, 0, 10, 7, "EditField Demo")
 	view.SetTitleButtons(ui.ButtonMaximize | ui.ButtonClose)
 
-	frmChk := ui.CreateFrame(view, 8, 5, ui.BorderNone, ui.Fixed)
+	frmChk := ui.CreateFrame(view, 8, 5, ui.BorderNone, types.Fixed)
 	frmChk.SetPack(ui.Vertical)
 	frmChk.SetPaddings(1, 1)
 	frmChk.SetGaps(1, 1)
-	ui.CreateLabel(frmChk, ui.AutoSize, ui.AutoSize, "Enter password:", ui.Fixed)
-	edFld := ui.CreateEditField(frmChk, 20, "", ui.Fixed)
+	ui.CreateLabel(frmChk, types.AutoSize, types.AutoSize, "Enter password:", types.Fixed)
+	edFld := ui.CreateEditField(frmChk, 20, "", types.Fixed)
 	edFld.SetPasswordMode(true)
-	chkPass := ui.CreateCheckBox(frmChk, ui.AutoSize, "Show Password", ui.Fixed)
+	chkPass := ui.CreateCheckBox(frmChk, types.AutoSize, "Show Password", types.Fixed)
 
 	ui.ActivateControl(view, edFld)
 

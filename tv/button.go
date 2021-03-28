@@ -6,6 +6,8 @@ import (
 
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+
+	"github.com/prospero78/goTV/tv/types"
 	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 )
 
@@ -33,15 +35,15 @@ control should keep its original size.
 */
 func CreateButton(parent types.IWidget, width, height int, title string, scale int) *Button {
 	b := new(Button)
-	b.TBaseControl = NewBaseControl()
+	b.TWidgetBase = widgetbase.New()
 
 	b.parent = parent
 	b.align = AlignCenter
 
-	if height == AutoSize {
+	if height == types.AutoSize {
 		height = 4
 	}
-	if width == AutoSize {
+	if width == types.AutoSize {
 		width = xs.Len(title) + 2 + 1
 	}
 

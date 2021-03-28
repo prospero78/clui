@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/prospero78/goTV/tv"
+	"github.com/prospero78/goTV/tv/types"
 )
 
 func customColored(d *tv.BarDataCell) {
@@ -33,18 +34,18 @@ func createView() *tv.BarChart {
 	view := tv.AddWindow(0, 0, 10, 7, "BarChart Demo")
 	bch := tv.CreateBarChart(view, 40, 12, 1)
 
-	frmChk := tv.CreateFrame(view, 8, 5, tv.BorderNone, tv.Fixed)
+	frmChk := tv.CreateFrame(view, 8, 5, tv.BorderNone, types.Fixed)
 	frmChk.SetPack(tv.Vertical)
-	chkTitles := tv.CreateCheckBox(frmChk, tv.AutoSize, "Show Titles", tv.Fixed)
-	chkMarks := tv.CreateCheckBox(frmChk, tv.AutoSize, "Show Marks", tv.Fixed)
+	chkTitles := tv.CreateCheckBox(frmChk, types.AutoSize, "Show Titles", types.Fixed)
+	chkMarks := tv.CreateCheckBox(frmChk, types.AutoSize, "Show Marks", types.Fixed)
 	chkTitles.SetState(1)
-	chkLegend := tv.CreateCheckBox(frmChk, tv.AutoSize, "Show Legend", tv.Fixed)
-	chkValues := tv.CreateCheckBox(frmChk, tv.AutoSize, "Show Values", tv.Fixed)
+	chkLegend := tv.CreateCheckBox(frmChk, types.AutoSize, "Show Legend", types.Fixed)
+	chkValues := tv.CreateCheckBox(frmChk, types.AutoSize, "Show Values", types.Fixed)
 	chkValues.SetState(1)
-	chkFixed := tv.CreateCheckBox(frmChk, tv.AutoSize, "Fixed Width", tv.Fixed)
-	chkGap := tv.CreateCheckBox(frmChk, tv.AutoSize, "No Gap", tv.Fixed)
-	chkMulti := tv.CreateCheckBox(frmChk, tv.AutoSize, "MultiColored", tv.Fixed)
-	chkCustom := tv.CreateCheckBox(frmChk, tv.AutoSize, "Custom Colors", tv.Fixed)
+	chkFixed := tv.CreateCheckBox(frmChk, types.AutoSize, "Fixed Width", types.Fixed)
+	chkGap := tv.CreateCheckBox(frmChk, types.AutoSize, "No Gap", types.Fixed)
+	chkMulti := tv.CreateCheckBox(frmChk, types.AutoSize, "MultiColored", types.Fixed)
+	chkCustom := tv.CreateCheckBox(frmChk, types.AutoSize, "Custom Colors", types.Fixed)
 
 	tv.ActivateControl(view, chkTitles)
 

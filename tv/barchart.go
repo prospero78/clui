@@ -6,8 +6,9 @@ import (
 
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 
-	"github.xom/prosprero78/goTV/tv/types"
+	"github.com/prospero78/goTV/tv/types"
 )
 
 // BarData is info about one bar in the chart. Every
@@ -60,7 +61,7 @@ If LegendWidth is greater than half of the chart it is not
 displayed. The same is applied to ValueWidth
 */
 type BarChart struct {
-	TBaseControl
+	widgetbase.TWidgetBase
 	data        []BarData
 	autosize    bool
 	gap         int32
@@ -82,20 +83,20 @@ control should keep its original size.
 */
 func CreateBarChart(parent types.IWidget, w, h int, scale int) *BarChart {
 	c := new(BarChart)
-	c.TBaseControl = NewBaseControl()
+	c.TWidgetBase = widgetbase.New()
 
-	if w == AutoSize {
+	if w == types.AutoSize {
 		w = 10
 	}
-	if h == AutoSize {
+	if h == types.AutoSize {
 		h = 5
 	}
 
-	c.parent = parent
+	c.SetParent(parent)
 
 	c.SetSize(w, h)
 	c.SetConstraints(w, h)
-	c.isTabSkip = true
+	c.SetTabStop(true)
 	c.showTitles = true
 	c.barWidth = 3
 	c.data = make([]BarData, 0)

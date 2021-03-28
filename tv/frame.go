@@ -50,12 +50,13 @@ func CreateFrame(parent types.IWidget, width, height int, bs BorderStyle, scale 
 	f.SetSize(width, height)
 	f.SetConstraints(width, height)
 	f.border = bs
-	f.parent = parent
+	f.SetParent(parent)
 	f.SetTabStop(false)
-	f.scale = scale
+	f.SetScale(scale)
 
-	f.gapX, f.gapY = 0, 0
+	f.SetGaps(0,0)
 	if bs == BorderNone {
+		f.SetPaddings()
 		f.padX, f.padY = 0, 0
 	} else {
 		f.padX, f.padY = 1, 1

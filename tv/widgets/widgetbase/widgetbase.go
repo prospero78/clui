@@ -29,9 +29,9 @@ type TWidgetBase struct {
 	fg, bg        mTerm.Attribute
 	fgActive      mTerm.Attribute
 	bgActive      mTerm.Attribute
-	align         Align
+	align         types.AAlign
 	parent        types.IWidget
-	pack          PackType
+	pack          types.APackDirect
 	children      []types.IWidget
 	block         sync.RWMutex
 	onActive      func(active bool)
@@ -40,8 +40,8 @@ type TWidgetBase struct {
 	style         string // Стиль окна
 }
 
-// NewBasedControl -- возвращает новый TBaseControl
-func NewBaseControl() TWidgetBase {
+// New -- возвращает новый TBaseControl
+func New() TWidgetBase {
 	return TWidgetBase{
 		widgetID: widgetid.GetWidgetID().NextID(),
 	}
