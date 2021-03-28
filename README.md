@@ -1,13 +1,16 @@
-# CLUI ![](https://travis-ci.org/VladimirMarkelov/clui.svg)
-Command Line User Interface (Console UI inspired by TurboVision) with built-in theme support. Please see screenshots of working examples at the end of the README.
+# goTV
 
-## Installation
+![build:?](https://travis-ci.org/prospero78/goTV.svg)
 
-    go get -u github.com/VladimirMarkelov/clui
+Пользовательский интерфейс командной строки **CUI** по аналогии с **TurboVision**) с поддержкой встроенных тем. Смотрите скриншоты рабочих примеров в конце этого **README**.
 
+## Установка
 
-## Current version
-The current version is 1.2.1. Please see details in [changelog](./changelog).
+    go get -u github.com/prospero78/goTV
+
+## Текущая версия
+
+Текущая версия 1.2.1. Для подробностей смотрите [изменения](./changelog.md).
 
 ## Applications that uses the library
 * Terminal FB2 reader(termfb2): https://github.com/VladimirMarkelov/termfb2

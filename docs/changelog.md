@@ -1,33 +1,44 @@
-2019-06-10 - version 1.2.1
-[*] Trim only trailing spaces when loading text into TextView
-[+] New Button property ShadowType = ShadowFull(default), ShadowHalf(bottom
-    part of shadow uses half-block), ShadowNone(no shadow at all)
+# Изменения
 
-2019-05-10 - version 1.2.0
-[*] Dual license: MIT or BSD-2-Clause
-[*] Window icons minimize and maximize are swapped
-[*] UX improvement: minimize and maximize buttons moved to left side of
+## 2019-06-10 - version 1.2.1
+
+- Trim only trailing spaces when loading text into TextView
+- New Button property ShadowType = ShadowFull(default), ShadowHalf(bottom part of shadow uses half-block), ShadowNone(no shadow at all)
+
+## 2019-05-10 - version 1.2.0
+
+- Dual license: MIT or BSD-2-Clause
+- Window icons minimize and maximize are swapped
+- UX improvement: minimize and maximize buttons moved to left side of
     a window to avoid closing window accidentally after misclicking.
+
     Old window title view:
+
     ╔Demo═══════[^_X]╗
+
     New one:
+
     ╔[_^]═Demo════[X]╗
 
-2019-05-7 - version 1.2.0
+## 2019-05-7 - version 1.2.0
+
 [*] Changed default window close icon from "O" to "■"
 [*] Doc comments clean up
 
-2019-03-16 - version 1.1.0
+## 2019-03-16 - version 1.1.0
+
 [!] TextReader renamed to TextDisplay to avoid confusion with io.Reader. In
     library version 1.x TextReader is deprecated but still available - it is
     just an alias for TextDisplay. In next major release TextReader will be
     removed.
 [*] Fix wrong window title for TextDisplay(TextReader) demo
 
-2018-12-01 - version 1.0.0
+## 2018-12-01 - version 1.0.0
+
 [*] No changes. No bug reports. The version 1.0 is out
 
-2018-11-09 - version 1.0.0 RC6
+## 2018-11-09 - version 1.0.0 RC6
+
 [*] If no error is found in the next few weeks, this release will become 1.0.
     It is high time to release 1.0. Everything looks working.
 [+] TableView new method VisibleArea - returns first visible column and row,
@@ -40,7 +51,8 @@
     of VisibleArea method
 [+] Added new demo tableview-preload to show how to use new event
 
-2018-10-08 - version 0.9.0 RC5
+## 2018-10-08 - version 0.9.0 RC5
+
 [*] Fix Frame border drawing
 
 2018-09-30 - version 0.9.0 RC4
@@ -51,15 +63,18 @@
     is invisible
 [*] Enter key did not work in TableView control
 
-2018-09-06 - version 0.9.0 RC3 (Thanks to Leandro Dorileo)
+## 2018-09-06 - version 0.9.0 RC3 (Thanks to Leandro Dorileo)
+
 [+] New big feature: scrollable Frame
 [+] Custom theme support: overriding theme colors with custom ones
 [*] Fix bug in getLinearControlList
 
-2018-08-13 - version 0.9.0 RC2
+## 2018-08-13 - version 0.9.0 RC2
+
 [+] New control: LoginDialog (a dialog with username and password fields)
 
-2018-08-04 - version 0.9.0 RC1
+## 2018-08-04 - version 0.9.0 RC1
+
 [+] New control: File Picker (a dialog for file save/load operations)
 [+] New property for Label: TextDisplay. It defines which part of Label title
    is shown when the title is longer than the Label length:
@@ -78,7 +93,8 @@
 [*] Fix bug with ListBox 'select item' event: the event was not emitted after
    pressing End, Home, PageUp, and PageDown
 
-2018-07-17 - version 0.8.1
+## 2018-07-17 - version 0.8.1
+
 [+] New API functions SetColorMap and GetColorMap to change the current color
     palette
 [*] FindNextControl function improved
@@ -87,22 +103,26 @@
 [+] Next and previous control can be selected with Up and Down Arrow keys
 [+] New event OnActive - is emitted when a control gains or lost focus
 
-2018-04-07 - version 0.8.0
+## 2018-04-07 - version 0.8.0
+
 [+] New dialog type: SelectDialogEdit - a dialog with an edit box
 [+] Added Control method destroy
 [*] EditField event OnKeyPress now receives two arguments: key code and rune
 
-2018-03-15 - version 0.8.0-RC3
+## 2018-03-15 - version 0.8.0-RC3
+
 [*] If active control is about to hide then the next control is activated
 [*] Setting EditField content with SetTitle moves cursor to the end of line
 
-2018-03-14 - version 0.8.0-RC2
+## 2018-03-14 - version 0.8.0-RC2
+
 [*] Fixed crash when the last Window is closed from a code call without user
     interaction (e.g, when a Dialog button is pressed the button click handler
     closes the Dialog and the application crashes if the Dialog is the last
     Window in the screen)
 
-2018-03-13 - version 0.8.0-RC1
+## 2018-03-13 - version 0.8.0-RC1
+
 [+] Added new property for all controls: Visible. It makes possible to show
     and hide any control with its children(if there are any).
     New Control interface methods: Visible and SetVisible
@@ -113,11 +133,13 @@
     never receives the event
 [+] Add a new simple demo to play with Control visibility: demos/visible
 
-2018-01-26 - version 0.7.0
+## 2018-01-26 - version 0.7.0
+
 [+] Added new event handler for Window: set a callback OnScreenResize if you
     want to handle terminal resize event
 
-2018-01-25 - version 0.7.0
+## 2018-01-25 - version 0.7.0
+
 [+] Added new methods to Composer: BeginUpdate and EndUpdate to use in
     multithreading application. Call BeginUpdate before creating a new Window or
     manipulating Composer Windows if the code runs in separate thread. And
@@ -126,7 +148,8 @@
     Another usage: create new Window inside various handlers (e.g, OnSelectItem
     of ListBox)
 
-2018-01-23 - version 0.7.0
+## 2018-01-23 - version 0.7.0
+
 [+] Added feature: Window method to set and read visible buttons in title bar
 [+] Added feature: Window manual resizing and moving can be disabled
 [*] Fix TableView scrollbars: both scrollbars did not response mouse clicks
@@ -135,10 +158,12 @@
 [*] Made function to get internal composer public for low level access to
     function that manipulates Windows. Function name is WindowManager
 
-2018-01-13 - version 0.6.4
+## 2018-01-13 - version 0.6.4
+
 [*] Add a workaround for 'false' key presses fired after clicking mouse on OSX
 
-2018-01-02 - version 0.6.3
+## 2018-01-02 - version 0.6.3
+
 [+] Add a new boolean property for EditField - PasswordMode. If PasswordMode is
     true then the EditField text is hidden with 'stars'.
     Please see demo demos/editfield for details
@@ -147,20 +172,24 @@
    mode is on. By default it is '*' in all included themes. Old themes that
    miss forth character use '*' as well.
 
-2017-12-01 - version 0.6.2
+## 2017-12-01 - version 0.6.2
+
 [*] Fix selecting the next control with TAB key
 
-2017-11-28 - version 0.6.2
+## 2017-11-28 - version 0.6.2
+
 [*] Fix races (that racy tool shows). The work is not completed but all demos
     and termfb2 application works without warnings
 
-2017-09-07 - version 0.6.2
+## 2017-09-07 - version 0.6.2
+
 [*] Setting the first button of confirmation dialog as default one did not work
 [*] TableView does not use 'go' to fire events that allows to create on the
     fly any required dialog. That is useful, e.g., to create a simple
     confirmation dialog to a user to approve a row deletion
 
-2017-07-04 - Version 0.6.1
+## 2017-07-04 - Version 0.6.1
+
 [*] Fix selection Window with mouse: clicking non-active Window makes the
     Window active (unless the top Window is modal one)
 [*] TableView does not fire OnSelectionChange event if a user clicked outside
@@ -174,49 +203,50 @@
 [*] Fix typo: TableView did not send TableDelete event if the selected Row
     was Row number 1
 
-2017-06-30 - Version 0.6.0
+## 2017-06-30 - Version 0.6.0
+
 [+] Added new control TextReader - a virtual text view control with
     built-in support of some hots keys to list the text
 [+] Added a new global event to close active view
 [+] Added a hotkey F4 to sort TableView by current column
 [+] Added onKeyDown for Window
 
-2016-10-13 - Version 0.5.0
+## 2016-10-13 - Version 0.5.0
 
-[+] Added mouse move and mouse button release support:
++ Added mouse move and mouse button release support:
     Now all windows can be dragged and resized with mouse
-[+] Added constants for dragging events - new type DragType
-[+] Added new type of Event MouseClick: it is generated if a user does mouse
++ Added constants for dragging events - new type DragType
++ Added new type of Event MouseClick: it is generated if a user does mouse
     button down and mouse release at the same coordinates. In this case a
     control receives 3 events: mouse down, mouse release, and mouse click
-[+] Main loop moved to separate source file
-[+] Added test for color parsing functions
++ Main loop moved to separate source file
++ Added test for color parsing functions
 
-[*] Logger moved to separate source file and it is global object now
-[*] Windows do not have their own interface - all objects are derived from the
++ Logger moved to separate source file and it is global object now
++ Windows do not have their own interface - all objects are derived from the
     same interface
-[*] Library initialization is made simpler: only one call is required, there
++ Library initialization is made simpler: only one call is required, there
     is no need to create composer, theme manager etc manually - everything is
     created inside library initialization
-[*] Because composer, theme manager and some other objects are hidden now then
++ Because composer, theme manager and some other objects are hidden now then
     a set of methods are just global library functions:
         - Event processing functions like Stop(), PutEvent() etc
         - Theme manager related functions like SysColor(), SysObject() etc
-[*] All functions to create new objects New* are renamed to Create* functions.
++ All functions to create new objects New* are renamed to Create* functions.
     Exclusion: CreateWindow is for internal use only: it creates a window but it
     does not do anything else, so the window is not displayed and a user cannot
     interact with it. Use AddWindow function instead of CreateWindow.
-[*] All text output is colorized by default. Multicolor property is removed.
++ All text output is colorized by default. Multicolor property is removed.
     If you want to draw text as is then use DrawRaw* functions.
-[*] Now all drawing function uses the current canvas colors, so all color
++ Now all drawing function uses the current canvas colors, so all color
     function arguments of all drawing functions are removed. Use global
     functions SetTextColor and SetBackColor to change colors before drawing.
     PopAttributes and PushAttributes may come handy to save/restore canvas
     attributes between drawing calls
-[*] Renamed a few constants to get rid of negative constructions:
++ Renamed a few constants to get rid of negative constructions:
     DoNotScale -> Fixed
     DoNotChange -> KeepValue
 
-[-] The first argument view of all Create* functions is removed as obsolete.
+- The first argument view of all Create* functions is removed as obsolete.
     Now library does not require to set parent Window. It is sufficient to set
     only control's parent
