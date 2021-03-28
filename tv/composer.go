@@ -74,7 +74,7 @@ func termboxEventToLocal(ev term.Event) Event {
 // Repaints everything on the screen
 func RefreshScreen() {
 	comp.BeginUpdate()
-	if err:=term.Clear(ColorWhite, ColorBlack);err!=nil{
+	if err := term.Clear(ColorWhite, ColorBlack); err != nil {
 		logrus.WithError(err).Fatalf("composer.go/RefreshScreen(): in clear terminal")
 	}
 	comp.EndUpdate()
@@ -292,13 +292,14 @@ func (c *Composer) resizeTopWindow(ev Event) bool {
 	w, h := view.Size()
 	w1, h1 := w, h
 	minW, minH := view.Constraints()
-	if ev.Key == term.KeyArrowUp && minH < h {
+	switch {
+	case ev.Key == term.KeyArrowUp && minH < h:
 		h--
-	} else if ev.Key == term.KeyArrowLeft && minW < w {
+	case ev.Key == term.KeyArrowLeft && minW < w:
 		w--
-	} else if ev.Key == term.KeyArrowDown {
+	case ev.Key == term.KeyArrowDown:
 		h++
-	} else if ev.Key == term.KeyArrowRight {
+	case ev.Key == term.KeyArrowRight:
 		w++
 	}
 
@@ -324,13 +325,14 @@ func (c *Composer) moveTopWindow(ev Event) bool {
 		w, h := view.Size()
 		x1, y1 := x, y
 		cx, cy := term.Size()
-		if ev.Key == term.KeyArrowUp && y > 0 {
+		switch {
+		case ev.Key == term.KeyArrowUp && y > 0:
 			y--
-		} else if ev.Key == term.KeyArrowDown && y+h < cy {
+		case ev.Key == term.KeyArrowDown && y+h < cy:
 			y++
-		} else if ev.Key == term.KeyArrowLeft && x > 0 {
+		case ev.Key == term.KeyArrowLeft && x > 0:
 			x--
-		} else if ev.Key == term.KeyArrowRight && x+w < cx {
+		case ev.Key == term.KeyArrowRight && x+w < cx:
 			x++
 		}
 
@@ -382,8 +384,8 @@ func (c *Composer) processWindowDrag(ev Event) {
 
 	switch c.dragType {
 	case DragMove:
-		newX = newX + dx
-		newY = newY + dy
+		newX += dx
+		newY += dy
 		if newX >= 0 && newY >= 0 && newX+newW < cw && newY+newH < ch {
 			c.lastX = ev.X
 			c.lastY = ev.Y
@@ -394,8 +396,8 @@ func (c *Composer) processWindowDrag(ev Event) {
 			RefreshScreen()
 		}
 	case DragResizeLeft:
-		newX = newX + dx
-		newW = newW - dx
+		newX += dx
+		newW -= dx
 		if newX >= 0 && newY >= 0 && newX+newW < cw && newY+newH < ch {
 			c.lastX = ev.X
 			c.lastY = ev.Y
@@ -409,7 +411,7 @@ func (c *Composer) processWindowDrag(ev Event) {
 			RefreshScreen()
 		}
 	case DragResizeRight:
-		newW = newW + dx
+		newW += dx
 		if newX >= 0 && newY >= 0 && newX+newW < cw && newY+newH < ch {
 			c.lastX = ev.X
 			c.lastY = ev.Y
@@ -420,7 +422,7 @@ func (c *Composer) processWindowDrag(ev Event) {
 			RefreshScreen()
 		}
 	case DragResizeBottom:
-		newH = newH + dy
+		newH += dy
 		if newX >= 0 && newY >= 0 && newX+newW < cw && newY+newH < ch {
 			c.lastX = ev.X
 			c.lastY = ev.Y
@@ -431,10 +433,10 @@ func (c *Composer) processWindowDrag(ev Event) {
 			RefreshScreen()
 		}
 	case DragResizeTopLeft:
-		newX = newX + dx
-		newW = newW - dx
-		newY = newY + dy
-		newH = newH - dy
+		newX += dx
+		newW += dx
+		newY += dy
+		newH -= dy
 		if newX >= 0 && newY >= 0 && newX+newW < cw && newY+newH < ch {
 			c.lastX = ev.X
 			c.lastY = ev.Y
@@ -448,9 +450,9 @@ func (c *Composer) processWindowDrag(ev Event) {
 			RefreshScreen()
 		}
 	case DragResizeBottomLeft:
-		newX = newX + dx
-		newW = newW - dx
-		newH = newH + dy
+		newX += dx
+		newW -= dx
+		newH += dy
 		if newX >= 0 && newY >= 0 && newX+newW < cw && newY+newH < ch {
 			c.lastX = ev.X
 			c.lastY = ev.Y
@@ -464,8 +466,8 @@ func (c *Composer) processWindowDrag(ev Event) {
 			RefreshScreen()
 		}
 	case DragResizeBottomRight:
-		newW = newW + dx
-		newH = newH + dy
+		newW += dx
+		newH += dy
 		if newX >= 0 && newY >= 0 && newX+newW < cw && newY+newH < ch {
 			c.lastX = ev.X
 			c.lastY = ev.Y
@@ -476,9 +478,9 @@ func (c *Composer) processWindowDrag(ev Event) {
 			RefreshScreen()
 		}
 	case DragResizeTopRight:
-		newY = newY + dy
-		newW = newW + dx
-		newH = newH - dy
+		newY += dy
+		newW += dx
+		newH -= dy
 		if newX >= 0 && newY >= 0 && newX+newW < cw && newY+newH < ch {
 			c.lastX = ev.X
 			c.lastY = ev.Y
@@ -559,15 +561,15 @@ func (c *Composer) processMouse(ev Event) {
 		c.activateWindow(view)
 		return
 	}
-
-	if ev.Key == term.MouseLeft {
+	switch {
+	case ev.Key == term.MouseLeft:
 		c.lastX = ev.X
 		c.lastY = ev.Y
 		c.mdownX = ev.X
 		c.mdownY = ev.Y
 		c.sendEventToActiveWindow(ev)
 		return
-	} else if ev.Key == term.MouseRelease {
+	case ev.Key == term.MouseRelease:
 		c.sendEventToActiveWindow(ev)
 		if c.lastX != ev.X && c.lastY != ev.Y {
 			return
@@ -576,13 +578,13 @@ func (c *Composer) processMouse(ev Event) {
 		ev.Type = EventClick
 		c.sendEventToActiveWindow(ev)
 		return
-	} else {
+	default:
 		c.sendEventToActiveWindow(ev)
 		return
 	}
 }
 
-// Stop sends termination event to Composer. Composer should stop
+// Stop -- sends termination event to Composer. Composer should stop
 // console management and quit application
 func Stop() {
 	ev := Event{Type: EventQuit}

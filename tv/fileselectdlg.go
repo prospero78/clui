@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	term "github.com/nsf/termbox-go"
+	"github.com/sirupsen/logrus"
 )
 
 // FileSelectDialog is a dialog to select a file or directory.
@@ -155,14 +156,18 @@ func (d *FileSelectDialog) pathUp() {
 		return
 	}
 	d.currPath = dirUp
-	d.populateFiles()
+	if err := d.populateFiles(); err != nil {
+		logrus.WithError(err).Fatalf("FileSelectDialog.pathUp(): in populate files")
+	}
 	d.selectFirst()
 }
 
 // Enters the directory
 func (d *FileSelectDialog) pathDown(dir string) {
 	d.currPath = filepath.Join(d.currPath, dir)
-	d.populateFiles()
+	if err := d.populateFiles(); err != nil {
+		logrus.WithError(err).Fatalf("FileSelectDialog.pathDown(): in populate files")
+	}
 	d.selectFirst()
 }
 

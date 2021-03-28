@@ -6,6 +6,7 @@ import (
 	"github.com/atotto/clipboard"
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+	"github.com/sirupsen/logrus"
 )
 
 /*
@@ -121,7 +122,9 @@ func (e *EditField) ProcessEvent(event Event) bool {
 			return true
 		case term.KeyCtrlC:
 			if !e.showStars {
-				clipboard.WriteAll(e.Title())
+				if err := clipboard.WriteAll(e.Title()); err != nil {
+					logrus.WithError(err).Fatalf("EditField.ProcessEvent() in write clipboard")
+				}
 			}
 			return true
 		case term.KeyCtrlV:
