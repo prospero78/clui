@@ -75,7 +75,7 @@ func termboxEventToLocal(ev term.Event) Event {
 func RefreshScreen() {
 	comp.BeginUpdate()
 	if err:=term.Clear(ColorWhite, ColorBlack);err!=nil{
-		logrus.WithErr(err).Fatalf("composer.go/RefreshScreen(): in clear terminal")
+		logrus.WithError(err).Fatalf("composer.go/RefreshScreen(): in clear terminal")
 	}
 	comp.EndUpdate()
 
