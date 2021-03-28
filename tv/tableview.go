@@ -555,16 +555,17 @@ func (l *TableView) EnsureColVisible() {
 
 	toShow := l.selectedCol
 	for width > 0 {
-		if l.columns[toShow].Width > width {
+		switch {
+		case l.columns[toShow].Width > width:
 			if toShow == l.selectedCol {
 				break
 			} else {
 				toShow++
 				break
 			}
-		} else if l.columns[toShow].Width == width {
+		case l.columns[toShow].Width == width:
 			break
-		} else {
+		default:
 			width -= l.columns[toShow].Width
 			if width < 0 {
 				break
@@ -641,12 +642,13 @@ func (l *TableView) mouseToCol(dx int) int {
 }
 
 func (l *TableView) horizontalScrollClick(dx int) {
-	if dx == 0 {
+	switch {
+	case dx == 0:
 		l.moveLeft(1)
 		return
-	} else if dx == l.width-2 {
+	case dx == l.width-2:
 		l.moveRight(1)
-	} else if dx > 0 && dx < l.width-2 {
+	case dx > 0 && dx < l.width-2:
 		pos := ThumbPosition(l.selectedCol, len(l.columns), l.width-1)
 		if pos < dx {
 			l.moveRight(1)
@@ -657,12 +659,13 @@ func (l *TableView) horizontalScrollClick(dx int) {
 }
 
 func (l *TableView) verticalScrollClick(dy int) {
-	if dy == 0 {
+	switch {
+	case dy == 0:
 		l.moveUp(1)
 		return
-	} else if dy == l.height-2 {
+	case dy == l.height-2:
 		l.moveDown(1)
-	} else if dy > 0 && dy < l.height-2 {
+	case dy > 0 && dy < l.height-2:
 		pos := ThumbPosition(l.selectedRow, l.rowCount, l.height-1)
 		if pos > dy {
 			l.moveUp(l.height - 3)
@@ -737,11 +740,12 @@ func (l *TableView) headerClicked(dx int) {
 			l.columns[idx].Sort = SortNone
 		}
 
-		if sort == SortAsc {
+		switch {
+		case sort == SortAsc:
 			sort = SortDesc
-		} else if sort == SortNone {
+		case sort == SortNone:
 			sort = SortAsc
-		} else {
+		default:
 			sort = SortNone
 		}
 		l.columns[colID].Sort = sort
@@ -834,13 +838,15 @@ func (l *TableView) ProcessEvent(event Event) bool {
 					l.columns[idx].Sort = SortNone
 				}
 
-				if sort == SortAsc {
+				switch {
+				case sort == SortAsc:
 					sort = SortDesc
-				} else if sort == SortNone {
+				case sort == SortNone:
 					sort = SortAsc
-				} else {
+				default:
 					sort = SortNone
 				}
+
 				l.columns[colID].Sort = sort
 
 				ev := TableEvent{Action: TableActionSort, Col: colID, Row: -1, Sort: sort}

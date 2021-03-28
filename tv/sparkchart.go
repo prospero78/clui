@@ -184,7 +184,7 @@ func (b *SparkChart) calculateBarArea() (int, int) {
 	pos := 0
 
 	if b.valueWidth < w/2 {
-		w = w - b.valueWidth
+		w -= b.valueWidth
 		pos = b.valueWidth
 	}
 

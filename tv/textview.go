@@ -119,8 +119,7 @@ func (l *TextView) drawText() {
 			remained := l.lengths[lineID]
 			start := 0
 			for remained > 0 {
-				var s string
-				s = SliceColorized(l.lines[lineID], start, start+maxWidth)
+				s := SliceColorized(l.lines[lineID], start, start+maxWidth)
 
 				if linePos >= l.topLine {
 					DrawText(l.x, l.y+y, s)
@@ -281,11 +280,12 @@ func (l *TextView) processMouseClick(ev Event) bool {
 
 	// vertical scroll bar
 	if dx == l.width-1 {
-		if dy == 0 {
+		switch {
+		case dy == 0:
 			l.moveUp(1)
-		} else if dy == yy-1 {
+		case dy == yy-1:
 			l.moveDown(1)
-		} else {
+		default:
 			newPos := ItemByThumbPosition(dy, l.virtualHeight-yy+1, yy)
 			if newPos >= 0 {
 				l.topLine = newPos
@@ -296,11 +296,12 @@ func (l *TextView) processMouseClick(ev Event) bool {
 	}
 
 	// horizontal scrollbar
-	if dx == 0 {
+	switch {
+	case dx == 0:
 		l.moveLeft()
-	} else if dx == l.width-2 {
+	case dx == l.width-2:
 		l.moveRight()
-	} else {
+	default:
 		newPos := ItemByThumbPosition(dx, l.virtualWidth-l.width+2, l.width-1)
 		if newPos >= 0 {
 			l.leftShift = newPos

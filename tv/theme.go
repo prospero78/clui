@@ -129,11 +129,11 @@ func ThemeReset() {
 	defer thememtx.Unlock()
 
 	themeManager.current = defaultTheme
-	themeManager.themes = make(map[string]theme, 0)
+	themeManager.themes = make(map[string]theme)
 
 	defTheme := theme{parent: "", title: "Default Theme", author: "Vladimir V. Markelov", version: "1.0"}
-	defTheme.colors = make(map[string]term.Attribute, 0)
-	defTheme.objects = make(map[string]string, 0)
+	defTheme.colors = make(map[string]term.Attribute)
+	defTheme.objects = make(map[string]string)
 
 	defTheme.objects[ObjSingleBorder] = "─│┌┐└┘"
 	defTheme.objects[ObjDoubleBorder] = "═║╔╗╚╝"
@@ -225,7 +225,7 @@ func SysColor(color string) term.Attribute {
 
 	clr, okclr := sch.colors[color]
 	if !okclr {
-		visited := make(map[string]int, 0)
+		visited := make(map[string]int)
 		visited[themeManager.current] = 1
 		if !ok {
 			visited[defaultTheme] = 1
@@ -270,7 +270,7 @@ func SysObject(object string) string {
 
 	obj, okobj := sch.objects[object]
 	if !okobj {
-		visited := make(map[string]int, 0)
+		visited := make(map[string]int)
 		visited[themeManager.current] = 1
 		if !ok {
 			visited[defaultTheme] = 1
@@ -388,8 +388,8 @@ func (s *ThemeManager) loadTheme(name string) {
 	}
 
 	theme := theme{parent: defaultTheme, title: "", author: ""}
-	theme.colors = make(map[string]term.Attribute, 0)
-	theme.objects = make(map[string]string, 0)
+	theme.colors = make(map[string]term.Attribute)
+	theme.objects = make(map[string]string)
 
 	file, err := os.Open(s.themePath + string(os.PathSeparator) + name + themeSuffix)
 	if err != nil {
@@ -422,15 +422,16 @@ func (s *ThemeManager) loadTheme(name string) {
 		}
 
 		low := strings.ToLower(key)
-		if low == "parent" {
+		switch {
+		case low == "parent":
 			theme.parent = value
-		} else if low == "author" {
+		case low == "author":
 			theme.author = value
-		} else if low == "name" || low == "title" {
+		case low == "name" || low == "title":
 			theme.title = value
-		} else if low == "version" {
+		case low == "version":
 			theme.version = value
-		} else if strings.HasSuffix(key, "Back") || strings.HasSuffix(key, "Text") {
+		case strings.HasSuffix(key, "Back") || strings.HasSuffix(key, "Text"):
 			// the first case is a reference to existing color (of this or parent theme)
 			// the second is the real color
 			if strings.HasSuffix(value, "Back") || strings.HasSuffix(value, "Text") {
@@ -462,7 +463,7 @@ func (s *ThemeManager) loadTheme(name string) {
 				}
 				theme.colors[key] = c
 			}
-		} else {
+		default:
 			theme.objects[key] = value
 		}
 	}
@@ -480,9 +481,7 @@ func ReloadTheme(name string) {
 	}
 
 	thememtx.Lock()
-	if _, ok := themeManager.themes[name]; ok {
-		delete(themeManager.themes, name)
-	}
+	delete(themeManager.themes, name)
 	thememtx.Unlock()
 
 	themeManager.loadTheme(name)

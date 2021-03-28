@@ -113,8 +113,8 @@ func AlignColorizedText(str string, width int, align Align) (int, string) {
 		if elem.Type == ElemEndOfText {
 			break
 		}
-
-		if elem.Type == ElemPrintable {
+		switch {
+		case elem.Type == ElemPrintable:
 			curr++
 			if curr == skip+1 {
 				if fgChanged {
@@ -127,12 +127,12 @@ func AlignColorizedText(str string, width int, align Align) (int, string) {
 			} else if curr > skip+1 {
 				out += string(elem.Ch)
 			}
-		} else if elem.Type == ElemTextColor {
+		case elem.Type == ElemTextColor:
 			fgChanged = true
 			if curr > skip+1 {
 				out += "<t:" + ColorToString(elem.Fg) + ">"
 			}
-		} else if elem.Type == ElemBackColor {
+		case elem.Type == ElemBackColor:
 			bgChanged = true
 			if curr > skip+1 {
 				out += "<b:" + ColorToString(elem.Bg) + ">"
@@ -216,13 +216,14 @@ func UnColorizeText(str string) string {
 // Examples: "red bold", "green+underline+bold"
 func StringToColor(str string) term.Attribute {
 	var parts []string
-	if strings.ContainsRune(str, '+') {
+	switch {
+	case strings.ContainsRune(str, '+'):
 		parts = strings.Split(str, "+")
-	} else if strings.ContainsRune(str, '|') {
+	case strings.ContainsRune(str, '|'):
 		parts = strings.Split(str, "|")
-	} else if strings.ContainsRune(str, ' ') {
+	case strings.ContainsRune(str, ' '):
 		parts = strings.Split(str, " ")
-	} else {
+	default:
 		parts = append(parts, str)
 	}
 

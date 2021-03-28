@@ -408,7 +408,9 @@ func CreateFileSelectDialog(title, fileMasks, initPath string, selectDir, mustEx
 	})
 
 	dlg.curDir.SetTitle(dlg.currPath)
-	dlg.populateFiles()
+	if err := dlg.populateFiles(); err != nil {
+		logrus.WithError(err).Fatalf("fileselectdlg.go/CreateFileSelectDialog(): in populate files")
+	}
 	dlg.selectFirst()
 
 	ActivateControl(dlg.View, dlg.listBox)
