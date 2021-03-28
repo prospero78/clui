@@ -1,54 +1,66 @@
-# First application
+# Первое приложение
 
-### Add the library to project
-Create an empty application. At first you need to import CLUI library:
-```
+### Добавить библиотеку в проект
+
+Создайте пустое приложение. Сначала вам нужно импортировать библиотеку `goTV`:
+
+```go
 import (
-    ui "github.com/prospero78/goTV/tv"
+    "github.com/prospero78/goTV/tv"
 )
 ```
-I created an alias 'ui' for the imported library to use shorter name in calls.
 
-### Initialization and finalization
-The library must be initialized before creating the first control. Initialization creates control and theme mamagers, intializes termbox library and prepares a main event loop. Finalization just cleans up the terminal - call it before exiting your application. If you forget to call finalization or the application crashes it usually results in cursor disappearing because the library turns off the text cursor at its start.
+### Инициализация и финализация
 
-In a simple application it can be done this way:
-```
+Библиотеку необходимо инициализировать перед созданием первого элемента управления. Инициализация создает управляющие элементы и диспетчеры тем, инициализирует библиотеку `termbox` и подготавливает главный цикл событий. Завершение просто очищает терминал - вызовите его перед выходом из приложения. Если вы забыли вызвать финализацию или приложение выйдет из строя, это обычно приводит к исчезновению курсора, потому что библиотека отключает текстовый курсор при его запуске.
+
+В простом приложении это можно сделать так:
+
+```go
 func main() {
-    ui.InitLibrary()
-    defer ui.DeinitLibrary()
-    ... your other code ...
+    tv.InitLibrary()
+    defer tv.DeinitLibrary()
+    ... тут ваш код ...
 }
 ```
 
-### Creating a Window
-An UI application without a window is useless. Let's create an empty window. Add the following code after 'defer':
-```
-view := ui.AddWindow(0, 0, 10, 7, "Hello World!")
-```
-0, 0 - is the position of the new window. The top left corner in our case
+### Создание окна
 
-10, 7 - minimal width and height of the window
+Приложение UI без окна бесполезно. Создадим пустое окно. Добавьте следующий код после defer:
 
-"Hello World!" - is the window title
+```go
+view := tv.AddWindow(0, 0, 10, 7, "Привет мир!")
+```
 
-### Make the application work
-The final step is to start the main event loop that is responsible for displaying and interacting all the UI stuff. Add this line before the final brace:
-```
-ui.MainLoop()
-```
-Note: this call must be the last line in the function because no code after this line is executed until the application is closed
+`0, 0` - позиция нового окна. Левый верхний угол в нашем случае
 
-### Add more controls
-Empty window is boring. Let's create a button that closes the application when anyone clicks it. Add the code between library initialization and calling the main event loop:
+`10, 7` - минимальная ширина и высота окна
+
+"Привет мир!" - это заголовок окна
+
+### Запуск приложения
+
+Последним шагом является запуск основного цикла событий, который отвечает за отображение и взаимодействие всех элементов пользовательского интерфейса. Добавьте эту строку перед последней фигурной скобкой:
+
+```go
+tv.MainLoop()
 ```
-    btnQuit := ui.CreateButton(view, 15, 4, "Hi", 1)
-    btnQuit.OnClick(func(ev ui.Event) {
-        go ui.Stop()
+
+Примечание: этот вызов должен быть последней строкой в функции, потому что код после этой строки не выполняется, пока приложение не будет закрыто.
+
+### Добавить дополнительные элементы управления
+
+Пустое окно - это скучно. Давайте создадим кнопку, которая закрывает приложение, когда кто-либо нажимает на нее. Добавьте код между инициализацией библиотеки и вызовом основного цикла событий:
+
+```go
+    btnQuit := tv.CreateButton(view, 15, 4, "Hi", 1)
+    btnQuit.OnClick(func(ev tv.Event) {
+        go tv.Stop()
     })
 ```
-The first line adds a button to our Window(the first argument is our Window). The button has minimal width 15 and height 4. Button text is 'Hi'. And the scaling coefficient is 1 that means the button will be automatically resized when its parent is resized. Try resizing the window and the button will always fill all the windows because the bitton is the only child of the window.
 
-The second line adds an event callback that is fired when someone clicks the button with mouse or by pressing 'space' key. In the callback we just sends an event to the main loop that application is terminating. ui.Stop() - is a gentle way to exit terminal application.
+Первая строка добавляет кнопку в наше окно (первый аргумент - это наше окно). Кнопка имеет минимальную ширину `15` и высоту `4`. Текст кнопки - «Hi». А коэффициент масштабирования равен `1`, что означает, что размер кнопки будет автоматически изменен при изменении размера ее родителя. Попробуйте изменить размер окна, и кнопка всегда будет заполнять все окна, потому что биттон является единственным дочерним элементом окна.
 
-The full code of the example can be found at ![demos/helloworld.go](/demos/helloworld.go)
+Вторая строка добавляет обратный вызов события, который запускается, когда кто-то щелкает кнопку мышью или нажимает клавишу «пробел». В обратном вызове мы просто отправляем событие в основной цикл, который приложение завершает. `tv.Stop()` - щадящий способ выйти из терминального приложения.
+
+Полный код примера можно найти в [helloworld.go](../demos/helloworld/helloworld.go)
