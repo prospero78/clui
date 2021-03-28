@@ -4,7 +4,7 @@
 Create an empty application. At first you need to import CLUI library:
 ```
 import (
-    ui "github.com/prospero78/gotv/lib"
+    ui "github.com/prospero78/gotv/tv"
 )
 ```
 I created an alias 'ui' for the imported library to use shorter name in calls.

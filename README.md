@@ -7,7 +7,7 @@
 ## Установка
 
 ```bash
-    go get -u github.com/prospero78/gotv/lib
+    go get -u github.com/prospero78/gotv/tv
 ```
 
 ## Текущая версия

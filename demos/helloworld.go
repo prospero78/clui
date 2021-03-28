@@ -1,7 +1,7 @@
 package main
 
 import (
-	ui "github.com/prospero78/gotv/lib"
+	ui "github.com/prospero78/gotv/tv"
 )
 
 func main() {

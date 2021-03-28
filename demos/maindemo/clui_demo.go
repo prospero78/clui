@@ -15,7 +15,7 @@ import (
 	"strconv"
 
 	term "github.com/nsf/termbox-go"
-	ui "github.com/prospero78/gotv/lib"
+	ui "github.com/prospero78/gotv/tv"
 )
 
 func updateProgress(value string, pb *ui.ProgressBar) {

@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"time"
 
-	ui "github.com/prospero78/gotv/lib"
+	ui "github.com/prospero78/gotv/tv"
 )
 
 func createView() *ui.SparkChart {
