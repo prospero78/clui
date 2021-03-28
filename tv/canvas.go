@@ -115,11 +115,11 @@ func clip(x, y, w, h int) (cx int, cy int, cw int, ch int) {
 	}
 
 	if x < canvas.clipX {
-		w = w - (canvas.clipX - x)
+		w -= canvas.clipX - x
 		x = canvas.clipX
 	}
 	if y < canvas.clipY {
-		h = h - (canvas.clipY - y)
+		h -= canvas.clipY - y
 		y = canvas.clipY
 	}
 	if x+w > canvas.clipX+canvas.clipW {
@@ -309,7 +309,7 @@ func DrawRawText(x, y int, text string) {
 
 	if x < cx {
 		text = xs.Slice(text, cx-x, -1)
-		length = length - (cx - x)
+		length -= cx - x // FIXME: вот эта штука никуда не присваивается
 		x = cx
 	}
 	text = CutText(text, cw)
@@ -365,7 +365,7 @@ func DrawRawTextVertical(x, y int, text string) {
 
 	if y < cy {
 		text = xs.Slice(text, cy-y, -1)
-		length = length - (cy - y)
+		length -= cy - y // FIXME: вот эта штука никуда не присваивается
 		y = cy
 	}
 	text = CutText(text, ch)
@@ -380,13 +380,14 @@ func DrawRawTextVertical(x, y int, text string) {
 // DrawFrame paints the frame without changing area inside it
 func DrawFrame(x, y, w, h int, border BorderStyle) {
 	var chars string
-	if border == BorderThick {
+	switch {
+	case border == BorderThick:
 		chars = SysObject(ObjDoubleBorder)
-	} else if border == BorderThin {
+	case border == BorderThin:
 		chars = SysObject(ObjSingleBorder)
-	} else if border == BorderNone {
+	case border == BorderNone:
 		chars = "      "
-	} else {
+	default:
 		chars = "      "
 	}
 

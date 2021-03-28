@@ -310,16 +310,17 @@ func (l *TableView) drawCells() {
 		for colNo < len(l.columns) && dx < l.width-1 {
 			c := l.columns[colNo]
 			info := ColumnDrawInfo{Row: rowNo, Col: colNo, Width: c.Width, Alignment: c.Alignment}
-			if l.selectedRow == rowNo && l.selectedCol == colNo {
+			switch {
+			case l.selectedRow == rowNo && l.selectedCol == colNo:
 				info.RowSelected = true
 				info.CellSelected = true
 				info.Bg = bgCell
 				info.Fg = fgCell
-			} else if l.selectedRow == rowNo && l.fullRowSelect {
+			case l.selectedRow == rowNo && l.fullRowSelect:
 				info.RowSelected = true
 				info.Bg = bgRow
 				info.Fg = fgRow
-			} else {
+			default:
 				info.Fg = fg
 				info.Bg = bg
 			}

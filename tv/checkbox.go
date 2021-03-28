@@ -97,7 +97,7 @@ func (c *CheckBox) Draw() {
 	DrawText(x+4+shift, y, text)
 }
 
-//ProcessEvent processes all events come from the control parent. If a control
+// ProcessEvent -- processes all events come from the control parent. If a control
 //   processes an event it should return true. If the method returns false it means
 //   that the control do not want or cannot process the event and the caller sends
 //   the event to the control parent
@@ -107,11 +107,12 @@ func (c *CheckBox) ProcessEvent(event Event) bool {
 	}
 
 	if (event.Type == EventKey && event.Key == term.KeySpace) || (event.Type == EventClick) {
-		if c.state == 0 {
+		switch {
+		case c.state == 0:
 			c.SetState(1)
-		} else if c.state == 2 {
+		case c.state == 2:
 			c.SetState(0)
-		} else {
+		default:
 			if c.allow3state {
 				c.SetState(2)
 			} else {

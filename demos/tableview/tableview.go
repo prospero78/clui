@@ -28,11 +28,11 @@ func mainLoop() {
 	b.SetShowRowNumber(true)
 	b.SetRowCount(rowCount)
 	cols := []ui.Column{
-		ui.Column{Title: "Text", Width: 5, Alignment: ui.AlignLeft},
-		ui.Column{Title: "Number", Width: 10, Alignment: ui.AlignRight},
-		ui.Column{Title: "Misc", Width: 12, Alignment: ui.AlignCenter},
-		ui.Column{Title: "Long", Width: 50, Alignment: ui.AlignLeft},
-		ui.Column{Title: "Last", Width: 8, Alignment: ui.AlignLeft},
+		{Title: "Text", Width: 5, Alignment: ui.AlignLeft},
+		{Title: "Number", Width: 10, Alignment: ui.AlignRight},
+		{Title: "Misc", Width: 12, Alignment: ui.AlignCenter},
+		{Title: "Long", Width: 50, Alignment: ui.AlignLeft},
+		{Title: "Last", Width: 8, Alignment: ui.AlignLeft},
 	}
 	b.SetColumns(cols)
 	colCount := len(cols)

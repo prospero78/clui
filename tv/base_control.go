@@ -12,30 +12,30 @@ import (
 // the same set of methods
 type BaseControl struct {
 	refID         int64
-	title         string
 	x, y          int
 	width, height int
 	minW, minH    int
 	scale         int
-	fg, bg        term.Attribute
-	fgActive      term.Attribute
-	bgActive      term.Attribute
+	padX, padY    int
+	gapX, gapY    int
 	tabSkip       bool
 	disabled      bool
 	hidden        bool
-	align         Align
-	parent        Control
 	inactive      bool
 	modal         bool
-	padX, padY    int
-	gapX, gapY    int
+	clipped       bool
+	fg, bg        term.Attribute
+	fgActive      term.Attribute
+	bgActive      term.Attribute
+	align         Align
+	parent        Control
 	pack          PackType
 	children      []Control
 	mtx           sync.RWMutex
 	onActive      func(active bool)
-	style         string
-	clipped       bool
 	clipper       *rect
+	title         string
+	style         string
 }
 
 var (
@@ -356,7 +356,7 @@ func (c *BaseControl) ResizeChildren() {
 
 		tw, th := ctrl.MinimalSize()
 		sc := ctrl.Scale()
-		d := int(ctrl.Scale() * aStep)
+		d := ctrl.Scale() * aStep
 		if c.pack == Horizontal {
 			if sc != 0 {
 				if sc == totalSc {
