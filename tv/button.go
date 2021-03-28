@@ -6,6 +6,7 @@ import (
 
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 )
 
 /*
@@ -14,7 +15,7 @@ emits OnClick event. Event has only one valid field Sender.
 Button can be clicked with mouse or using space on keyboard while the Button is active.
 */
 type Button struct {
-	BaseControl
+	widgetbase.TWidgetBase
 	shadowColor term.Attribute
 	pressed     int32
 	shadowType  ButtonShadow
@@ -30,9 +31,9 @@ title - button title.
 scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 control should keep its original size.
 */
-func CreateButton(parent Control, width, height int, title string, scale int) *Button {
+func CreateButton(parent types.IWidget, width, height int, title string, scale int) *Button {
 	b := new(Button)
-	b.BaseControl = NewBaseControl()
+	b.TBaseControl = NewBaseControl()
 
 	b.parent = parent
 	b.align = AlignCenter
@@ -65,12 +66,12 @@ func CreateButton(parent Control, width, height int, title string, scale int) *B
 
 // Repaint draws the control on its View surface
 func (b *Button) Draw() {
-	if b.hidden {
+	if b.isHidden {
 		return
 	}
 
-	b.mtx.RLock()
-	defer b.mtx.RUnlock()
+	b.block.RLock()
+	defer b.block.RUnlock()
 	PushAttributes()
 	defer PopAttributes()
 
@@ -80,7 +81,7 @@ func (b *Button) Draw() {
 	fg, bg := b.fg, b.bg
 	shadow := RealColor(b.shadowColor, b.Style(), ColorButtonShadow)
 	switch {
-	case b.disabled:
+	case b.isDisabled:
 		fg, bg = RealColor(fg, b.Style(), ColorButtonDisabledText), RealColor(bg, b.Style(), ColorButtonDisabledBack)
 	case b.Active():
 		fg, bg = RealColor(b.fgActive, b.Style(), ColorButtonActiveText), RealColor(b.bgActive, b.Style(), ColorButtonActiveBack)
@@ -193,7 +194,7 @@ func (b *Button) ShadowType() ButtonShadow {
 
 // SetShadowType changes the shadow the button drops
 func (b *Button) SetShadowType(sh ButtonShadow) {
-	b.mtx.Lock()
+	b.block.Lock()
 	b.shadowType = sh
-	b.mtx.Unlock()
+	b.block.Unlock()
 }

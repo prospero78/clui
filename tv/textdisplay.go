@@ -6,7 +6,7 @@ import (
 )
 
 type TextDisplay struct {
-	BaseControl
+	TBaseControl
 	colorized bool
 	topLine   int
 	lineCount int
@@ -19,13 +19,13 @@ type TextDisplay struct {
 // In next major library version TextReader will be removed
 type TextReader = TextDisplay
 
-func CreateTextReader(parent Control, width, height int, scale int) *TextDisplay {
+func CreateTextReader(parent types.IWidget, width, height int, scale int) *TextDisplay {
 	return CreateTextDisplay(parent, width, height, scale)
 }
 
-func CreateTextDisplay(parent Control, width, height int, scale int) *TextDisplay {
+func CreateTextDisplay(parent types.IWidget, width, height int, scale int) *TextDisplay {
 	l := new(TextDisplay)
-	l.BaseControl = NewBaseControl()
+	l.TBaseControl = NewBaseControl()
 
 	if height == AutoSize {
 		height = 10
@@ -89,7 +89,7 @@ func (l *TextDisplay) drawText() {
 
 // Draw repaints the control on its View surface
 func (l *TextDisplay) Draw() {
-	if l.hidden {
+	if l.isHidden {
 		return
 	}
 

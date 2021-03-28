@@ -6,6 +6,8 @@ import (
 
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+
+	"github.xom/prosprero78/goTV/tv/types"
 )
 
 // BarData is info about one bar in the chart. Every
@@ -58,7 +60,7 @@ If LegendWidth is greater than half of the chart it is not
 displayed. The same is applied to ValueWidth
 */
 type BarChart struct {
-	BaseControl
+	TBaseControl
 	data        []BarData
 	autosize    bool
 	gap         int32
@@ -78,9 +80,9 @@ w and h - are minimal size of the control.
 scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 control should keep its original size.
 */
-func CreateBarChart(parent Control, w, h int, scale int) *BarChart {
+func CreateBarChart(parent types.IWidget, w, h int, scale int) *BarChart {
 	c := new(BarChart)
-	c.BaseControl = NewBaseControl()
+	c.TBaseControl = NewBaseControl()
 
 	if w == AutoSize {
 		w = 10
@@ -93,7 +95,7 @@ func CreateBarChart(parent Control, w, h int, scale int) *BarChart {
 
 	c.SetSize(w, h)
 	c.SetConstraints(w, h)
-	c.tabSkip = true
+	c.isTabSkip = true
 	c.showTitles = true
 	c.barWidth = 3
 	c.data = make([]BarData, 0)
@@ -108,12 +110,12 @@ func CreateBarChart(parent Control, w, h int, scale int) *BarChart {
 
 // Draw repaints the control on its View surface
 func (b *BarChart) Draw() {
-	if b.hidden {
+	if b.isHidden {
 		return
 	}
 
-	b.mtx.RLock()
-	defer b.mtx.RUnlock()
+	b.block.RLock()
+	defer b.block.RUnlock()
 
 	PushAttributes()
 	defer PopAttributes()
@@ -400,24 +402,24 @@ func (b *BarChart) calculateMultiplier() (float64, float64) {
 
 // AddData appends a new bar to a chart
 func (b *BarChart) AddData(val BarData) {
-	b.mtx.Lock()
-	defer b.mtx.Unlock()
+	b.block.Lock()
+	defer b.block.Unlock()
 
 	b.data = append(b.data, val)
 }
 
 // ClearData removes all bar from chart
 func (b *BarChart) ClearData() {
-	b.mtx.Lock()
-	defer b.mtx.Unlock()
+	b.block.Lock()
+	defer b.block.Unlock()
 
 	b.data = make([]BarData, 0)
 }
 
 // SetData assign a new bar list to a chart
 func (b *BarChart) SetData(data []BarData) {
-	b.mtx.Lock()
-	defer b.mtx.Unlock()
+	b.block.Lock()
+	defer b.block.Unlock()
 
 	b.data = make([]BarData, len(data))
 	copy(b.data, data)
@@ -436,8 +438,8 @@ func (b *BarChart) AutoSize() bool {
 // SetAutoSize enables or disables automatic bar
 // width calculation
 func (b *BarChart) SetAutoSize(auto bool) {
-	b.mtx.Lock()
-	defer b.mtx.Unlock()
+	b.block.Lock()
+	defer b.block.Unlock()
 
 	b.autosize = auto
 }
@@ -482,8 +484,8 @@ func (b *BarChart) ShowTitles() bool {
 
 // SetShowTitles turns on and off horizontal axis and bar titles
 func (b *BarChart) SetShowTitles(show bool) {
-	b.mtx.Lock()
-	defer b.mtx.Unlock()
+	b.block.Lock()
+	defer b.block.Unlock()
 
 	b.showTitles = show
 }
@@ -507,8 +509,8 @@ func (b *BarChart) SetLegendWidth(width int32) {
 // changing colors and rune makes sense. Changing anything else
 // does not affect the chart
 func (b *BarChart) OnDrawCell(fn func(*BarDataCell)) {
-	b.mtx.Lock()
-	defer b.mtx.Unlock()
+	b.block.Lock()
+	defer b.block.Unlock()
 
 	b.onDrawCell = fn
 }
@@ -521,8 +523,8 @@ func (b *BarChart) ShowMarks() bool {
 
 // SetShowMarks turns on and off marks under horizontal axis
 func (b *BarChart) SetShowMarks(show bool) {
-	b.mtx.Lock()
-	defer b.mtx.Unlock()
+	b.block.Lock()
+	defer b.block.Unlock()
 
 	b.showMarks = show
 }

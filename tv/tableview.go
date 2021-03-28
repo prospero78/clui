@@ -47,7 +47,7 @@ Events:
         number of visible columns, number of visible rows.
 */
 type TableView struct {
-	BaseControl
+	TBaseControl
 	// own TableView members
 	topRow        int
 	topCol        int
@@ -132,9 +132,9 @@ width and height - are minimal size of the control.
 scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 control should keep its original size.
 */
-func CreateTableView(parent Control, width, height int, scale int) *TableView {
+func CreateTableView(parent types.IWidget, width, height int, scale int) *TableView {
 	l := new(TableView)
-	l.BaseControl = NewBaseControl()
+	l.TBaseControl = NewBaseControl()
 
 	if height == AutoSize {
 		height = 3
@@ -357,12 +357,12 @@ func (l *TableView) drawCells() {
 
 // Draw repaints the control on its View surface
 func (l *TableView) Draw() {
-	if l.hidden {
+	if l.isHidden {
 		return
 	}
 
-	l.mtx.RLock()
-	defer l.mtx.RUnlock()
+	l.block.RLock()
+	defer l.block.RUnlock()
 	PushAttributes()
 	defer PopAttributes()
 
@@ -953,9 +953,9 @@ func (l *TableView) OnKeyPress(fn func(term.Key) bool) {
 // OnDrawCell is called every time the table is going to display
 // a cell
 func (l *TableView) OnDrawCell(fn func(*ColumnDrawInfo)) {
-	l.mtx.Lock()
+	l.block.Lock()
 	l.onDrawCell = fn
-	l.mtx.Unlock()
+	l.block.Unlock()
 }
 
 // OnAction is called when the table wants a user application to
@@ -1023,9 +1023,9 @@ func (l *TableView) SetSelectedCol(col int) {
 // Callback receives 4 arguments: first visible column, first visible row,
 // the number of visible columns, the number of visible rows
 func (l *TableView) OnBeforeDraw(fn func(int, int, int, int)) {
-	l.mtx.Lock()
+	l.block.Lock()
 	l.onBeforeDraw = fn
-	l.mtx.Unlock()
+	l.block.Unlock()
 }
 
 // VisibleArea returns which rows and columns are currently visible. It can be

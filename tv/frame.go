@@ -4,6 +4,8 @@ import (
 	"math"
 
 	xs "github.com/huandu/xstrings"
+	"github.com/prospero78/goTV/tv/types"
+	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 )
 
 /*
@@ -13,9 +15,9 @@ All area inside a frame is transparent. Frame can be used as spacer element
 is required
 */
 type Frame struct {
-	BaseControl
+	widgetbase.TWidgetBase
 	border         BorderStyle
-	children       []Control
+	children       []types.IWidget
 	pack           PackType
 	scrollable     bool
 	lastScrollProp int
@@ -30,9 +32,9 @@ bs - type of border: no border, single or double.
 scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 control should keep its original size.
 */
-func CreateFrame(parent Control, width, height int, bs BorderStyle, scale int) *Frame {
+func CreateFrame(parent types.IWidget, width, height int, bs BorderStyle, scale int) *Frame {
 	f := new(Frame)
-	f.BaseControl = NewBaseControl()
+	f.TBaseControl = NewBaseControl()
 
 	if width == AutoSize {
 		width = 5
@@ -92,7 +94,7 @@ func (f *Frame) Scrollable() bool {
 
 // Repaint draws the control on its View surface
 func (f *Frame) Draw() {
-	if f.hidden {
+	if f.isHidden {
 		return
 	}
 

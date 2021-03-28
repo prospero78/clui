@@ -6,6 +6,7 @@ import (
 	"github.com/atotto/clipboard"
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 	"github.com/sirupsen/logrus"
 )
 
@@ -19,7 +20,7 @@ maximun then the text is automatically truncated.
 EditField calls onChage in case of its text is changed. Event field Msg contains the new text
 */
 type EditField struct {
-	BaseControl
+	widgetbase.TWidgetBase
 	// cursor position in edit text
 	cursorPos int
 	// the number of the first displayed text character - it is used in case of text is longer than edit width
@@ -39,9 +40,9 @@ type EditField struct {
 // text - text to edit.
 // scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 //  control should keep its original size.
-func CreateEditField(parent Control, width int, text string, scale int) *EditField {
+func CreateEditField(parent types.IWidget, width int, text string, scale int) *EditField {
 	e := new(EditField)
-	e.BaseControl = NewBaseControl()
+	e.TBaseControl = NewBaseControl()
 	e.onChange = nil
 	e.SetTitle(text)
 	e.SetEnabled(true)

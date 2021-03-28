@@ -17,7 +17,7 @@ Y - selected item number in list(-1 if nothing is selected),
 Msg - text of the selected item.
 */
 type ListBox struct {
-	BaseControl
+	TBaseControl
 	// own listbox members
 	items         []string
 	currSelection int
@@ -36,9 +36,9 @@ width and height - are minimal size of the control.
 scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 control should keep its original size.
 */
-func CreateListBox(parent Control, width, height int, scale int) *ListBox {
+func CreateListBox(parent types.IWidget, width, height int, scale int) *ListBox {
 	l := new(ListBox)
-	l.BaseControl = NewBaseControl()
+	l.TBaseControl = NewBaseControl()
 
 	if height == AutoSize {
 		height = 3
@@ -112,7 +112,7 @@ func (l *ListBox) drawItems() {
 
 // Draw repaints the control on its View surface
 func (l *ListBox) Draw() {
-	if l.hidden {
+	if l.isHidden {
 		return
 	}
 

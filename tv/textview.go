@@ -21,7 +21,7 @@ and horizontal. The latter one is available only if WordWrap
 mode is off).
 */
 type TextView struct {
-	BaseControl
+	TBaseControl
 	// own listbox members
 	lines   []string
 	lengths []int
@@ -45,9 +45,9 @@ width and height - are minimal size of the control.
 scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 control should keep its original size.
 */
-func CreateTextView(parent Control, width, height int, scale int) *TextView {
+func CreateTextView(parent types.IWidget, width, height int, scale int) *TextView {
 	l := new(TextView)
-	l.BaseControl = NewBaseControl()
+	l.TBaseControl = NewBaseControl()
 
 	if height == AutoSize {
 		height = 3
@@ -170,7 +170,7 @@ func (l *TextView) drawText() {
 
 // Repaint draws the control on its View surface
 func (l *TextView) Draw() {
-	if l.hidden {
+	if l.isHidden {
 		return
 	}
 

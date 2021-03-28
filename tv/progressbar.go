@@ -16,7 +16,7 @@ one set: foreground and background colors): for filled part and for
 empty one. By default colors are the same.
 */
 type ProgressBar struct {
-	BaseControl
+	TBaseControl
 	direction        Direction
 	min, max         int
 	value            int
@@ -31,9 +31,9 @@ width and heigth - are minimal size of the control.
 scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 control should keep its original size.
 */
-func CreateProgressBar(parent Control, width, height int, scale int) *ProgressBar {
+func CreateProgressBar(parent types.IWidget, width, height int, scale int) *ProgressBar {
 	b := new(ProgressBar)
-	b.BaseControl = NewBaseControl()
+	b.TBaseControl = NewBaseControl()
 
 	if height == AutoSize {
 		height = 1
@@ -73,12 +73,12 @@ func CreateProgressBar(parent Control, width, height int, scale int) *ProgressBa
 //      pb.SetTitle("{{value}} of {{max}}")
 //      pb.SetTitle("{{percent}}%")
 func (b *ProgressBar) Draw() {
-	if b.hidden {
+	if b.isHidden {
 		return
 	}
 
-	b.mtx.RLock()
-	defer b.mtx.RUnlock()
+	b.block.RLock()
+	defer b.block.RUnlock()
 	if b.max <= b.min {
 		return
 	}
@@ -171,8 +171,8 @@ func (b *ProgressBar) Draw() {
 // SetValue sets new progress value. If value exceeds ProgressBar
 // limits then the limit value is used
 func (b *ProgressBar) SetValue(pos int) {
-	b.mtx.Lock()
-	defer b.mtx.Unlock()
+	b.block.Lock()
+	defer b.block.Unlock()
 	switch {
 	case pos < b.min:
 		b.value = b.min
@@ -185,8 +185,8 @@ func (b *ProgressBar) SetValue(pos int) {
 
 // Value returns the current ProgressBar value
 func (b *ProgressBar) Value() int {
-	b.mtx.RLock()
-	defer b.mtx.RUnlock()
+	b.block.RLock()
+	defer b.block.RUnlock()
 	return b.value
 }
 
@@ -212,8 +212,8 @@ func (b *ProgressBar) SetLimits(min, max int) {
 // Step increases ProgressBar value by 1 if the value is less
 // than ProgressBar high limit
 func (b *ProgressBar) Step() int {
-	b.mtx.Lock()
-	defer b.mtx.Unlock()
+	b.block.Lock()
+	defer b.block.Unlock()
 	b.value++
 
 	if b.value > b.max {

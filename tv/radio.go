@@ -10,7 +10,7 @@ Radio button control. Unite a few radios in one radio group to
 make a user select one of available choices.
 */
 type Radio struct {
-	BaseControl
+	TBaseControl
 	group    *RadioGroup
 	selected bool
 
@@ -26,9 +26,9 @@ title - radio title.
 scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 control should keep its original size.
 */
-func CreateRadio(parent Control, width int, title string, scale int) *Radio {
+func CreateRadio(parent types.IWidget, width int, title string, scale int) *Radio {
 	c := new(Radio)
-	c.BaseControl = NewBaseControl()
+	c.TBaseControl = NewBaseControl()
 
 	if width == AutoSize {
 		width = xs.Len(title) + 4
@@ -53,7 +53,7 @@ func CreateRadio(parent Control, width int, title string, scale int) *Radio {
 
 // Draw repaints the control on its View surface
 func (c *Radio) Draw() {
-	if c.hidden {
+	if c.isHidden {
 		return
 	}
 
@@ -143,8 +143,8 @@ func (c *Radio) SetGroup(group *RadioGroup) {
 // OnChange sets the callback that is called whenever the state
 // of the Radio is changed. Argument of callback is the current
 func (c *Radio) OnChange(fn func(bool)) {
-	c.mtx.Lock()
-	defer c.mtx.Unlock()
+	c.block.Lock()
+	defer c.block.Unlock()
 
 	c.onChange = fn
 }

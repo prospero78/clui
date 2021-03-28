@@ -2,6 +2,8 @@ package tv
 
 import (
 	term "github.com/nsf/termbox-go"
+	"github.com/prospero78/goTV/tv/types"
+	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 )
 
 const (
@@ -87,7 +89,7 @@ type Event struct {
 	// For resize event - new terminal size
 	Width  int
 	Height int
-	Target Control
+	Target types.IWidget
 }
 
 // BorderStyle constants

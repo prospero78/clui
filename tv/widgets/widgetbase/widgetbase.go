@@ -1,63 +1,86 @@
-package tv
+// Package wigdetbase -- базовый виджет длявсех виджетов
+package widgetbase
 
 import (
 	"sync"
-	"sync/atomic"
 
 	mTerm "github.com/nsf/termbox-go"
+	"github.com/prospero78/goTV/tv/types"
+	"github.com/prospero78/goTV/tv/widgets/widgetbase/widgetid"
 )
 
-
-var (
-	globalRefId int64
-)
-
-// возвращает следующий ID виджета
-func nextRefId() int64 {
-	return atomic.AddInt64(&globalRefId, 1)
+// TWidgetBase -- основа для всех виджетов.
+// Каждый новый виджет должен включать его или реализовывать
+// его методы
+type TWidgetBase struct {
+	widgetID      types.AWidgetID
+	x, y          int
+	width, height int // Высота и ширина виджета
+	minW, minH    int // Минимальные размеры виджеты
+	scale         int
+	padX, padY    int
+	gapX, gapY    int
+	isTabSkip     bool // Пропускать при нажатии клавиши TAB
+	isDisabled    bool // Признак отключенности окна
+	isHidden      bool // Признак скрытости элемента
+	isInactive    bool
+	isModal       bool // Признак модальности окна
+	isClipped     bool // Признак обрезки виджета
+	fg, bg        mTerm.Attribute
+	fgActive      mTerm.Attribute
+	bgActive      mTerm.Attribute
+	align         Align
+	parent        types.IWidget
+	pack          PackType
+	children      []types.IWidget
+	block         sync.RWMutex
+	onActive      func(active bool)
+	clipper       *rect
+	title         string // Заголовок окна
+	style         string // Стиль окна
 }
 
 // NewBasedControl -- возвращает новый TBaseControl
-func NewBaseControl() TBaseControl {
-	return TBaseControl{
-		refID: nextRefId(),
+func NewBaseControl() TWidgetBase {
+	return TWidgetBase{
+		widgetID: widgetid.GetWidgetID().NextID(),
 	}
 }
 
 // SetClipped -- устанавливает признак обрезки виджета
-func (sf *TBaseControl) SetClipped(isClipped bool) {
+func (sf *TWidgetBase) SetClipped(isClipped bool) {
 	sf.isClipped = isClipped
 }
 
-func (c *TBaseControl) Clipped() bool {
+func (c *TWidgetBase) Clipped() bool {
 	return c.isClipped
 }
 
-func (c *TBaseControl) SetStyle(style string) {
+func (c *TWidgetBase) SetStyle(style string) {
 	c.style = style
 }
 
-func (c *TBaseControl) Style() string {
+func (c *TWidgetBase) Style() string {
 	return c.style
 }
 
-func (c *TBaseControl) RefID() int64 {
-	return c.refID
+func (c *TWidgetBase) RefID() types.AWidgetID {
+	return c.widgetID
 }
 
-func (c *TBaseControl) Title() string {
+func (c *TWidgetBase) Title() string {
 	return c.title
 }
 
-func (c *TBaseControl) SetTitle(title string) {
+func (c *TWidgetBase) SetTitle(title string) {
 	c.title = title
 }
 
-func (c *TBaseControl) Size() (widht int, height int) {
+func (c *TWidgetBase) Size() (widht int, height int) {
 	return c.width, c.height
 }
 
-func (c *TBaseControl) SetSize(width, height int) {
+func (c *TWidgetBase) SetSize(width, height int) {
 	if width < c.minW {
 		width = c.minW
 	}
@@ -71,11 +94,11 @@ func (c *TBaseControl) SetSize(width, height int) {
 	}
 }
 
-func (c *TBaseControl) Pos() (x int, y int) {
+func (c *TWidgetBase) Pos() (x int, y int) {
 	return c.x, c.y
 }
 
-func (c *TBaseControl) SetPos(x, y int) {
+func (c *TWidgetBase) SetPos(x, y int) {
 	if c.isClipped && c.clipper != nil {
 		cx, cy, _, _ := c.Clipper()
 		px, py := c.Paddings()
@@ -94,7 +117,7 @@ func (c *TBaseControl) SetPos(x, y int) {
 	}
 }
 
-func (c *TBaseControl) applyConstraints() {
+func (c *TWidgetBase) applyConstraints() {
 	ww, hh := c.width, c.height
 	if ww < c.minW {
 		ww = c.minW
@@ -107,21 +130,21 @@ func (c *TBaseControl) applyConstraints() {
 	}
 }
 
-func (c *TBaseControl) Constraints() (minw int, minh int) {
+func (c *TWidgetBase) Constraints() (minw int, minh int) {
 	return c.minW, c.minH
 }
 
-func (c *TBaseControl) SetConstraints(minw, minh int) {
+func (c *TWidgetBase) SetConstraints(minw, minh int) {
 	c.minW = minw
 	c.minH = minh
 	c.applyConstraints()
 }
 
-func (c *TBaseControl) Active() bool {
+func (c *TWidgetBase) Active() bool {
 	return !c.isInactive
 }
 
-func (c *TBaseControl) SetActive(active bool) {
+func (c *TWidgetBase) SetActive(active bool) {
 	c.isInactive = !active
 
 	if c.onActive != nil {
@@ -129,40 +152,40 @@ func (c *TBaseControl) SetActive(active bool) {
 	}
 }
 
-func (c *TBaseControl) OnActive(fn func(active bool)) {
+func (c *TWidgetBase) OnActive(fn func(active bool)) {
 	c.onActive = fn
 }
 
-func (c *TBaseControl) TabStop() bool {
+func (c *TWidgetBase) TabStop() bool {
 	return !c.isTabSkip
 }
 
-func (c *TBaseControl) SetTabStop(tabstop bool) {
+func (c *TWidgetBase) SetTabStop(tabstop bool) {
 	c.isTabSkip = !tabstop
 }
 
-func (c *TBaseControl) Enabled() bool {
+func (c *TWidgetBase) Enabled() bool {
 	c.block.RLock()
 	defer c.block.RUnlock()
 
 	return !c.isDisabled
 }
 
-func (c *TBaseControl) SetEnabled(enabled bool) {
+func (c *TWidgetBase) SetEnabled(enabled bool) {
 	c.block.Lock()
 	defer c.block.Unlock()
 
 	c.isDisabled = !enabled
 }
 
-func (c *TBaseControl) Visible() bool {
+func (c *TWidgetBase) Visible() bool {
 	c.block.RLock()
 	defer c.block.RUnlock()
 
 	return !c.isHidden
 }
 
-func (c *TBaseControl) SetVisible(visible bool) {
+func (c *TWidgetBase) SetVisible(visible bool) {
 	c.block.Lock()
 	defer c.block.Unlock()
 
@@ -188,29 +211,29 @@ func (c *TBaseControl) SetVisible(visible bool) {
 	}()
 }
 
-func (c *TBaseControl) Parent() types.IWidget {
+func (c *TWidgetBase) Parent() types.IWidget {
 	return c.parent
 }
 
-func (c *TBaseControl) SetParent(parent types.IWidget) {
+func (c *TWidgetBase) SetParent(parent types.IWidget) {
 	if c.parent == nil {
 		c.parent = parent
 	}
 }
 
-func (c *TBaseControl) Modal() bool {
+func (c *TWidgetBase) Modal() bool {
 	return c.isModal
 }
 
-func (c *TBaseControl) SetModal(modal bool) {
+func (c *TWidgetBase) SetModal(modal bool) {
 	c.isModal = modal
 }
 
-func (c *TBaseControl) Paddings() (px int, py int) {
+func (c *TWidgetBase) Paddings() (px int, py int) {
 	return c.padX, c.padY
 }
 
-func (c *TBaseControl) SetPaddings(px, py int) {
+func (c *TWidgetBase) SetPaddings(px, py int) {
 	if px >= 0 {
 		c.padX = px
 	}
@@ -219,11 +242,11 @@ func (c *TBaseControl) SetPaddings(px, py int) {
 	}
 }
 
-func (c *TBaseControl) Gaps() (dx int, dy int) {
+func (c *TWidgetBase) Gaps() (dx int, dy int) {
 	return c.gapX, c.gapY
 }
 
-func (c *TBaseControl) SetGaps(dx, dy int) {
+func (c *TWidgetBase) SetGaps(dx, dy int) {
 	if dx >= 0 {
 		c.gapX = dx
 	}
@@ -232,49 +255,49 @@ func (c *TBaseControl) SetGaps(dx, dy int) {
 	}
 }
 
-func (c *TBaseControl) Pack() PackType {
+func (c *TWidgetBase) Pack() PackType {
 	return c.pack
 }
 
-func (c *TBaseControl) SetPack(pack PackType) {
+func (c *TWidgetBase) SetPack(pack PackType) {
 	c.pack = pack
 }
 
-func (c *TBaseControl) Scale() int {
+func (c *TWidgetBase) Scale() int {
 	return c.scale
 }
 
-func (c *TBaseControl) SetScale(scale int) {
+func (c *TWidgetBase) SetScale(scale int) {
 	if scale >= 0 {
 		c.scale = scale
 	}
 }
 
-func (c *TBaseControl) Align() Align {
+func (c *TWidgetBase) Align() Align {
 	return c.align
 }
 
-func (c *TBaseControl) SetAlign(align Align) {
+func (c *TWidgetBase) SetAlign(align Align) {
 	c.align = align
 }
 
-func (c *TBaseControl) TextColor() mTerm.Attribute {
+func (c *TWidgetBase) TextColor() mTerm.Attribute {
 	return c.fg
 }
 
-func (c *TBaseControl) SetTextColor(clr mTerm.Attribute) {
+func (c *TWidgetBase) SetTextColor(clr mTerm.Attribute) {
 	c.fg = clr
 }
 
-func (c *TBaseControl) BackColor() mTerm.Attribute {
+func (c *TWidgetBase) BackColor() mTerm.Attribute {
 	return c.bg
 }
 
-func (c *TBaseControl) SetBackColor(clr mTerm.Attribute) {
+func (c *TWidgetBase) SetBackColor(clr mTerm.Attribute) {
 	c.bg = clr
 }
 
-func (c *TBaseControl) childCount() int {
+func (c *TWidgetBase) childCount() int {
 	cnt := 0
 	for _, child := range c.children {
 		if child.Visible() {
@@ -285,7 +308,7 @@ func (c *TBaseControl) childCount() int {
 	return cnt
 }
 
-func (c *TBaseControl) ResizeChildren() {
+func (c *TWidgetBase) ResizeChildren() {
 	children := c.childCount()
 	if children == 0 {
 		return
@@ -361,7 +384,7 @@ func (c *TBaseControl) ResizeChildren() {
 	}
 }
 
-func (c *TBaseControl) AddChild(control types.IWidget) {
+func (c *TWidgetBase) AddChild(control types.IWidget) {
 	if c.children == nil {
 		c.children = make([]types.IWidget, 1)
 		c.children[0] = control
@@ -405,13 +428,13 @@ func (c *TBaseControl) AddChild(control types.IWidget) {
 	}
 }
 
-func (c *TBaseControl) Children() []types.IWidget {
+func (c *TWidgetBase) Children() []types.IWidget {
 	child := make([]types.IWidget, len(c.children))
 	copy(child, c.children)
 	return child
 }
 
-func (c *TBaseControl) ChildExists(control types.IWidget) bool {
+func (c *TWidgetBase) ChildExists(control types.IWidget) bool {
 	if len(c.children) == 0 {
 		return false
 	}
@@ -425,7 +448,7 @@ func (c *TBaseControl) ChildExists(control types.IWidget) bool {
 	return false
 }
 
-func (c *TBaseControl) ChildrenScale() int {
+func (c *TWidgetBase) ChildrenScale() int {
 	if c.childCount() == 0 {
 		return c.scale
 	}
@@ -440,7 +463,7 @@ func (c *TBaseControl) ChildrenScale() int {
 	return total
 }
 
-func (c *TBaseControl) MinimalSize() (w int, h int) {
+func (c *TWidgetBase) MinimalSize() (w int, h int) {
 	children := c.childCount()
 	if children == 0 {
 		return c.minW, c.minH
@@ -487,11 +510,11 @@ func (c *TBaseControl) MinimalSize() (w int, h int) {
 	return totalX, totalY
 }
 
-func (c *TBaseControl) Draw() {
+func (c *TWidgetBase) Draw() {
 	panic("BaseControl Draw Called")
 }
 
-func (c *TBaseControl) DrawChildren() {
+func (c *TWidgetBase) DrawChildren() {
 	if c.isHidden {
 		return
 	}
@@ -515,7 +538,7 @@ func (c *TBaseControl) DrawChildren() {
 	}
 }
 
-func (c *TBaseControl) Clipper() (int, int, int, int) {
+func (c *TWidgetBase) Clipper() (int, int, int, int) {
 	clipped := ClippedParent(c)
 
 	if clipped == nil || (c.isClipped && c.clipper != nil) {
@@ -525,12 +548,12 @@ func (c *TBaseControl) Clipper() (int, int, int, int) {
 	return CalcClipper(c)
 }
 
-func (c *TBaseControl) setClipper() {
+func (c *TWidgetBase) setClipper() {
 	x, y, w, h := CalcClipper(c)
 	c.clipper = &rect{x: x, y: y, w: w, h: h}
 }
 
-func (c *TBaseControl) HitTest(x, y int) HitResult {
+func (c *TWidgetBase) HitTest(x, y int) HitResult {
 	if x > c.x && x < c.x+c.width-1 &&
 		y > c.y && y < c.y+c.height-1 {
 		return HitInside
@@ -549,11 +572,11 @@ func (c *TBaseControl) HitTest(x, y int) HitResult {
 	return HitOutside
 }
 
-func (c *TBaseControl) ProcessEvent(ev Event) bool {
+func (c *TWidgetBase) ProcessEvent(ev Event) bool {
 	return SendEventToChild(c, ev)
 }
 
-func (c *TBaseControl) PlaceChildren() {
+func (c *TWidgetBase) PlaceChildren() {
 	children := c.childCount()
 	if c.children == nil || children == 0 {
 		return
@@ -579,21 +602,21 @@ func (c *TBaseControl) PlaceChildren() {
 
 // ActiveColors return the attributes for the controls when it
 // is active: text and background colors
-func (c *TBaseControl) ActiveColors() (mTerm.Attribute, mTerm.Attribute) {
+func (c *TWidgetBase) ActiveColors() (mTerm.Attribute, mTerm.Attribute) {
 	return c.fgActive, c.bgActive
 }
 
 // SetActiveTextColor changes text color of the active control
-func (c *TBaseControl) SetActiveTextColor(clr mTerm.Attribute) {
+func (c *TWidgetBase) SetActiveTextColor(clr mTerm.Attribute) {
 	c.fgActive = clr
 }
 
 // SetActiveBackColor changes background color of the active control
-func (c *TBaseControl) SetActiveBackColor(clr mTerm.Attribute) {
+func (c *TWidgetBase) SetActiveBackColor(clr mTerm.Attribute) {
 	c.bgActive = clr
 }
 
-func (c *TBaseControl) removeChild(control types.IWidget) {
+func (c *TWidgetBase) removeChild(control types.IWidget) {
 	children := []types.IWidget{}
 
 	for _, child := range c.children {
@@ -611,7 +634,7 @@ func (c *TBaseControl) removeChild(control types.IWidget) {
 }
 
 // Destroy removes an object from its parental chain
-func (c *TBaseControl) Destroy() {
+func (c *TWidgetBase) Destroy() {
 	c.parent.removeChild(c)
 	c.parent.SetConstraints(0, 0)
 }

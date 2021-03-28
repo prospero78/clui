@@ -1,41 +1,41 @@
 package main
 
 import (
-	ui "github.com/prospero78/goTV/tv"
+	"github.com/prospero78/goTV/tv"
 )
 
 func createView() {
-	view := ui.AddWindow(0, 0, 30, 7, "Login dialog")
-	view.SetPack(ui.Vertical)
+	view := tv.AddWindow(0, 0, 30, 7, "Login dialog")
+	view.SetPack(tv.Vertical)
 	view.SetGaps(0, 1)
 	view.SetPaddings(2, 2)
 
-	frmOpts := ui.CreateFrame(view, 1, 1, ui.BorderNone, ui.Fixed)
-	frmOpts.SetPack(ui.Horizontal)
-	cbCheck := ui.CreateCheckBox(frmOpts, ui.AutoSize, "Use callback to test data", ui.Fixed)
+	frmOpts := tv.CreateFrame(view, 1, 1, tv.BorderNone, tv.Fixed)
+	frmOpts.SetPack(tv.Horizontal)
+	cbCheck := tv.CreateCheckBox(frmOpts, tv.AutoSize, "Use callback to test data", tv.Fixed)
 
-	ui.CreateLabel(view, ui.AutoSize, ui.AutoSize, "Correct credentials", ui.Fixed)
+	tv.CreateLabel(view, tv.AutoSize, tv.AutoSize, "Correct credentials", tv.Fixed)
 
-	frmCreds := ui.CreateFrame(view, 1, 1, ui.BorderNone, ui.Fixed)
-	frmCreds.SetPack(ui.Horizontal)
+	frmCreds := tv.CreateFrame(view, 1, 1, tv.BorderNone, tv.Fixed)
+	frmCreds.SetPack(tv.Horizontal)
 	frmCreds.SetGaps(1, 0)
-	ui.CreateLabel(frmCreds, ui.AutoSize, ui.AutoSize, "Username", ui.Fixed)
-	edUser := ui.CreateEditField(frmCreds, 8, "", 1)
-	ui.CreateLabel(frmCreds, ui.AutoSize, ui.AutoSize, "Password", ui.Fixed)
-	edPass := ui.CreateEditField(frmCreds, 8, "", 1)
+	tv.CreateLabel(frmCreds, tv.AutoSize, tv.AutoSize, "Username", tv.Fixed)
+	edUser := tv.CreateEditField(frmCreds, 8, "", 1)
+	tv.CreateLabel(frmCreds, tv.AutoSize, tv.AutoSize, "Password", tv.Fixed)
+	edPass := tv.CreateEditField(frmCreds, 8, "", 1)
 
-	lbRes := ui.CreateLabel(view, ui.AutoSize, ui.AutoSize, "Result:", ui.Fixed)
+	lbRes := tv.CreateLabel(view, tv.AutoSize, tv.AutoSize, "Result:", tv.Fixed)
 
-	frmBtns := ui.CreateFrame(view, 1, 1, ui.BorderNone, ui.Fixed)
-	frmBtns.SetPack(ui.Horizontal)
-	btnDlg := ui.CreateButton(frmBtns, ui.AutoSize, 4, "Login", ui.Fixed)
-	btnQuit := ui.CreateButton(frmBtns, ui.AutoSize, 4, "Quit", ui.Fixed)
-	ui.CreateFrame(frmBtns, 1, 1, ui.BorderNone, 1)
+	frmBtns := tv.CreateFrame(view, 1, 1, tv.BorderNone, tv.Fixed)
+	frmBtns.SetPack(tv.Horizontal)
+	btnDlg := tv.CreateButton(frmBtns, tv.AutoSize, 4, "Login", tv.Fixed)
+	btnQuit := tv.CreateButton(frmBtns, tv.AutoSize, 4, "Quit", tv.Fixed)
+	tv.CreateFrame(frmBtns, 1, 1, tv.BorderNone, 1)
 
-	ui.ActivateControl(view, edUser)
+	tv.ActivateControl(view, edUser)
 
-	btnDlg.OnClick(func(ev ui.Event) {
-		dlg := ui.CreateLoginDialog(
+	btnDlg.OnClick(func(ev tv.Event) {
+		dlg := tv.CreateLoginDialog(
 			"Enter credentials",
 			edUser.Title(),
 		)
@@ -49,17 +49,17 @@ func createView() {
 		}
 
 		dlg.OnClose(func() {
-			if dlg.Action == ui.LoginCanceled {
+			if dlg.Action == tv.LoginCanceled {
 				lbRes.SetTitle("Result:\nDialog canceled")
 				return
 			}
 
-			if dlg.Action == ui.LoginInvalid {
+			if dlg.Action == tv.LoginInvalid {
 				lbRes.SetTitle("Result:\nInvalid username or password")
 				return
 			}
 
-			if dlg.Action == ui.LoginOk {
+			if dlg.Action == tv.LoginOk {
 				if cbCheck.State() == 1 {
 					lbRes.SetTitle("Result:\nLogged in successfully")
 				} else {
@@ -70,21 +70,21 @@ func createView() {
 		})
 	})
 
-	btnQuit.OnClick(func(ev ui.Event) {
-		go ui.Stop()
+	btnQuit.OnClick(func(ev tv.Event) {
+		go tv.Stop()
 	})
 }
 
 func mainLoop() {
 	// Every application must create a single Composer and
 	// call its intialize method
-	ui.InitLibrary()
-	defer ui.DeinitLibrary()
+	tv.InitLibrary()
+	defer tv.DeinitLibrary()
 
 	createView()
 
 	// start event processing loop - the main core of the library
-	ui.MainLoop()
+	tv.MainLoop()
 }
 
 func main() {

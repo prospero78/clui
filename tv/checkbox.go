@@ -3,6 +3,8 @@ package tv
 import (
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+	"github.com/prospero78/goTV/tv/types"
+	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 )
 
 /*
@@ -10,7 +12,7 @@ CheckBox control. It can be two-state one(on and off) - it is default mode - or 
 State values are 0=off, 1=on, 2=third state
 */
 type CheckBox struct {
-	BaseControl
+	widgetbase.TWidgetBase
 	state       int
 	allow3state bool
 
@@ -26,9 +28,9 @@ scale - the way of scaling the control when the parent is resized. Use DoNotScal
 control should keep its original size.
 CheckBox state can be changed using mouse or pressing space on keyboard while the control is active
 */
-func CreateCheckBox(parent Control, width int, title string, scale int) *CheckBox {
+func CreateCheckBox(parent types.IWidget, width int, title string, scale int) *CheckBox {
 	c := new(CheckBox)
-	c.BaseControl = NewBaseControl()
+	c.TBaseControl = NewBaseControl()
 	c.parent = parent
 
 	if width == AutoSize {
@@ -53,12 +55,12 @@ func CreateCheckBox(parent Control, width int, title string, scale int) *CheckBo
 
 // Repaint draws the control on its View surface
 func (c *CheckBox) Draw() {
-	if c.hidden {
+	if c.isHidden {
 		return
 	}
 
-	c.mtx.RLock()
-	defer c.mtx.RUnlock()
+	c.block.RLock()
+	defer c.block.RUnlock()
 
 	PushAttributes()
 	defer PopAttributes()
@@ -129,8 +131,8 @@ func (c *CheckBox) ProcessEvent(event Event) bool {
 // Value must be 0 or 1 if Allow3State is off,
 // and 0, 1, or 2 if Allow3State is on
 func (c *CheckBox) SetState(val int) {
-	c.mtx.Lock()
-	defer c.mtx.Unlock()
+	c.block.Lock()
+	defer c.block.Unlock()
 
 	if val == c.state {
 		return
@@ -155,8 +157,8 @@ func (c *CheckBox) SetState(val int) {
 
 // State returns current state of CheckBox
 func (c *CheckBox) State() int {
-	c.mtx.RLock()
-	defer c.mtx.RUnlock()
+	c.block.RLock()
+	defer c.block.RUnlock()
 
 	return c.state
 }
@@ -200,8 +202,8 @@ func (c *CheckBox) SetSize(width, height int) {
 // of the CheckBox is changed. Argument of callback is the current
 // CheckBox state: 0 - off, 1 - on, 2 - third state
 func (c *CheckBox) OnChange(fn func(int)) {
-	c.mtx.Lock()
-	defer c.mtx.Unlock()
+	c.block.Lock()
+	defer c.block.Unlock()
 
 	c.onChange = fn
 }

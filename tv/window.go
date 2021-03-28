@@ -7,7 +7,7 @@ import (
 
 // Window is an implementation of View managed by Composer.
 type Window struct {
-	BaseControl
+	TBaseControl
 
 	buttons   ViewButton
 	maximized bool
@@ -34,7 +34,7 @@ type keyDownCb struct {
 
 func CreateWindow(x, y, w, h int, title string) *Window {
 	wnd := new(Window)
-	wnd.BaseControl = NewBaseControl()
+	wnd.TBaseControl = NewBaseControl()
 
 	if w == AutoSize || w < 1 || w > 1000 {
 		w = 10
@@ -48,7 +48,7 @@ func CreateWindow(x, y, w, h int, title string) *Window {
 	wnd.SetPos(x, y)
 	wnd.SetTitle(title)
 	wnd.buttons = ButtonClose | ButtonBottom | ButtonMaximize
-	wnd.children = make([]Control, 0)
+	wnd.children = make([]types.IWidget, 0)
 	wnd.SetPaddings(1, 1)
 	wnd.SetGaps(1, 0)
 	wnd.SetScale(1)
@@ -78,7 +78,7 @@ func (wnd *Window) drawFrame() {
 	var bs BorderStyle
 	switch {
 	case wnd.border == BorderAuto:
-		if wnd.inactive {
+		if wnd.isInactive {
 			bs = BorderThin
 		} else {
 			bs = BorderThick
@@ -276,7 +276,7 @@ func (c *Window) ProcessEvent(ev Event) bool {
 			aC := ActiveControl(c)
 			nC := NextControl(c, aC, ev.Key != term.KeyArrowUp)
 
-			var clipped Control
+			var clipped types.IWidget
 
 			if aC != nil && aC.Clipped() {
 				clipped = aC

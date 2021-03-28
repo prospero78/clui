@@ -1,108 +1,108 @@
 package main
 
 import (
-	ui "github.com/prospero78/goTV/tv"
+	"github.com/prospero78/goTV/tv"
 )
 
-func customColored(d *ui.BarDataCell) {
+func customColored(d *tv.BarDataCell) {
 	part := d.TotalMax / 3
 	if d.ID%2 == 0 {
 		switch {
 		case d.Value <= part:
-			d.Fg = ui.ColorGreen
+			d.Fg = tv.ColorGreen
 		case d.Value > 2*part:
-			d.Fg = ui.ColorRed
+			d.Fg = tv.ColorRed
 		default:
-			d.Fg = ui.ColorBlue
+			d.Fg = tv.ColorBlue
 		}
 	} else {
 		d.Ch = '#'
 		switch {
 		case d.Value <= part:
-			d.Fg = ui.ColorGreenBold
+			d.Fg = tv.ColorGreenBold
 		case d.Value > 2*part:
-			d.Fg = ui.ColorRedBold
+			d.Fg = tv.ColorRedBold
 		default:
-			d.Fg = ui.ColorBlueBold
+			d.Fg = tv.ColorBlueBold
 		}
 	}
 }
 
-func createView() *ui.BarChart {
+func createView() *tv.BarChart {
 
-	view := ui.AddWindow(0, 0, 10, 7, "BarChart Demo")
-	bch := ui.CreateBarChart(view, 40, 12, 1)
+	view := tv.AddWindow(0, 0, 10, 7, "BarChart Demo")
+	bch := tv.CreateBarChart(view, 40, 12, 1)
 
-	frmChk := ui.CreateFrame(view, 8, 5, ui.BorderNone, ui.Fixed)
-	frmChk.SetPack(ui.Vertical)
-	chkTitles := ui.CreateCheckBox(frmChk, ui.AutoSize, "Show Titles", ui.Fixed)
-	chkMarks := ui.CreateCheckBox(frmChk, ui.AutoSize, "Show Marks", ui.Fixed)
+	frmChk := tv.CreateFrame(view, 8, 5, tv.BorderNone, tv.Fixed)
+	frmChk.SetPack(tv.Vertical)
+	chkTitles := tv.CreateCheckBox(frmChk, tv.AutoSize, "Show Titles", tv.Fixed)
+	chkMarks := tv.CreateCheckBox(frmChk, tv.AutoSize, "Show Marks", tv.Fixed)
 	chkTitles.SetState(1)
-	chkLegend := ui.CreateCheckBox(frmChk, ui.AutoSize, "Show Legend", ui.Fixed)
-	chkValues := ui.CreateCheckBox(frmChk, ui.AutoSize, "Show Values", ui.Fixed)
+	chkLegend := tv.CreateCheckBox(frmChk, tv.AutoSize, "Show Legend", tv.Fixed)
+	chkValues := tv.CreateCheckBox(frmChk, tv.AutoSize, "Show Values", tv.Fixed)
 	chkValues.SetState(1)
-	chkFixed := ui.CreateCheckBox(frmChk, ui.AutoSize, "Fixed Width", ui.Fixed)
-	chkGap := ui.CreateCheckBox(frmChk, ui.AutoSize, "No Gap", ui.Fixed)
-	chkMulti := ui.CreateCheckBox(frmChk, ui.AutoSize, "MultiColored", ui.Fixed)
-	chkCustom := ui.CreateCheckBox(frmChk, ui.AutoSize, "Custom Colors", ui.Fixed)
+	chkFixed := tv.CreateCheckBox(frmChk, tv.AutoSize, "Fixed Width", tv.Fixed)
+	chkGap := tv.CreateCheckBox(frmChk, tv.AutoSize, "No Gap", tv.Fixed)
+	chkMulti := tv.CreateCheckBox(frmChk, tv.AutoSize, "MultiColored", tv.Fixed)
+	chkCustom := tv.CreateCheckBox(frmChk, tv.AutoSize, "Custom Colors", tv.Fixed)
 
-	ui.ActivateControl(view, chkTitles)
+	tv.ActivateControl(view, chkTitles)
 
 	chkTitles.OnChange(func(state int) {
 		if state == 0 {
 			chkMarks.SetEnabled(false)
 			bch.SetShowTitles(false)
-			ui.PutEvent(ui.Event{Type: ui.EventRedraw})
+			tv.PutEvent(tv.Event{Type: tv.EventRedraw})
 		} else if state == 1 {
 			chkMarks.SetEnabled(true)
 			bch.SetShowTitles(true)
-			ui.PutEvent(ui.Event{Type: ui.EventRedraw})
+			tv.PutEvent(tv.Event{Type: tv.EventRedraw})
 		}
 	})
 	chkMarks.OnChange(func(state int) {
 		if state == 0 {
 			bch.SetShowMarks(false)
-			ui.PutEvent(ui.Event{Type: ui.EventRedraw})
+			tv.PutEvent(tv.Event{Type: tv.EventRedraw})
 		} else if state == 1 {
 			bch.SetShowMarks(true)
-			ui.PutEvent(ui.Event{Type: ui.EventRedraw})
+			tv.PutEvent(tv.Event{Type: tv.EventRedraw})
 		}
 	})
 	chkLegend.OnChange(func(state int) {
 		if state == 0 {
 			bch.SetLegendWidth(0)
-			ui.PutEvent(ui.Event{Type: ui.EventRedraw})
+			tv.PutEvent(tv.Event{Type: tv.EventRedraw})
 		} else if state == 1 {
 			bch.SetLegendWidth(10)
-			ui.PutEvent(ui.Event{Type: ui.EventRedraw})
+			tv.PutEvent(tv.Event{Type: tv.EventRedraw})
 		}
 	})
 	chkValues.OnChange(func(state int) {
 		if state == 0 {
 			bch.SetValueWidth(0)
-			ui.PutEvent(ui.Event{Type: ui.EventRedraw})
+			tv.PutEvent(tv.Event{Type: tv.EventRedraw})
 		} else if state == 1 {
 			bch.SetValueWidth(5)
-			ui.PutEvent(ui.Event{Type: ui.EventRedraw})
+			tv.PutEvent(tv.Event{Type: tv.EventRedraw})
 		}
 	})
 	chkMulti.OnChange(func(state int) {
 		if state == 0 {
-			d := []ui.BarData{
+			d := []tv.BarData{
 				{Value: 80, Title: "80%"},
 				{Value: 50, Title: "50%"},
 				{Value: 150, Title: ">100%"},
 			}
 			bch.SetData(d)
-			ui.PutEvent(ui.Event{Type: ui.EventRedraw})
+			tv.PutEvent(tv.Event{Type: tv.EventRedraw})
 		} else if state == 1 {
-			d := []ui.BarData{
-				{Value: 80, Title: "80%", Fg: ui.ColorBlue},
-				{Value: 50, Title: "50%", Fg: ui.ColorGreen, Ch: 'X'},
-				{Value: 150, Title: ">100%", Fg: ui.ColorYellow},
+			d := []tv.BarData{
+				{Value: 80, Title: "80%", Fg: tv.ColorBlue},
+				{Value: 50, Title: "50%", Fg: tv.ColorGreen, Ch: 'X'},
+				{Value: 150, Title: ">100%", Fg: tv.ColorYellow},
 			}
 			bch.SetData(d)
-			ui.PutEvent(ui.Event{Type: ui.EventRedraw})
+			tv.PutEvent(tv.Event{Type: tv.EventRedraw})
 		}
 	})
 	chkFixed.OnChange(func(state int) {
@@ -111,7 +111,7 @@ func createView() *ui.BarChart {
 		} else if state == 1 {
 			bch.SetAutoSize(false)
 		}
-		ui.PutEvent(ui.Event{Type: ui.EventRedraw})
+		tv.PutEvent(tv.Event{Type: tv.EventRedraw})
 	})
 	chkGap.OnChange(func(state int) {
 		if state == 1 {
@@ -119,7 +119,7 @@ func createView() *ui.BarChart {
 		} else if state == 0 {
 			bch.SetBarGap(1)
 		}
-		ui.PutEvent(ui.Event{Type: ui.EventRedraw})
+		tv.PutEvent(tv.Event{Type: tv.EventRedraw})
 	})
 	chkCustom.OnChange(func(state int) {
 		if state == 0 {
@@ -127,7 +127,7 @@ func createView() *ui.BarChart {
 		} else if state == 1 {
 			bch.OnDrawCell(customColored)
 		}
-		ui.PutEvent(ui.Event{Type: ui.EventRedraw})
+		tv.PutEvent(tv.Event{Type: tv.EventRedraw})
 	})
 
 	return bch
@@ -136,12 +136,12 @@ func createView() *ui.BarChart {
 func mainLoop() {
 	// Every application must create a single Composer and
 	// call its intialize method
-	ui.InitLibrary()
-	defer ui.DeinitLibrary()
+	tv.InitLibrary()
+	defer tv.DeinitLibrary()
 
 	b := createView()
 	b.SetBarGap(1)
-	d := []ui.BarData{
+	d := []tv.BarData{
 		{Value: 80, Title: "80%"},
 		{Value: 50, Title: "50%"},
 		{Value: 150, Title: ">100%"},
@@ -151,7 +151,7 @@ func mainLoop() {
 	b.SetAutoSize(true)
 
 	// start event processing loop - the main core of the library
-	ui.MainLoop()
+	tv.MainLoop()
 }
 
 func main() {

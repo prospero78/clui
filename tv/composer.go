@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	term "github.com/nsf/termbox-go"
+	"github.com/prospero78/goTV/tv/types"
 	"github.com/sirupsen/logrus"
 )
 
@@ -12,9 +13,9 @@ import (
 // one object of this type
 type Composer struct {
 	// list of visible Views
-	windows      []Control
+	windows      []types.IWidget
 	windowBorder BorderStyle
-	consumer     Control
+	consumer     types.IWidget
 	// last pressed key - to make repeatable actions simpler, e.g, at first
 	// one presses Ctrl+S and then just repeatedly presses arrow lest to
 	// resize Window
@@ -36,7 +37,7 @@ var (
 
 func initComposer() {
 	comp = new(Composer)
-	comp.windows = make([]Control, 0)
+	comp.windows = make([]types.IWidget, 0)
 	comp.windowBorder = BorderAuto
 	comp.consumer = nil
 	comp.lastKey = term.KeyEsc
@@ -54,7 +55,7 @@ func WindowManager() *Composer {
 // this function the control will recieve all mouse and keyboard events even
 // if it is not active or mouse is outside it. Useful to implement dragging
 // or alike stuff
-func GrabEvents(c Control) {
+func GrabEvents(c types.IWidget) {
 	comp.consumer = c
 }
 
@@ -149,16 +150,16 @@ func (c *Composer) EndUpdate() {
 	c.mtx.Unlock()
 }
 
-func (c *Composer) getWindowList() []Control {
+func (c *Composer) getWindowList() []types.IWidget {
 	c.mtx.RLock()
 	defer c.mtx.RUnlock()
 
-	arr_copy := make([]Control, len(c.windows))
+	arr_copy := make([]types.IWidget, len(c.windows))
 	copy(arr_copy, c.windows)
 	return arr_copy
 }
 
-func (c *Composer) checkWindowUnderMouse(screenX, screenY int) (Control, HitResult) {
+func (c *Composer) checkWindowUnderMouse(screenX, screenY int) (types.IWidget, HitResult) {
 	windows := c.getWindowList()
 	if len(windows) == 0 {
 		return nil, HitOutside
@@ -175,7 +176,7 @@ func (c *Composer) checkWindowUnderMouse(screenX, screenY int) (Control, HitResu
 	return nil, HitOutside
 }
 
-func (c *Composer) activateWindow(window Control) bool {
+func (c *Composer) activateWindow(window types.IWidget) bool {
 	windows := c.getWindowList()
 	if c.topWindow() == window {
 		for _, v := range windows {
@@ -185,7 +186,7 @@ func (c *Composer) activateWindow(window Control) bool {
 		return true
 	}
 
-	var wList []Control
+	var wList []types.IWidget
 	found := false
 
 	for _, v := range windows {
@@ -268,7 +269,7 @@ func (c *Composer) sendEventToActiveWindow(ev Event) bool {
 	return false
 }
 
-func (c *Composer) topWindow() Control {
+func (c *Composer) topWindow() types.IWidget {
 	windows := c.getWindowList()
 
 	if len(windows) == 0 {
@@ -278,7 +279,7 @@ func (c *Composer) topWindow() Control {
 	return windows[len(windows)-1]
 }
 
-func (c *Composer) resizeTopWindow(ev Event) bool {
+func (c *Composer) resizeTopWindow(ev types.IWidget) bool {
 	view := c.topWindow()
 	if view == nil {
 		return false
@@ -592,12 +593,12 @@ func Stop() {
 }
 
 // DestroyWindow removes the Window from the list of managed Windows
-func (c *Composer) DestroyWindow(view Control) {
+func (c *Composer) DestroyWindow(view types.IWidget) {
 	ev := Event{Type: EventClose}
 	c.sendEventToActiveWindow(ev)
 
 	windows := c.getWindowList()
-	var newOrder []Control
+	var newOrder []types.IWidget
 	for i := 0; i < len(windows); i++ {
 		if windows[i] != view {
 			newOrder = append(newOrder, windows[i])
