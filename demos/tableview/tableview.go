@@ -62,8 +62,7 @@ func mainLoop() {
 				fmt.Sprintf("Editing value: %s", oldVal), "New value", oldVal,
 			)
 			dlg.OnClose(func() {
-				switch dlg.Result() {
-				case ui.DialogButton1:
+				if dlg.Result() == ui.DialogButton1 {
 					newText := dlg.EditResult()
 					values[r*colCount+c] = newText
 					ui.PutEvent(ui.Event{Type: ui.EventRedraw})
