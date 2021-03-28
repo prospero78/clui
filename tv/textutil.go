@@ -42,7 +42,7 @@ func Ellipsize(str string, maxWidth int) string {
 		return xs.Slice(str, 0, maxWidth)
 	}
 
-	left := int((maxWidth - 3) / 2)
+	left := (maxWidth - 3) / 2
 	right := maxWidth - left - 3
 	return xs.Slice(str, 0, left) + "..." + xs.Slice(str, ln-right, -1)
 }

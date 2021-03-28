@@ -982,11 +982,12 @@ func (l *TableView) SelectedCol() int {
 // The table scrolls automatically to display the column
 func (l *TableView) SetSelectedRow(row int) {
 	oldSelection := l.selectedRow
-	if row >= l.rowCount {
+	switch {
+	case row >= l.rowCount:
 		l.selectedRow = l.rowCount - 1
-	} else if row < -1 {
+	case row < -1:
 		l.selectedRow = -1
-	} else {
+	default:
 		l.selectedRow = row
 	}
 
@@ -1002,11 +1003,12 @@ func (l *TableView) SetSelectedRow(row int) {
 // The table scrolls automatically to display the column
 func (l *TableView) SetSelectedCol(col int) {
 	oldSelection := l.selectedCol
-	if col >= len(l.columns) {
+	switch {
+	case col >= len(l.columns):
 		l.selectedCol = len(l.columns) - 1
-	} else if col < -1 {
+	case col < -1:
 		l.selectedCol = -1
-	} else {
+	default:
 		l.selectedCol = col
 	}
 
