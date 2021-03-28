@@ -65,6 +65,6 @@ The library is in the very beginning but it can be used to create working utilit
 
 ![Закачка Дилберта](./demos/dilbert_demo.gif)
 
-## License
+## Лицензия
 
-**goTV** is dual-licensed under BSD-2-Clause
+**goTV** распространяется под лицензией BSD-2-Clause
