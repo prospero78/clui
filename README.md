@@ -67,4 +67,4 @@ The library is in the very beginning but it can be used to create working utilit
 
 ## Лицензия
 
-**goTV** распространяется под лицензией BSD-2-Clause
+**goTV** распространяется под лицензией [BSD-2-Clause](./docs/LICENSE.md).
