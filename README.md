@@ -7,7 +7,7 @@
 ## Установка
 
 ```bash
-    go get -u github.com/prospero78/goTV
+    go get -u github.com/prospero78/gotv/lib
 ```
 
 ## Текущая версия
@@ -48,7 +48,7 @@
 - `SparkChart` (Show tabular data as a bar graph)
 - `GridView` (Table to show structured data - only virtual and readonly mode with scroll support)
 - [FilePicker](./docs/fselect.md)
-- `LoginDialog - a simple authorization dialog with two fields: Username and Password`
+- `LoginDialog` - a simple authorization dialog with two fields: Username and Password
 - `TextDisplay` - a "virtual" text view control: it does not store any data, every time it needs to draw its line it requests the line from external source by line ID
 
 ## Скриншоты
@@ -67,4 +67,4 @@ The library is in the very beginning but it can be used to create working utilit
 
 ## License
 
-CLUI is dual-licensed under MIT OR BSD-2-Clause
+**goTV** is dual-licensed under BSD-2-Clause

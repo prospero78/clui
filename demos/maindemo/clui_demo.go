@@ -14,8 +14,8 @@ import (
 	"fmt"
 	"strconv"
 
-	ui "github.com/VladimirMarkelov/clui"
 	term "github.com/nsf/termbox-go"
+	ui "github.com/prospero78/gotv/lib"
 )
 
 func updateProgress(value string, pb *ui.ProgressBar) {

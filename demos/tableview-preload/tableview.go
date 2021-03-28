@@ -7,7 +7,8 @@ package main
 
 import (
 	"fmt"
-	ui "github.com/VladimirMarkelov/clui"
+
+	ui "github.com/prospero78/gotv/lib"
 )
 
 // number of columns in a table

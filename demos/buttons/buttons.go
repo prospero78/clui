@@ -1,7 +1,7 @@
 package main
 
 import (
-	ui "github.com/VladimirMarkelov/clui"
+	ui "github.com/prospero78/gotv/lib"
 )
 
 func createView() {
