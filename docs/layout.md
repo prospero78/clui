@@ -1,24 +1,31 @@
-# Control Layout
-CLUI control layout management is similar to management used in well-known libraries like Qt or FOX toolkit. The difference between them and CLUI that CLUI does not have dedicated controls for layout management - any control turns into layout(container) if it has children, and CLUI layout managent is much simpler - only one way to arrange controls is available.
+# Менеджер компоновки
 
-### Layout basics
-A control that has children can arrange them only in one direction: from left to right or from top to bottom in order of adding the children. So, any container is always either 1 control high or 1 control wide depending on layout type. The layout type for a control can be set by calling:
-```
+Управление компоновкой элементов управления `goTV` аналогично управлению, используемому в известных библиотеках, таких как `Qt` или `FOX toolkit`. Разница между ними и `goTV` в том, что в `goTV` нет выделенных элементов управления для управления компоновкой - любой элемент управления превращается в контейнер, если у него есть дочерние элементы, а менеджер компоновки `goTV` намного проще - доступен только один способ упорядочить элементы управления.
+
+## Основы компоновки
+
+Элемент управления, у которого есть дочерние элементы, может располагать их только в одном направлении: слева направо или сверху вниз в порядке добавления дочерних элементов. Таким образом, любой контейнер всегда имеет либо 1 элемент управления, либо 1 элемент управления в зависимости от типа контейнера. Тип контейнера для элемента управления можно установить, вызвав:
+
+```go
 control.SetPack(newPackDirection)
 ```
-where newPackDirection either Horizontal(default value) or Vertical.
 
-Automatic control placement can be tuned up with extra container properties for nicer-looking result. It is padding and gap values. By default all of them are 0 (except paddings for Window and Frame with a border - in this case default paddings are 1, and gapX for Window is 1 by default). Padding is a number of character between the container edge and the first child, gap is a number of characters between children inside container. The default padding and gap sizes can be changed with calls:
-```
+где `newPackDirection` либо `Horizontal` (значение по умолчанию), либо `Vertical`.
+
+Автоматическое размещение элементов управления можно настроить с помощью дополнительных свойств контейнера для получения более приятного результата. Это значения отступов и пробелов. По умолчанию все они равны 0 (кроме отступов для `Window` и `Frame` с рамкой - в этом случае отступы по умолчанию равны `1`, а `gapX` для `Window` по умолчанию равен `1`). Заполнение - это количество символов между краем контейнера и первым дочерним элементом, пробел - это количество символов между дочерними элементами внутри контейнера. Размеры отступов и зазоров по умолчанию можно изменить с помощью вызовов:
+
+```go
 container.SetGaps(gapX, gapY)
 container.SetPaddings(identX, identY)
 ```
-Please see a picture to get the idea:
 
-<img src="/docs/img/layout.png" alt="Layout manager">
+Пожалуйста, посмотрите картинку, чтобы понять:
 
-Please, keep in mind the following feature of CLUI layout manager:
-* padding is always calculated from the very edge of a control. That is why Window and Frame with a border have default paddings equal 1 - to avoid overlapping their children with their border
-* Fixed control placement and grid layout manager are not available - only horizontal and vertical automatic layout managers. It may make designing a complex Window layout difficult
-* It is possible to set minimal width and height for a container control but if a container has at least one child then the real minimal size is calculated as a maximum of container's minimal values and the total space required to display all its children. In other words, you cannot set minimal size of a container less than the total minimal size of its children plus gaps and paddings
-* To create a control aligned to bottom or right side, use the following trick: at first add a frameless Frame with scale equals 1 and after it add the control with scale equals Fixed. It makes the frame resizable when its parent is resized while the control will keep its size and will always stick to the container edge
+![Менеджер компоновки](./img/layout.png)
+
+Обратите внимание на следующую особенность менеджера компоновки `goTV`:
+
+- отступы всегда рассчитываются от самого края элемента управления. Вот почему `Window` и `Frame` с рамкой имеют отступы по умолчанию, равные `1` - чтобы избежать перекрытия их дочерних элементов их границей.
+- Фиксированное размещение элементов управления и менеджер компоновки сетки недоступны - только горизонтальные и вертикальные автоматические менеджеры компоновки. Это может затруднить разработку сложной компоновки окон.
+- Можно установить минимальную ширину и высоту для элемента управления контейнера, но если у контейнера есть хотя бы один дочерний элемент, то реальный минимальный размер рассчитывается как максимум минимальных значений контейнера и общего пространства, необходимого для отображения всех его дочерних элементов. Другими словами, вы не можете установить минимальный размер контейнера меньше, чем общий минимальный размер его дочерних элементов плюс пробелы и отступы.
+- Чтобы создать элемент управления, выровненный по нижнему или правому краю, используйте следующий прием: сначала добавьте фрейм без рамки с масштабом, равным 1, а затем добавьте элемент управления с масштабом, равным фиксированному. Он позволяет изменять размер кадра при изменении размера его родителя, в то время как элемент управления сохраняет свой размер и всегда будет придерживаться края контейнера.
