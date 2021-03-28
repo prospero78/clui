@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	term "github.com/nsf/termbox-go"
+	"github.com/sirupsen/logrus"
 )
 
 // Composer is a service object that manages Views and console, processes
@@ -73,7 +74,9 @@ func termboxEventToLocal(ev term.Event) Event {
 // Repaints everything on the screen
 func RefreshScreen() {
 	comp.BeginUpdate()
-	term.Clear(ColorWhite, ColorBlack)
+	if err:=term.Clear(ColorWhite, ColorBlack);err!=nil{
+		logrus.WithErr(err).Fatalf("composer.go/RefreshScreen(): in clear terminal")
+	}
 	comp.EndUpdate()
 
 	windows := comp.getWindowList()
