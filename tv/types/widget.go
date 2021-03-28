@@ -39,9 +39,12 @@ type IWidget interface {
 	// Enable return if a control can process keyboard and mouse events
 	Enabled() bool
 	SetEnabled(enabled bool)
-	// Visible return if a control is visible
-	Visible() bool
-	SetVisible(enabled bool)
+	// IsVisible -- возвращает признак видимости виджета
+	IsVisible() AVisible
+	// IsHidden -- возвращает признак скрытия виджета
+	IsHidden()AVisible
+	// SetVisible -- устанавливает признак видимости
+	SetVisible(isVisible AVisible)
 	// Parent return control's container or nil if there is no parent container
 	// that is true for Windows
 	Parent() IWidget
@@ -64,7 +67,7 @@ type IWidget interface {
 	// by horizontally-packed parents and dy by vertically-packed ones
 	Gaps() (dx int, dy int)
 	SetGaps(dx, dy int)
-	// Pack -- возвращает направление упаковки внутренних виджетов в контейнере (horizontal или vertical) 
+	// Pack -- возвращает направление упаковки внутренних виджетов в контейнере (horizontal или vertical)
 	Pack() APackDirect
 	// SetPack -- устанавливает направление упаковки внутренних виджетов
 	SetPack(pack APackDirect)
@@ -146,7 +149,7 @@ type IWidget interface {
 	// processes an event it should return true. If the method returns false it means
 	// that the control do not want or cannot process the event and the caller sends
 	// the event to the control parent
-	ProcessEvent(ev Event) bool
+	ProcessEvent(event IEvent) bool
 	// RefID returns the controls internal reference id
 	RefID() int64
 	// removeChild removes a child from a container

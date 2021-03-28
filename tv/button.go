@@ -7,7 +7,9 @@ import (
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
 
+	"github.com/prospero78/goTV/tv/cons"
 	"github.com/prospero78/goTV/tv/types"
+	"github.com/prospero78/goTV/tv/widgets/event"
 	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 )
 
@@ -20,8 +22,8 @@ type Button struct {
 	widgetbase.TWidgetBase
 	shadowColor term.Attribute
 	pressed     int32
-	shadowType  ButtonShadow
-	onClick     func(Event)
+	shadowType  cons.ButtonShadow
+	onClick     func(event.TEvent)
 }
 
 /*
@@ -38,12 +40,12 @@ func CreateButton(parent types.IWidget, width, height int, title string, scale i
 	b.TWidgetBase = widgetbase.New()
 
 	b.parent = parent
-	b.align = AlignCenter
+	b.align = cons.AlignCenter
 
-	if height == types.AutoSize {
+	if height == cons.AutoSize {
 		height = 4
 	}
-	if width == types.AutoSize {
+	if width == cons.AutoSize {
 		width = xs.Len(title) + 2 + 1
 	}
 
@@ -68,7 +70,7 @@ func CreateButton(parent types.IWidget, width, height int, title string, scale i
 
 // Repaint draws the control on its View surface
 func (b *Button) Draw() {
-	if b.isHidden {
+	if b.IsHidden() {
 		return
 	}
 
@@ -83,7 +85,7 @@ func (b *Button) Draw() {
 	fg, bg := b.fg, b.bg
 	shadow := RealColor(b.shadowColor, b.Style(), ColorButtonShadow)
 	switch {
-	case b.isDisabled:
+	case b.IsDisabled():
 		fg, bg = RealColor(fg, b.Style(), ColorButtonDisabledText), RealColor(bg, b.Style(), ColorButtonDisabledBack)
 	case b.Active():
 		fg, bg = RealColor(b.fgActive, b.Style(), ColorButtonActiveText), RealColor(b.bgActive, b.Style(), ColorButtonActiveBack)
@@ -190,12 +192,12 @@ func (b *Button) OnClick(fn func(Event)) {
 }
 
 // ShadowType returns type of a show the button drops
-func (b *Button) ShadowType() ButtonShadow {
+func (b *Button) ShadowType() cons.ButtonShadow {
 	return b.shadowType
 }
 
 // SetShadowType changes the shadow the button drops
-func (b *Button) SetShadowType(sh ButtonShadow) {
+func (b *Button) SetShadowType(sh cons.ButtonShadow) {
 	b.block.Lock()
 	b.shadowType = sh
 	b.block.Unlock()

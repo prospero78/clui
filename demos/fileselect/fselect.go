@@ -2,43 +2,43 @@ package main
 
 import (
 	"github.com/prospero78/goTV/tv"
-	"github.com/prospero78/goTV/tv/types"
+	"github.com/prospero78/goTV/tv/cons"
 )
 
 func createView() {
 	view := tv.AddWindow(0, 0, 30, 7, "File select")
-	view.SetPack(tv.Vertical)
+	view.SetPack(cons.Vertical)
 	view.SetGaps(0, 1)
 	view.SetPaddings(2, 2)
 
-	frmPath := tv.CreateFrame(view, 1, 1, tv.BorderNone, types.Fixed)
-	frmPath.SetPack(tv.Horizontal)
-	tv.CreateLabel(frmPath, types.AutoSize, types.AutoSize, "Initial path", types.Fixed)
+	frmPath := tv.CreateFrame(view, 1, 1, cons.BorderNone, cons.Fixed)
+	frmPath.SetPack(cons.Horizontal)
+	tv.CreateLabel(frmPath, cons.AutoSize, cons.AutoSize, "Initial path", cons.Fixed)
 	edPath := tv.CreateEditField(frmPath, 16, "", 1)
 
-	frmMask := tv.CreateFrame(view, 1, 1, tv.BorderNone, types.Fixed)
-	frmMask.SetPack(tv.Horizontal)
-	tv.CreateLabel(frmMask, types.AutoSize, types.AutoSize, "File masks", types.Fixed)
+	frmMask := tv.CreateFrame(view, 1, 1, cons.BorderNone, cons.Fixed)
+	frmMask.SetPack(cons.Horizontal)
+	tv.CreateLabel(frmMask, cons.AutoSize, cons.AutoSize, "File masks", cons.Fixed)
 	edMasks := tv.CreateEditField(frmMask, 16, "*", 1)
 
-	frmOpts := tv.CreateFrame(view, 1, 1, tv.BorderNone, types.Fixed)
-	frmOpts.SetPack(tv.Horizontal)
-	cbDir := tv.CreateCheckBox(frmOpts, types.AutoSize, "Select directory", types.Fixed)
-	cbMust := tv.CreateCheckBox(frmOpts, types.AutoSize, "Must exists", types.Fixed)
-	tv.CreateFrame(frmOpts, 1, 1, tv.BorderNone, 1)
+	frmOpts := tv.CreateFrame(view, 1, 1, cons.BorderNone, cons.Fixed)
+	frmOpts.SetPack(cons.Horizontal)
+	cbDir := tv.CreateCheckBox(frmOpts, cons.AutoSize, "Select directory", cons.Fixed)
+	cbMust := tv.CreateCheckBox(frmOpts, cons.AutoSize, "Must exists", cons.Fixed)
+	tv.CreateFrame(frmOpts, 1, 1, cons.BorderNone, 1)
 
-	lblSelected := tv.CreateLabel(view, 30, 5, "Selected:", types.Fixed)
+	lblSelected := tv.CreateLabel(view, 30, 5, "Selected:", cons.Fixed)
 	lblSelected.SetMultiline(true)
 
-	frmBtns := tv.CreateFrame(view, 1, 1, tv.BorderNone, types.Fixed)
-	frmBtns.SetPack(tv.Horizontal)
-	btnSet := tv.CreateButton(frmBtns, types.AutoSize, 4, "Select", types.Fixed)
-	btnQuit := tv.CreateButton(frmBtns, types.AutoSize, 4, "Quit", types.Fixed)
-	tv.CreateFrame(frmBtns, 1, 1, tv.BorderNone, 1)
+	frmBtns := tv.CreateFrame(view, 1, 1, cons.BorderNone, cons.Fixed)
+	frmBtns.SetPack(cons.Horizontal)
+	btnSet := tv.CreateButton(frmBtns, cons.AutoSize, 4, "Select", cons.Fixed)
+	btnQuit := tv.CreateButton(frmBtns, cons.AutoSize, 4, "Quit", cons.Fixed)
+	tv.CreateFrame(frmBtns, 1, 1, cons.BorderNone, 1)
 
 	tv.ActivateControl(view, edMasks)
 
-	btnSet.OnClick(func(ev tv.Event) {
+	btnSet.OnClick(func(ev cons.Event) {
 		s := "Select "
 		if cbDir.State() == 1 {
 			s += "directory"

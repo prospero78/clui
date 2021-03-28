@@ -6,6 +6,7 @@ import (
 
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+	"github.com/prospero78/goTV/tv/cons"
 	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 
 	"github.com/prospero78/goTV/tv/types"
@@ -60,7 +61,7 @@ LegendWidth is greater than 3.
 If LegendWidth is greater than half of the chart it is not
 displayed. The same is applied to ValueWidth
 */
-type BarChart struct {
+type TBarChart struct {
 	widgetbase.TWidgetBase
 	data        []BarData
 	autosize    bool
@@ -81,14 +82,14 @@ w and h - are minimal size of the control.
 scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 control should keep its original size.
 */
-func CreateBarChart(parent types.IWidget, w, h int, scale int) *BarChart {
-	c := new(BarChart)
+func CreateBarChart(parent types.IWidget, w, h int, scale int) *TBarChart {
+	c := new(TBarChart)
 	c.TWidgetBase = widgetbase.New()
 
-	if w == types.AutoSize {
+	if w == cons.AutoSize {
 		w = 10
 	}
-	if h == types.AutoSize {
+	if h == cons.AutoSize {
 		h = 5
 	}
 
@@ -110,8 +111,8 @@ func CreateBarChart(parent types.IWidget, w, h int, scale int) *BarChart {
 }
 
 // Draw repaints the control on its View surface
-func (b *BarChart) Draw() {
-	if b.isHidden {
+func (b *TBarChart) Draw() {
+	if b.IsHidden() {
 		return
 	}
 
@@ -137,14 +138,14 @@ func (b *BarChart) Draw() {
 	b.drawBars()
 }
 
-func (b *BarChart) barHeight() int {
+func (b *TBarChart) barHeight() int {
 	if b.showTitles {
 		return b.height - 2
 	}
 	return b.height
 }
 
-func (b *BarChart) drawBars() {
+func (b *TBarChart) drawBars() {
 	if len(b.data) == 0 {
 		return
 	}
@@ -231,7 +232,7 @@ func (b *BarChart) drawBars() {
 	}
 }
 
-func (b *BarChart) drawLegend() {
+func (b *TBarChart) drawLegend() {
 	pos, width := b.calculateBarArea()
 	if pos+width >= b.width-3 {
 		return
@@ -262,7 +263,7 @@ func (b *BarChart) drawLegend() {
 	}
 }
 
-func (b *BarChart) drawValues() {
+func (b *TBarChart) drawValues() {
 	valVal := int(b.ValueWidth())
 	if valVal <= 0 {
 		return
@@ -291,7 +292,7 @@ func (b *BarChart) drawValues() {
 	}
 }
 
-func (b *BarChart) drawRulers() {
+func (b *TBarChart) drawRulers() {
 	if int(b.ValueWidth()) <= 0 && int(b.LegendWidth()) <= 0 && !b.showTitles {
 		return
 	}
@@ -324,7 +325,7 @@ func (b *BarChart) drawRulers() {
 	}
 }
 
-func (b *BarChart) calculateBarArea() (int, int) {
+func (b *TBarChart) calculateBarArea() (int, int) {
 	w := b.width
 	pos := 0
 
@@ -342,7 +343,7 @@ func (b *BarChart) calculateBarArea() (int, int) {
 	return pos, w
 }
 
-func (b *BarChart) calculateBarWidth() int {
+func (b *TBarChart) calculateBarWidth() int {
 	if len(b.data) == 0 {
 		return 0
 	}
@@ -377,7 +378,7 @@ func (b *BarChart) calculateBarWidth() int {
 	return sz
 }
 
-func (b *BarChart) calculateMultiplier() (float64, float64) {
+func (b *TBarChart) calculateMultiplier() (float64, float64) {
 	if len(b.data) == 0 {
 		return 0, 0
 	}
@@ -402,7 +403,7 @@ func (b *BarChart) calculateMultiplier() (float64, float64) {
 }
 
 // AddData appends a new bar to a chart
-func (b *BarChart) AddData(val BarData) {
+func (b *TBarChart) AddData(val BarData) {
 	b.block.Lock()
 	defer b.block.Unlock()
 
@@ -410,7 +411,7 @@ func (b *BarChart) AddData(val BarData) {
 }
 
 // ClearData removes all bar from chart
-func (b *BarChart) ClearData() {
+func (b *TBarChart) ClearData() {
 	b.block.Lock()
 	defer b.block.Unlock()
 
@@ -418,7 +419,7 @@ func (b *BarChart) ClearData() {
 }
 
 // SetData assign a new bar list to a chart
-func (b *BarChart) SetData(data []BarData) {
+func (b *TBarChart) SetData(data []BarData) {
 	b.block.Lock()
 	defer b.block.Unlock()
 
@@ -432,13 +433,13 @@ func (b *BarChart) SetData(data []BarData) {
 // bar width is the maximum of three values: BarWidth,
 // calculated width that makes all bars fit the
 // bar chart area, and 1
-func (b *BarChart) AutoSize() bool {
+func (b *TBarChart) AutoSize() bool {
 	return b.autosize
 }
 
 // SetAutoSize enables or disables automatic bar
 // width calculation
-func (b *BarChart) SetAutoSize(auto bool) {
+func (b *TBarChart) SetAutoSize(auto bool) {
 	b.block.Lock()
 	defer b.block.Unlock()
 
@@ -446,45 +447,45 @@ func (b *BarChart) SetAutoSize(auto bool) {
 }
 
 // BarGap returns width of visual gap between two adjacent bars
-func (b *BarChart) BarGap() int32 {
+func (b *TBarChart) BarGap() int32 {
 	return atomic.LoadInt32(&b.gap)
 }
 
 // SetBarGap sets the space width between two adjacent bars
-func (b *BarChart) SetBarGap(gap int32) {
+func (b *TBarChart) SetBarGap(gap int32) {
 	atomic.StoreInt32(&b.gap, gap)
 }
 
 // MinBarWidth returns current minimal bar width
-func (b *BarChart) MinBarWidth() int32 {
+func (b *TBarChart) MinBarWidth() int32 {
 	return atomic.LoadInt32(&b.barWidth)
 }
 
 // SetMinBarWidth changes the minimal bar width
-func (b *BarChart) SetMinBarWidth(size int32) {
+func (b *TBarChart) SetMinBarWidth(size int32) {
 	atomic.StoreInt32(&b.barWidth, size)
 }
 
 // ValueWidth returns the width of the area at the left of
 // chart used to draw values. Set it to 0 to turn off the
 // value panel
-func (b *BarChart) ValueWidth() int32 {
+func (b *TBarChart) ValueWidth() int32 {
 	return atomic.LoadInt32(&b.valueWidth)
 }
 
 // SetValueWidth changes width of the value panel on the left
-func (b *BarChart) SetValueWidth(width int32) {
+func (b *TBarChart) SetValueWidth(width int32) {
 	atomic.StoreInt32(&b.valueWidth, width)
 }
 
 // ShowTitles returns if chart displays horizontal axis and
 // bar titles under it
-func (b *BarChart) ShowTitles() bool {
+func (b *TBarChart) ShowTitles() bool {
 	return b.showTitles
 }
 
 // SetShowTitles turns on and off horizontal axis and bar titles
-func (b *BarChart) SetShowTitles(show bool) {
+func (b *TBarChart) SetShowTitles(show bool) {
 	b.block.Lock()
 	defer b.block.Unlock()
 
@@ -493,12 +494,12 @@ func (b *BarChart) SetShowTitles(show bool) {
 
 // LegendWidth returns width of chart legend displayed at the
 // right side of the chart. Set it to 0 to disable legend
-func (b *BarChart) LegendWidth() int32 {
+func (b *TBarChart) LegendWidth() int32 {
 	return atomic.LoadInt32(&b.legendWidth)
 }
 
 // SetLegendWidth sets new legend panel width
-func (b *BarChart) SetLegendWidth(width int32) {
+func (b *TBarChart) SetLegendWidth(width int32) {
 	atomic.StoreInt32(&b.legendWidth, width)
 }
 
@@ -509,7 +510,7 @@ func (b *BarChart) SetLegendWidth(width int32) {
 // depending on some external data or calculations - only
 // changing colors and rune makes sense. Changing anything else
 // does not affect the chart
-func (b *BarChart) OnDrawCell(fn func(*BarDataCell)) {
+func (b *TBarChart) OnDrawCell(fn func(*BarDataCell)) {
 	b.block.Lock()
 	defer b.block.Unlock()
 
@@ -518,12 +519,12 @@ func (b *BarChart) OnDrawCell(fn func(*BarDataCell)) {
 
 // ShowMarks returns if horizontal axis has mark under each
 // bar. To show marks, ShowTitles must be enabled.
-func (b *BarChart) ShowMarks() bool {
+func (b *TBarChart) ShowMarks() bool {
 	return b.showMarks
 }
 
 // SetShowMarks turns on and off marks under horizontal axis
-func (b *BarChart) SetShowMarks(show bool) {
+func (b *TBarChart) SetShowMarks(show bool) {
 	b.block.Lock()
 	defer b.block.Unlock()
 

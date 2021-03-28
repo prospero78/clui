@@ -4,7 +4,7 @@ import (
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
 
-	"github.com/prospero78/goTV/tv"
+	"github.com/prospero78/goTV/tv/cons"
 	"github.com/prospero78/goTV/tv/types"
 	"github.com/prospero78/goTV/tv/widgets/event"
 	"github.com/prospero78/goTV/tv/widgets/widgetbase"
@@ -41,10 +41,10 @@ func CreateWindow(x, y, w, h int, title string) *TWindow {
 	wnd := new(TWindow)
 	wnd.TWidgetBase = widgetbase.New()
 
-	if w == AutoSize || w < 1 || w > 1000 {
+	if w == cons.AutoSize || w < 1 || w > 1000 {
 		w = 10
 	}
-	if h == AutoSize || h < 1 || h > 1000 {
+	if h == cons.AutoSize || h < 1 || h > 1000 {
 		w = 5
 	}
 
@@ -52,24 +52,24 @@ func CreateWindow(x, y, w, h int, title string) *TWindow {
 	wnd.SetSize(w, h)
 	wnd.SetPos(x, y)
 	wnd.SetTitle(title)
-	wnd.buttons = ButtonClose | ButtonBottom | ButtonMaximize
+	wnd.buttons = cons.ButtonClose | cons.ButtonBottom | cons.ButtonMaximize
 	wnd.children = make([]types.IWidget, 0)
 	wnd.SetPaddings(1, 1)
 	wnd.SetGaps(1, 0)
 	wnd.SetScale(1)
-	wnd.SetBorder(BorderAuto)
+	wnd.SetBorder(cons.BorderAuto)
 
 	return wnd
 }
 
 func (wnd *TWindow) buttonCount() (left, right int) {
-	if wnd.buttons&ButtonClose == ButtonClose {
+	if wnd.buttons&cons.ButtonClose == cons.ButtonClose {
 		right += 1
 	}
-	if wnd.buttons&ButtonMaximize == ButtonMaximize {
+	if wnd.buttons&cons.ButtonMaximize == cons.ButtonMaximize {
 		left += 1
 	}
-	if wnd.buttons&ButtonBottom == ButtonBottom {
+	if wnd.buttons&cons.ButtonBottom == cons.ButtonBottom {
 		left += 1
 	}
 
@@ -80,15 +80,15 @@ func (wnd *TWindow) drawFrame() {
 	PushAttributes()
 	defer PopAttributes()
 
-	var bs BorderStyle
+	var bs cons.BorderStyle
 	switch {
-	case wnd.border == BorderAuto:
-		if wnd.isInactive {
-			bs = BorderThin
+	case wnd.border == cons.BorderAuto:
+		if wnd.IsInactive() {
+			bs = cons.BorderThin
 		} else {
-			bs = BorderThick
+			bs = cons.BorderThick
 		}
-	case wnd.border == BorderNone:
+	case wnd.border == cons.BorderNone:
 	default:
 		bs = wnd.border
 	}
@@ -132,7 +132,7 @@ func (wnd *TWindow) drawButtons() {
 	PushAttributes()
 	defer PopAttributes()
 
-	chars := []rune(SysObject(ObjViewButtons))
+	chars := []rune(SysObject(cons.ObjViewButtons))
 	cMax, cBottom, cClose, cOpenB, cCloseB := chars[0], chars[1], chars[2], chars[3], chars[4]
 
 	// draw close button (rb can be either 1 or 0)
@@ -147,11 +147,11 @@ func (wnd *TWindow) drawButtons() {
 		pos := wnd.x + 1
 		putCharUnsafe(pos, wnd.y, cOpenB)
 		pos += 1
-		if wnd.buttons&ButtonBottom == ButtonBottom {
+		if wnd.buttons&cons.ButtonBottom == cons.ButtonBottom {
 			putCharUnsafe(pos, wnd.y, cBottom)
 			pos += 1
 		}
-		if wnd.buttons&ButtonMaximize == ButtonMaximize {
+		if wnd.buttons&cons.ButtonMaximize == cons.ButtonMaximize {
 			putCharUnsafe(pos, wnd.y, cMax)
 			pos += 1
 		}
@@ -166,7 +166,7 @@ func (wnd *TWindow) Draw() {
 	PushAttributes()
 	defer PopAttributes()
 
-	fg, bg := RealColor(wnd.fg, wnd.Style(), ColorViewText), RealColor(wnd.bg, wnd.Style(), ColorViewBack)
+	fg, bg := RealColor(wnd.fg, wnd.Style(), cons.ColorViewText), RealColor(wnd.bg, wnd.Style(), cons.ColorViewBack)
 	SetBackColor(bg)
 
 	FillRect(wnd.x, wnd.y, wnd.width, wnd.height, ' ')
@@ -184,27 +184,27 @@ func (wnd *TWindow) Draw() {
 // HitTest returns type of a Window region at a given screen coordinates. The
 // method is used to detect if a mouse cursor on a window border or outside,
 // which window icon is under cursor etc
-func (c *TWindow) HitTest(x, y int) HitResult {
+func (c *TWindow) HitTest(x, y int) types.AHitResult {
 	if x > c.x && x < c.x+c.width-1 &&
 		y > c.y && y < c.y+c.height-1 {
-		return HitInside
+		return cons.HitInside
 	}
 
-	hResult := HitOutside
+	hResult := cons.HitOutside
 
 	switch {
 	case x == c.x && y == c.y:
-		hResult = HitTopLeft
+		hResult = cons.HitTopLeft
 	case x == c.x+c.width-1 && y == c.y:
-		hResult = HitTopRight
+		hResult = cons.HitTopRight
 	case x == c.x && y == c.y+c.height-1:
-		hResult = HitBottomLeft
+		hResult = cons.HitBottomLeft
 	case x == c.x+c.width-1 && y == c.y+c.height-1:
-		hResult = HitBottomRight
+		hResult = cons.HitBottomRight
 	case x == c.x && y > c.y && y < c.y+c.height-1:
-		hResult = HitLeft
+		hResult = cons.HitLeft
 	case x == c.x+c.width-1 && y > c.y && y < c.y+c.height-1:
-		hResult = HitRight
+		hResult = cons.HitRight
 	case y == c.y && x > c.x && x < c.x+c.width-1:
 		lb, rb := c.buttonCount()
 		fromL, fromR := lb, rb
@@ -215,21 +215,21 @@ func (c *TWindow) HitTest(x, y int) HitResult {
 			fromR += 2
 		}
 		if x > c.x+fromL && x < c.x+c.width-fromR {
-			hResult = HitTop
+			hResult = cons.HitTop
 		} else {
-			hResult = HitTop
-			if c.buttons&ButtonClose == ButtonClose && rb != 0 && x == c.x+c.width-2 {
-				hResult = HitButtonClose
+			hResult = cons.HitTop
+			if c.buttons&cons.ButtonClose == cons.ButtonClose && rb != 0 && x == c.x+c.width-2 {
+				hResult = cons.HitButtonClose
 			} else if lb != 0 && x > c.x+1 && x < c.x+2+lb {
 				dx := x - c.x - 2
-				hitRes := []HitResult{HitTop, HitTop}
+				hitRes := []cons.HitResult{cons.HitTop, cons.HitTop}
 				pos := 0
-				if c.buttons&ButtonBottom == ButtonBottom {
-					hitRes[pos] = HitButtonBottom
+				if c.buttons&cons.ButtonBottom == cons.ButtonBottom {
+					hitRes[pos] = cons.HitButtonBottom
 					pos += 1
 				}
-				if c.buttons&ButtonMaximize == ButtonMaximize {
-					hitRes[pos] = HitButtonMaximize
+				if c.buttons&cons.ButtonMaximize == cons.ButtonMaximize {
+					hitRes[pos] = cons.HitButtonMaximize
 					pos += 1
 				}
 				if dx < len(hitRes) {
@@ -238,41 +238,41 @@ func (c *TWindow) HitTest(x, y int) HitResult {
 			}
 		}
 	case y == c.y+c.height-1 && x > c.x && x < c.x+c.width-1:
-		hResult = HitBottom
+		hResult = cons.HitBottom
 
 	}
 
-	if hResult != HitOutside {
-		if c.immovable && hResult == HitTop {
-			hResult = HitInside
+	if hResult != cons.HitOutside {
+		if c.immovable && hResult == cons.HitTop {
+			hResult = cons.HitInside
 		}
 		if c.fixedSize &&
-			(hResult == HitBottom || hResult == HitLeft ||
-				hResult == HitRight || hResult == HitTopLeft ||
-				hResult == HitTopRight || hResult == HitBottomRight ||
-				hResult == HitBottomLeft || hResult == HitButtonMaximize) {
-			hResult = HitInside
+			(hResult == cons.HitBottom || hResult == cons.HitLeft ||
+				hResult == cons.HitRight || hResult == cons.HitTopLeft ||
+				hResult == cons.HitTopRight || hResult == cons.HitBottomRight ||
+				hResult == cons.HitBottomLeft || hResult == cons.HitButtonMaximize) {
+			hResult = cons.HitInside
 		}
 	}
 
 	return hResult
 }
 
-func (c *TWindow) ProcessEvent(ev Event) bool {
+func (c *TWindow) ProcessEvent(ev event.TEvent) bool {
 	switch ev.Type {
-	case EventMove:
+	case cons.EventMove:
 		c.PlaceChildren()
-	case EventResize:
+	case cons.EventResize:
 		c.ResizeChildren()
 		c.PlaceChildren()
-	case EventClose:
+	case cons.EventClose:
 		if c.onClose != nil {
 			if !c.onClose(ev) {
 				return false
 			}
 		}
 		return true
-	case EventKey:
+	case cons.EventKey:
 		if ev.Key == term.KeyTab || ev.Key == term.KeyArrowUp || ev.Key == term.KeyArrowDown {
 			if SendEventToChild(c, ev) {
 				return true
@@ -295,17 +295,17 @@ func (c *TWindow) ProcessEvent(ev Event) bool {
 					dir = -1
 				}
 
-				clipped.ProcessEvent(Event{Type: EventActivateChild, Target: nC, X: dir})
+				clipped.ProcessEvent(event.TEvent{Type: cons.EventActivateChild, Target: nC, X: dir})
 			}
 
 			if nC != aC {
 				if aC != nil {
 					aC.SetActive(false)
-					aC.ProcessEvent(Event{Type: EventActivate, X: 0})
+					aC.ProcessEvent(event.TEvent{Type: cons.EventActivate, X: 0})
 				}
 				if nC != nil {
 					nC.SetActive(true)
-					nC.ProcessEvent(Event{Type: EventActivate, X: 1})
+					nC.ProcessEvent(event.TEvent{Type: cons.EventActivate, X: 1})
 				}
 			}
 			return true
@@ -318,7 +318,7 @@ func (c *TWindow) ProcessEvent(ev Event) bool {
 		}
 		return false
 	default:
-		if ev.Type == EventMouse && ev.Key == term.MouseLeft {
+		if ev.Type == cons.EventMouse && ev.Key == term.MouseLeft {
 			DeactivateControls(c)
 		}
 		return SendEventToChild(c, ev)
@@ -328,13 +328,13 @@ func (c *TWindow) ProcessEvent(ev Event) bool {
 }
 
 // OnClose sets the callback that is called when the Window is about to destroy
-func (w *TWindow) OnClose(fn func(Event) bool) {
+func (w *TWindow) OnClose(fn func(event.TEvent) bool) {
 	w.onClose = fn
 }
 
 // OnKeyDown sets the callback that is called when a user presses a key
 // while the Window is active
-func (w *TWindow) OnKeyDown(fn func(Event, interface{}) bool, data interface{}) {
+func (w *TWindow) OnKeyDown(fn func(event.TEvent, interface{}) bool, data interface{}) {
 	if fn == nil {
 		w.onKeyDown = nil
 	} else {
@@ -343,17 +343,17 @@ func (w *TWindow) OnKeyDown(fn func(Event, interface{}) bool, data interface{}) 
 }
 
 // OnScreenResize sets the callback that is called when size of terminal changes
-func (w *TWindow) OnScreenResize(fn func(Event)) {
+func (w *TWindow) OnScreenResize(fn func(event.TEvent)) {
 	w.onScreenResize = fn
 }
 
 // Border returns the default window border
-func (w *TWindow) Border() BorderStyle {
+func (w *TWindow) Border() cons.BorderStyle {
 	return w.border
 }
 
 // SetBorder changes the default window border
-func (w *TWindow) SetBorder(border BorderStyle) {
+func (w *TWindow) SetBorder(border cons.BorderStyle) {
 	w.border = border
 }
 

@@ -2,7 +2,8 @@ package main
 
 import (
 	"github.com/prospero78/goTV/tv"
-	"github.com/prospero78/goTV/tv/types"
+	"github.com/prospero78/goTV/tv/cons"
+	"github.com/prospero78/goTV/tv/widgets/event"
 )
 
 func customColored(d *tv.BarDataCell) {
@@ -10,42 +11,42 @@ func customColored(d *tv.BarDataCell) {
 	if d.ID%2 == 0 {
 		switch {
 		case d.Value <= part:
-			d.Fg = tv.ColorGreen
+			d.Fg = cons.ColorGreen
 		case d.Value > 2*part:
-			d.Fg = tv.ColorRed
+			d.Fg = cons.ColorRed
 		default:
-			d.Fg = tv.ColorBlue
+			d.Fg = cons.ColorBlue
 		}
 	} else {
 		d.Ch = '#'
 		switch {
 		case d.Value <= part:
-			d.Fg = tv.ColorGreenBold
+			d.Fg = cons.ColorGreenBold
 		case d.Value > 2*part:
-			d.Fg = tv.ColorRedBold
+			d.Fg = cons.ColorRedBold
 		default:
-			d.Fg = tv.ColorBlueBold
+			d.Fg = cons.ColorBlueBold
 		}
 	}
 }
 
-func createView() *tv.BarChart {
+func createView() *tv.TBarChart {
 
 	view := tv.AddWindow(0, 0, 10, 7, "BarChart Demo")
 	bch := tv.CreateBarChart(view, 40, 12, 1)
 
-	frmChk := tv.CreateFrame(view, 8, 5, tv.BorderNone, types.Fixed)
-	frmChk.SetPack(tv.Vertical)
-	chkTitles := tv.CreateCheckBox(frmChk, types.AutoSize, "Show Titles", types.Fixed)
-	chkMarks := tv.CreateCheckBox(frmChk, types.AutoSize, "Show Marks", types.Fixed)
+	frmChk := tv.CreateFrame(view, 8, 5, cons.ABorderNone, cons.Fixed)
+	frmChk.SetPack(cons.Vertical)
+	chkTitles := tv.CreateCheckBox(frmChk, cons.AutoSize, "Show Titles", cons.Fixed)
+	chkMarks := tv.CreateCheckBox(frmChk, cons.AutoSize, "Show Marks", cons.Fixed)
 	chkTitles.SetState(1)
-	chkLegend := tv.CreateCheckBox(frmChk, types.AutoSize, "Show Legend", types.Fixed)
-	chkValues := tv.CreateCheckBox(frmChk, types.AutoSize, "Show Values", types.Fixed)
+	chkLegend := tv.CreateCheckBox(frmChk, cons.AutoSize, "Show Legend", cons.Fixed)
+	chkValues := tv.CreateCheckBox(frmChk, cons.AutoSize, "Show Values", cons.Fixed)
 	chkValues.SetState(1)
-	chkFixed := tv.CreateCheckBox(frmChk, types.AutoSize, "Fixed Width", types.Fixed)
-	chkGap := tv.CreateCheckBox(frmChk, types.AutoSize, "No Gap", types.Fixed)
-	chkMulti := tv.CreateCheckBox(frmChk, types.AutoSize, "MultiColored", types.Fixed)
-	chkCustom := tv.CreateCheckBox(frmChk, types.AutoSize, "Custom Colors", types.Fixed)
+	chkFixed := tv.CreateCheckBox(frmChk, cons.AutoSize, "Fixed Width", cons.Fixed)
+	chkGap := tv.CreateCheckBox(frmChk, cons.AutoSize, "No Gap", cons.Fixed)
+	chkMulti := tv.CreateCheckBox(frmChk, cons.AutoSize, "MultiColored", cons.Fixed)
+	chkCustom := tv.CreateCheckBox(frmChk, cons.AutoSize, "Custom Colors", cons.Fixed)
 
 	tv.ActivateControl(view, chkTitles)
 
@@ -53,38 +54,38 @@ func createView() *tv.BarChart {
 		if state == 0 {
 			chkMarks.SetEnabled(false)
 			bch.SetShowTitles(false)
-			tv.PutEvent(tv.Event{Type: tv.EventRedraw})
+			tv.PutEvent(event.TEvent{Type: cons.EventRedraw})
 		} else if state == 1 {
 			chkMarks.SetEnabled(true)
 			bch.SetShowTitles(true)
-			tv.PutEvent(tv.Event{Type: tv.EventRedraw})
+			tv.PutEvent(event.TEvent{Type: cons.EventRedraw})
 		}
 	})
 	chkMarks.OnChange(func(state int) {
 		if state == 0 {
 			bch.SetShowMarks(false)
-			tv.PutEvent(tv.Event{Type: tv.EventRedraw})
+			tv.PutEvent(event.TEvent{Type: cons.EventRedraw})
 		} else if state == 1 {
 			bch.SetShowMarks(true)
-			tv.PutEvent(tv.Event{Type: tv.EventRedraw})
+			tv.PutEvent(event.TEvent{Type: cons.EventRedraw})
 		}
 	})
 	chkLegend.OnChange(func(state int) {
 		if state == 0 {
 			bch.SetLegendWidth(0)
-			tv.PutEvent(tv.Event{Type: tv.EventRedraw})
+			tv.PutEvent(event.TEvent{Type: cons.EventRedraw})
 		} else if state == 1 {
 			bch.SetLegendWidth(10)
-			tv.PutEvent(tv.Event{Type: tv.EventRedraw})
+			tv.PutEvent(event.TEvent{Type: cons.EventRedraw})
 		}
 	})
 	chkValues.OnChange(func(state int) {
 		if state == 0 {
 			bch.SetValueWidth(0)
-			tv.PutEvent(tv.Event{Type: tv.EventRedraw})
+			tv.PutEvent(event.TEvent{Type: cons.EventRedraw})
 		} else if state == 1 {
 			bch.SetValueWidth(5)
-			tv.PutEvent(tv.Event{Type: tv.EventRedraw})
+			tv.PutEvent(event.TEvent{Type: cons.EventRedraw})
 		}
 	})
 	chkMulti.OnChange(func(state int) {
@@ -95,15 +96,15 @@ func createView() *tv.BarChart {
 				{Value: 150, Title: ">100%"},
 			}
 			bch.SetData(d)
-			tv.PutEvent(tv.Event{Type: tv.EventRedraw})
+			tv.PutEvent(event.TEvent{Type: cons.EventRedraw})
 		} else if state == 1 {
 			d := []tv.BarData{
-				{Value: 80, Title: "80%", Fg: tv.ColorBlue},
-				{Value: 50, Title: "50%", Fg: tv.ColorGreen, Ch: 'X'},
-				{Value: 150, Title: ">100%", Fg: tv.ColorYellow},
+				{Value: 80, Title: "80%", Fg: cons.ColorBlue},
+				{Value: 50, Title: "50%", Fg: cons.ColorGreen, Ch: 'X'},
+				{Value: 150, Title: ">100%", Fg: cons.ColorYellow},
 			}
 			bch.SetData(d)
-			tv.PutEvent(tv.Event{Type: tv.EventRedraw})
+			tv.PutEvent(event.TEvent{Type: cons.EventRedraw})
 		}
 	})
 	chkFixed.OnChange(func(state int) {
@@ -112,7 +113,7 @@ func createView() *tv.BarChart {
 		} else if state == 1 {
 			bch.SetAutoSize(false)
 		}
-		tv.PutEvent(tv.Event{Type: tv.EventRedraw})
+		tv.PutEvent(event.TEvent{Type: cons.EventRedraw})
 	})
 	chkGap.OnChange(func(state int) {
 		if state == 1 {
@@ -120,7 +121,7 @@ func createView() *tv.BarChart {
 		} else if state == 0 {
 			bch.SetBarGap(1)
 		}
-		tv.PutEvent(tv.Event{Type: tv.EventRedraw})
+		tv.PutEvent(event.TEvent{Type: cons.EventRedraw})
 	})
 	chkCustom.OnChange(func(state int) {
 		if state == 0 {
@@ -128,7 +129,7 @@ func createView() *tv.BarChart {
 		} else if state == 1 {
 			bch.OnDrawCell(customColored)
 		}
-		tv.PutEvent(tv.Event{Type: tv.EventRedraw})
+		tv.PutEvent(event.TEvent{Type: cons.EventRedraw})
 	})
 
 	return bch

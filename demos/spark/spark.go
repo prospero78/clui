@@ -4,26 +4,27 @@ import (
 	"math/rand"
 	"time"
 
-	ui "github.com/prospero78/goTV/tv"
-	"github.com/prospero78/goTV/tv/types"
+	"github.com/prospero78/goTV/tv"
+	"github.com/prospero78/goTV/tv/cons"
+	"github.com/prospero78/goTV/tv/widgets/event"
 )
 
-func createView() *ui.SparkChart {
+func createView() *tv.SparkChart {
 
-	view := ui.AddWindow(0, 0, 10, 7, "BarChart Demo")
-	bch := ui.CreateSparkChart(view, 25, 12, 1)
+	view := tv.AddWindow(0, 0, 10, 7, "BarChart Demo")
+	bch := tv.CreateSparkChart(view, 25, 12, 1)
 	bch.SetTop(20)
 
-	frmChk := ui.CreateFrame(view, 8, 5, ui.BorderNone, types.Fixed)
-	frmChk.SetPack(ui.Vertical)
-	chkValues := ui.CreateCheckBox(frmChk, types.AutoSize, "Show Values", types.Fixed)
+	frmChk := tv.CreateFrame(view, 8, 5, cons.ABorderNone, cons.Fixed)
+	frmChk.SetPack(cons.Vertical)
+	chkValues := tv.CreateCheckBox(frmChk, cons.AutoSize, "Show Values", cons.Fixed)
 	chkValues.SetState(0)
-	chkHilite := ui.CreateCheckBox(frmChk, types.AutoSize, "Hilite peaks", types.Fixed)
+	chkHilite := tv.CreateCheckBox(frmChk, cons.AutoSize, "Hilite peaks", cons.Fixed)
 	chkHilite.SetState(1)
-	chkAuto := ui.CreateCheckBox(frmChk, types.AutoSize, "Auto scale", types.Fixed)
+	chkAuto := tv.CreateCheckBox(frmChk, cons.AutoSize, "Auto scale", cons.Fixed)
 	chkAuto.SetState(1)
 
-	ui.ActivateControl(view, chkValues)
+	tv.ActivateControl(view, chkValues)
 
 	chkValues.OnChange(func(state int) {
 		if state == 0 {
@@ -31,7 +32,7 @@ func createView() *ui.SparkChart {
 		} else if state == 1 {
 			bch.SetValueWidth(5)
 		}
-		ui.PutEvent(ui.Event{Type: ui.EventRedraw})
+		tv.PutEvent(event.TEvent{Type: cons.EventRedraw})
 	})
 	chkHilite.OnChange(func(state int) {
 		if state == 0 {
@@ -39,7 +40,7 @@ func createView() *ui.SparkChart {
 		} else if state == 1 {
 			bch.SetHilitePeaks(true)
 		}
-		ui.PutEvent(ui.Event{Type: ui.EventRedraw})
+		tv.PutEvent(event.TEvent{Type: cons.EventRedraw})
 	})
 	chkAuto.OnChange(func(state int) {
 		if state == 0 {
@@ -47,7 +48,7 @@ func createView() *ui.SparkChart {
 		} else if state == 1 {
 			bch.SetAutoScale(true)
 		}
-		ui.PutEvent(ui.Event{Type: ui.EventRedraw})
+		tv.PutEvent(event.TEvent{Type: cons.EventRedraw})
 	})
 
 	return bch
@@ -56,8 +57,8 @@ func createView() *ui.SparkChart {
 func mainLoop() {
 	// Every application must create a single Composer and
 	// call its intialize method
-	ui.InitLibrary()
-	defer ui.DeinitLibrary()
+	tv.InitLibrary()
+	defer tv.DeinitLibrary()
 
 	b := createView()
 	b.SetData([]float64{1, 2, 3, 4, 5, 6, 6, 7, 5, 8, 9})
@@ -68,13 +69,13 @@ func mainLoop() {
 			select {
 			case <-ticker:
 				b.AddData(float64(rand.Int31n(20)))
-				ui.PutEvent(ui.Event{Type: ui.EventRedraw})
+				tv.PutEvent(event.TEvent{Type: cons.EventRedraw})
 			}
 		}
 	}()
 
 	// start event processing loop - the main core of the library
-	ui.MainLoop()
+	tv.MainLoop()
 }
 
 func main() {

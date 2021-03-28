@@ -4,7 +4,10 @@ import (
 	"sync"
 
 	term "github.com/nsf/termbox-go"
+
+	"github.com/prospero78/goTV/tv/cons"
 	"github.com/prospero78/goTV/tv/types"
+	"github.com/prospero78/goTV/tv/widgets/event"
 	"github.com/prospero78/goTV/tv/widgets/window"
 	"github.com/sirupsen/logrus"
 )
@@ -15,7 +18,7 @@ import (
 type Composer struct {
 	// list of visible Views
 	windows      []types.IWidget
-	windowBorder BorderStyle
+	windowBorder cons.BorderStyle
 	consumer     types.IWidget
 	// last pressed key - to make repeatable actions simpler, e.g, at first
 	// one presses Ctrl+S and then just repeatedly presses arrow lest to
@@ -27,7 +30,7 @@ type Composer struct {
 	// last processed coordinates: e.g, for mouse move
 	lastX, lastY int
 	// Type of dragging
-	dragType DragType
+	dragType cons.DragType
 	// For safe Window manipulations
 	mtx sync.RWMutex
 }
@@ -39,7 +42,7 @@ var (
 func initComposer() {
 	comp = new(Composer)
 	comp.windows = make([]types.IWidget, 0)
-	comp.windowBorder = BorderAuto
+	comp.windowBorder = cons.BorderAuto
 	comp.consumer = nil
 	comp.lastKey = term.KeyEsc
 }
@@ -66,8 +69,8 @@ func ReleaseEvents() {
 	comp.consumer = nil
 }
 
-func termboxEventToLocal(ev term.Event) Event {
-	e := Event{Type: EventType(ev.Type), Ch: ev.Ch,
+func termboxEventToLocal(ev term.Event) event.TEvent {
+	e := event.TEvent{Type: types.AEventType(ev.Type), Ch: ev.Ch,
 		Key: ev.Key, Err: ev.Err, X: ev.MouseX, Y: ev.MouseY,
 		Mod: ev.Mod, Width: ev.Width, Height: ev.Height}
 	return e
@@ -76,7 +79,7 @@ func termboxEventToLocal(ev term.Event) Event {
 // Repaints everything on the screen
 func RefreshScreen() {
 	comp.BeginUpdate()
-	if err := term.Clear(ColorWhite, ColorBlack); err != nil {
+	if err := term.Clear(cons.ColorWhite, cons.ColorBlack); err != nil {
 		logrus.WithError(err).Fatalf("composer.go/RefreshScreen(): in clear terminal")
 	}
 	comp.EndUpdate()
@@ -106,7 +109,7 @@ func RefreshScreen() {
 // posX and posY are top left coordinates of the Window
 // width and height are Window size
 // title is a Window title
-func AddWindow(posX, posY, width, height int, title string) *Window {
+func AddWindow(posX, posY, width, height int, title string) *window.TWindow {
 	window := CreateWindow(posX, posY, width, height, title)
 	window.SetBorder(comp.windowBorder)
 
@@ -124,12 +127,12 @@ func AddWindow(posX, posY, width, height int, title string) *Window {
 }
 
 // Border returns the default window border
-func (c *Composer) BorderStyle() BorderStyle {
+func (c *Composer) BorderStyle() cons.BorderStyle {
 	return c.windowBorder
 }
 
 // SetBorder changes the default window border
-func (c *Composer) SetBorder(border BorderStyle) {
+func (c *Composer) SetBorder(border cons.BorderStyle) {
 	c.windowBorder = border
 }
 
@@ -160,21 +163,21 @@ func (c *Composer) getWindowList() []types.IWidget {
 	return arr_copy
 }
 
-func (c *Composer) checkWindowUnderMouse(screenX, screenY int) (types.IWidget, HitResult) {
+func (c *Composer) checkWindowUnderMouse(screenX, screenY int) (types.IWidget, types.AHitResult) {
 	windows := c.getWindowList()
 	if len(windows) == 0 {
-		return nil, HitOutside
+		return nil, cons.HitOutside
 	}
 
 	for i := len(windows) - 1; i >= 0; i-- {
 		window := windows[i]
 		hit := window.HitTest(screenX, screenY)
-		if hit != HitOutside {
+		if hit != cons.HitOutside {
 			return window, hit
 		}
 	}
 
-	return nil, HitOutside
+	return nil, cons.HitOutside
 }
 
 func (c *Composer) activateWindow(window types.IWidget) bool {
@@ -222,7 +225,7 @@ func (c *Composer) moveActiveWindowToBottom() bool {
 
 	anyVisible := false
 	for _, w := range windows {
-		v := w.(*Window)
+		v := w.(*window.TWindow)
 		if v.Visible() {
 			anyVisible = true
 			break
@@ -232,8 +235,8 @@ func (c *Composer) moveActiveWindowToBottom() bool {
 		return false
 	}
 
-	event := Event{Type: EventActivate, X: 0} // send deactivated
-	c.sendEventToActiveWindow(event)
+	_event := event.TEvent{Type: cons.EventActivate, X: 0} // send deactivated
+	c.sendEventToActiveWindow(_event)
 
 	for {
 		last := c.topWindow()
@@ -254,14 +257,14 @@ func (c *Composer) moveActiveWindowToBottom() bool {
 		}
 	}
 
-	event = Event{Type: EventActivate, X: 1} // send 'activated'
-	c.sendEventToActiveWindow(event)
+	_event = event.TEvent{Type: cons.EventActivate, X: 1} // send 'activated'
+	c.sendEventToActiveWindow(_event)
 	RefreshScreen()
 
 	return true
 }
 
-func (c *Composer) sendEventToActiveWindow(ev Event) bool {
+func (c *Composer) sendEventToActiveWindow(ev event.TEvent) bool {
 	view := c.topWindow()
 	if view != nil {
 		return view.ProcessEvent(ev)
@@ -307,15 +310,15 @@ func (c *Composer) resizeTopWindow(ev types.IWidget) bool {
 
 	if w1 != w || h1 != h {
 		view.SetSize(w, h)
-		event := Event{Type: EventResize, X: w, Y: h}
-		c.sendEventToActiveWindow(event)
+		_event := event.TEvent{Type: types.AEventType(cons.EventResize), X: w, Y: h}
+		c.sendEventToActiveWindow(_event)
 		RefreshScreen()
 	}
 
 	return true
 }
 
-func (c *Composer) moveTopWindow(ev Event) bool {
+func (c *Composer) moveTopWindow(ev event.TEvent) bool {
 	view := c.topWindow()
 	if view != nil {
 		topwindow, ok := view.(*window.TWindow)
@@ -340,7 +343,7 @@ func (c *Composer) moveTopWindow(ev Event) bool {
 
 		if x1 != x || y1 != y {
 			view.SetPos(x, y)
-			event := Event{Type: EventMove, X: x, Y: y}
+			event := event.TEvent{Type: cons.EventMove, X: x, Y: y}
 			c.sendEventToActiveWindow(event)
 			RefreshScreen()
 		}
@@ -353,14 +356,14 @@ func (c *Composer) moveTopWindow(ev Event) bool {
 func (c *Composer) closeTopWindow() {
 	if len(c.windows) > 1 {
 		view := c.topWindow()
-		event := Event{Type: EventClose, X: 1}
+		_event := event.TEvent{Type: cons.EventClose, X: 1}
 
-		if c.sendEventToActiveWindow(event) {
+		if c.sendEventToActiveWindow(_event) {
 			c.DestroyWindow(view)
 			activate := c.topWindow()
 			c.activateWindow(activate)
-			event = Event{Type: EventActivate, X: 1} // send 'activated'
-			c.sendEventToActiveWindow(event)
+			event = event.TEvent{Type: cons.EventActivate, X: 1} // send 'activated'
+			c.sendEventToActiveWindow(_event)
 		}
 
 		RefreshScreen()
@@ -369,8 +372,8 @@ func (c *Composer) closeTopWindow() {
 	}
 }
 
-func (c *Composer) processWindowDrag(ev Event) {
-	if ev.Mod != term.ModMotion || c.dragType == DragNone {
+func (c *Composer) processWindowDrag(ev event.TEvent) {
+	if ev.Mod != term.ModMotion || c.dragType == cons.DragNone {
 		return
 	}
 	dx := ev.X - c.lastX
@@ -385,7 +388,7 @@ func (c *Composer) processWindowDrag(ev Event) {
 	cw, ch := ScreenSize()
 
 	switch c.dragType {
-	case DragMove:
+	case cons.DragMove:
 		newX += dx
 		newY += dy
 		if newX >= 0 && newY >= 0 && newX+newW < cw && newY+newH < ch {
@@ -393,11 +396,11 @@ func (c *Composer) processWindowDrag(ev Event) {
 			c.lastY = ev.Y
 
 			w.SetPos(newX, newY)
-			event := Event{Type: EventMove, X: newX, Y: newY}
-			c.sendEventToActiveWindow(event)
+			_event := event.TEvent{Type: cons.EventMove, X: newX, Y: newY}
+			c.sendEventToActiveWindow(_event)
 			RefreshScreen()
 		}
-	case DragResizeLeft:
+	case cons.DragResizeLeft:
 		newX += dx
 		newW -= dx
 		if newX >= 0 && newY >= 0 && newX+newW < cw && newY+newH < ch {
@@ -406,35 +409,35 @@ func (c *Composer) processWindowDrag(ev Event) {
 
 			w.SetPos(newX, newY)
 			w.SetSize(newW, newH)
-			event := Event{Type: EventMove, X: newX, Y: newY}
-			c.sendEventToActiveWindow(event)
-			event.Type = EventResize
-			c.sendEventToActiveWindow(event)
+			_event := event.TEvent{Type: cons.EventMove, X: newX, Y: newY}
+			c.sendEventToActiveWindow(_event)
+			_event.Type = types.AEventType(cons.EventResize)
+			c.sendEventToActiveWindow(_event)
 			RefreshScreen()
 		}
-	case DragResizeRight:
+	case cons.DragResizeRight:
 		newW += dx
 		if newX >= 0 && newY >= 0 && newX+newW < cw && newY+newH < ch {
 			c.lastX = ev.X
 			c.lastY = ev.Y
 
 			w.SetSize(newW, newH)
-			event := Event{Type: EventResize}
-			c.sendEventToActiveWindow(event)
+			_event := event.TEvent{Type: types.AEventType(cons.EventResize)}
+			c.sendEventToActiveWindow(_event)
 			RefreshScreen()
 		}
-	case DragResizeBottom:
+	case cons.DragResizeBottom:
 		newH += dy
 		if newX >= 0 && newY >= 0 && newX+newW < cw && newY+newH < ch {
 			c.lastX = ev.X
 			c.lastY = ev.Y
 
 			w.SetSize(newW, newH)
-			event := Event{Type: EventResize}
-			c.sendEventToActiveWindow(event)
+			_event := event.TEvent{Type: types.AEventType(cons.EventResize)}
+			c.sendEventToActiveWindow(_event)
 			RefreshScreen()
 		}
-	case DragResizeTopLeft:
+	case cons.DragResizeTopLeft:
 		newX += dx
 		newW += dx
 		newY += dy
@@ -445,13 +448,13 @@ func (c *Composer) processWindowDrag(ev Event) {
 
 			w.SetPos(newX, newY)
 			w.SetSize(newW, newH)
-			event := Event{Type: EventMove, X: newX, Y: newY}
-			c.sendEventToActiveWindow(event)
-			event.Type = EventResize
-			c.sendEventToActiveWindow(event)
+			_event := event.TEvent{Type: cons.EventMove, X: newX, Y: newY}
+			c.sendEventToActiveWindow(_event)
+			_event.Type = types.AEventType(cons.EventResize)
+			c.sendEventToActiveWindow(_event)
 			RefreshScreen()
 		}
-	case DragResizeBottomLeft:
+	case cons.DragResizeBottomLeft:
 		newX += dx
 		newW -= dx
 		newH += dy
@@ -461,13 +464,13 @@ func (c *Composer) processWindowDrag(ev Event) {
 
 			w.SetPos(newX, newY)
 			w.SetSize(newW, newH)
-			event := Event{Type: EventMove, X: newX, Y: newY}
+			event := event.TEvent{Type: cons.EventMove, X: newX, Y: newY}
 			c.sendEventToActiveWindow(event)
-			event.Type = EventResize
+			event.Type = types.AEventType(cons.EventResize)
 			c.sendEventToActiveWindow(event)
 			RefreshScreen()
 		}
-	case DragResizeBottomRight:
+	case cons.DragResizeBottomRight:
 		newW += dx
 		newH += dy
 		if newX >= 0 && newY >= 0 && newX+newW < cw && newY+newH < ch {
@@ -475,11 +478,11 @@ func (c *Composer) processWindowDrag(ev Event) {
 			c.lastY = ev.Y
 
 			w.SetSize(newW, newH)
-			event := Event{Type: EventResize}
+			event := event.TEvent{Type: types.AEventType(cons.EventResize)}
 			c.sendEventToActiveWindow(event)
 			RefreshScreen()
 		}
-	case DragResizeTopRight:
+	case cons.DragResizeTopRight:
 		newY += dy
 		newW += dx
 		newH -= dy
@@ -489,9 +492,9 @@ func (c *Composer) processWindowDrag(ev Event) {
 
 			w.SetPos(newX, newY)
 			w.SetSize(newW, newH)
-			event := Event{Type: EventMove, X: newX, Y: newY}
+			event := event.TEvent{Type: cons.EventMove, X: newX, Y: newY}
 			c.sendEventToActiveWindow(event)
-			event.Type = EventResize
+			event.Type = types.AEventType(cons.EventResize)
 			c.sendEventToActiveWindow(event)
 			RefreshScreen()
 		}

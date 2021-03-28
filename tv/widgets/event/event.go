@@ -28,5 +28,5 @@ type TEvent struct {
 	// For resize event - new terminal size
 	Width  int
 	Height int
-	Target IWidget
+	Target types.IWidget
 }

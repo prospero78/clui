@@ -2,6 +2,9 @@ package tv
 
 import (
 	xs "github.com/huandu/xstrings"
+	"github.com/prospero78/goTV/tv/cons"
+	"github.com/prospero78/goTV/tv/types"
+	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 )
 
 /*
@@ -13,10 +16,10 @@ of alignment feature: if text is longer than Label width the text
 is always left aligned
 */
 type Label struct {
-	TBaseControl
+	widgetbase.TWidgetBase
 	direction   Direction
 	multiline   bool
-	textDisplay Align
+	textDisplay types.AAlign
 }
 
 /*
@@ -30,9 +33,9 @@ control should keep its original size.
 */
 func CreateLabel(parent types.IWidget, w, h int, title string, scale int) *Label {
 	c := new(Label)
-	c.TBaseControl = NewBaseControl()
+	c.TWidgetBase = widgetbase.New()
 
-	if w == AutoSize {
+	if w == cons.AutoSize {
 		w = xs.Len(title)
 	}
 	if h == AutoSize {

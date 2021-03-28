@@ -3,14 +3,16 @@ package main
 import (
 	"fmt"
 
-	ui "github.com/prospero78/goTV/tv"
+	"github.com/prospero78/goTV/tv"
+	"github.com/prospero78/goTV/tv/cons"
+	"github.com/prospero78/goTV/tv/widgets/event"
 )
 
-func createView() *ui.TableView {
+func createView() *tv.TableView {
 
-	view := ui.AddWindow(0, 0, 10, 7, "TableView Demo")
-	bch := ui.CreateTableView(view, 25, 12, 1)
-	ui.ActivateControl(view, bch)
+	view := tv.AddWindow(0, 0, 10, 7, "TableView Demo")
+	bch := tv.CreateTableView(view, 25, 12, 1)
+	tv.ActivateControl(view, bch)
 
 	return bch
 }
@@ -20,19 +22,19 @@ const rowCount = 15
 func mainLoop() {
 	// Every application must create a single Composer and
 	// call its intialize method
-	ui.InitLibrary()
-	defer ui.DeinitLibrary()
+	tv.InitLibrary()
+	defer tv.DeinitLibrary()
 
 	b := createView()
 	b.SetShowLines(true)
 	b.SetShowRowNumber(true)
 	b.SetRowCount(rowCount)
-	cols := []ui.Column{
-		{Title: "Text", Width: 5, Alignment: ui.AlignLeft},
-		{Title: "Number", Width: 10, Alignment: ui.AlignRight},
-		{Title: "Misc", Width: 12, Alignment: ui.AlignCenter},
-		{Title: "Long", Width: 50, Alignment: ui.AlignLeft},
-		{Title: "Last", Width: 8, Alignment: ui.AlignLeft},
+	cols := []tv.Column{
+		{Title: "Text", Width: 5, Alignment: cons.AlignLeft},
+		{Title: "Number", Width: 10, Alignment: cons.AlignRight},
+		{Title: "Misc", Width: 12, Alignment: cons.AlignCenter},
+		{Title: "Long", Width: 50, Alignment: cons.AlignLeft},
+		{Title: "Last", Width: 8, Alignment: cons.AlignLeft},
 	}
 	b.SetColumns(cols)
 	colCount := len(cols)
@@ -44,48 +46,48 @@ func mainLoop() {
 		}
 	}
 
-	b.OnDrawCell(func(info *ui.ColumnDrawInfo) {
+	b.OnDrawCell(func(info *tv.ColumnDrawInfo) {
 		info.Text = values[info.Row*colCount+info.Col]
 	})
 
-	b.OnAction(func(ev ui.TableEvent) {
+	b.OnAction(func(ev tv.TableEvent) {
 		btns := []string{"Close", "Dismiss"}
 		var action string
 		switch ev.Action {
-		case ui.TableActionSort:
+		case cons.TableActionSort:
 			action = "Sort table"
-		case ui.TableActionEdit:
+		case cons.TableActionEdit:
 			c := ev.Col
 			r := ev.Row
 			oldVal := values[r*colCount+c]
-			dlg := ui.CreateEditDialog(
+			dlg := tv.CreateEditDialog(
 				fmt.Sprintf("Editing value: %s", oldVal), "New value", oldVal,
 			)
 			dlg.OnClose(func() {
-				if dlg.Result() == ui.DialogButton1 {
+				if dlg.Result() == cons.DialogButton1 {
 					newText := dlg.EditResult()
 					values[r*colCount+c] = newText
-					ui.PutEvent(ui.Event{Type: ui.EventRedraw})
+					tv.PutEvent(event.TEvent{Type: cons.EventRedraw})
 				}
 			})
 			return
-		case ui.TableActionNew:
+		case cons.TableActionNew:
 			action = "Add new row"
-		case ui.TableActionDelete:
+		case cons.TableActionDelete:
 			action = "Delete row"
 		default:
 			action = "Unknown action"
 		}
 
-		dlg := ui.CreateConfirmationDialog(
+		dlg := tv.CreateConfirmationDialog(
 			"<c:blue>"+action,
 			"Click any button or press <c:yellow>SPACE<c:> to close the dialog",
-			btns, ui.DialogButton1)
+			btns, cons.DialogButton1)
 		dlg.OnClose(func() {})
 	})
 
 	// start event processing loop - the main core of the library
-	ui.MainLoop()
+	tv.MainLoop()
 }
 
 func main() {

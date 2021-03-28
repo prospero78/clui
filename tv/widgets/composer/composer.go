@@ -1,12 +1,14 @@
 // Package composer -- операции с компоновщиком
 package composer
 
-
 import (
 	"sync"
 
 	term "github.com/nsf/termbox-go"
+	"github.com/prospero78/goTV/tv/cons"
 	"github.com/prospero78/goTV/tv/types"
+	"github.com/prospero78/goTV/tv/widgets/event"
+	"github.com/prospero78/goTV/tv/widgets/window"
 	"github.com/sirupsen/logrus"
 )
 
@@ -386,7 +388,7 @@ func (c *TPacker) processWindowDrag(ev Event) {
 	cw, ch := ScreenSize()
 
 	switch c.dragType {
-	case DragMove:
+	case cons.DragMove:
 		newX += dx
 		newY += dy
 		if newX >= 0 && newY >= 0 && newX+newW < cw && newY+newH < ch {
@@ -394,11 +396,11 @@ func (c *TPacker) processWindowDrag(ev Event) {
 			c.lastY = ev.Y
 
 			w.SetPos(newX, newY)
-			event := Event{Type: EventMove, X: newX, Y: newY}
+			event := event.TEvent{Type: cons.EventMove, X: newX, Y: newY}
 			c.sendEventToActiveWindow(event)
 			RefreshScreen()
 		}
-	case DragResizeLeft:
+	case cons.DragResizeLeft:
 		newX += dx
 		newW -= dx
 		if newX >= 0 && newY >= 0 && newX+newW < cw && newY+newH < ch {
@@ -407,35 +409,35 @@ func (c *TPacker) processWindowDrag(ev Event) {
 
 			w.SetPos(newX, newY)
 			w.SetSize(newW, newH)
-			event := Event{Type: EventMove, X: newX, Y: newY}
+			event := event.TEvent{Type: cons.EventMove, X: newX, Y: newY}
 			c.sendEventToActiveWindow(event)
-			event.Type = EventResize
+			event.Type = cons.EventResize
 			c.sendEventToActiveWindow(event)
 			RefreshScreen()
 		}
-	case DragResizeRight:
+	case cons.DragResizeRight:
 		newW += dx
 		if newX >= 0 && newY >= 0 && newX+newW < cw && newY+newH < ch {
 			c.lastX = ev.X
 			c.lastY = ev.Y
 
 			w.SetSize(newW, newH)
-			event := Event{Type: EventResize}
+			event := event.TEvent{Type: cons.EventResize}
 			c.sendEventToActiveWindow(event)
 			RefreshScreen()
 		}
-	case DragResizeBottom:
+	case cons.DragResizeBottom:
 		newH += dy
 		if newX >= 0 && newY >= 0 && newX+newW < cw && newY+newH < ch {
 			c.lastX = ev.X
 			c.lastY = ev.Y
 
 			w.SetSize(newW, newH)
-			event := Event{Type: EventResize}
+			event := event.TEvent{Type: cons.EventResize}
 			c.sendEventToActiveWindow(event)
 			RefreshScreen()
 		}
-	case DragResizeTopLeft:
+	case cons.DragResizeTopLeft:
 		newX += dx
 		newW += dx
 		newY += dy
@@ -446,13 +448,13 @@ func (c *TPacker) processWindowDrag(ev Event) {
 
 			w.SetPos(newX, newY)
 			w.SetSize(newW, newH)
-			event := Event{Type: EventMove, X: newX, Y: newY}
+			event := event.TEvent{Type: cons.EventMove, X: newX, Y: newY}
 			c.sendEventToActiveWindow(event)
-			event.Type = EventResize
+			event.Type = cons.EventResize
 			c.sendEventToActiveWindow(event)
 			RefreshScreen()
 		}
-	case DragResizeBottomLeft:
+	case cons.DragResizeBottomLeft:
 		newX += dx
 		newW -= dx
 		newH += dy
@@ -462,13 +464,13 @@ func (c *TPacker) processWindowDrag(ev Event) {
 
 			w.SetPos(newX, newY)
 			w.SetSize(newW, newH)
-			event := Event{Type: EventMove, X: newX, Y: newY}
+			event := event.TEvent{Type: cons.EventMove, X: newX, Y: newY}
 			c.sendEventToActiveWindow(event)
-			event.Type = EventResize
+			event.Type = cons.EventResize
 			c.sendEventToActiveWindow(event)
 			RefreshScreen()
 		}
-	case DragResizeBottomRight:
+	case cons.DragResizeBottomRight:
 		newW += dx
 		newH += dy
 		if newX >= 0 && newY >= 0 && newX+newW < cw && newY+newH < ch {
@@ -476,11 +478,11 @@ func (c *TPacker) processWindowDrag(ev Event) {
 			c.lastY = ev.Y
 
 			w.SetSize(newW, newH)
-			event := Event{Type: EventResize}
+			event := event.TEvent{Type: cons.EventResize}
 			c.sendEventToActiveWindow(event)
 			RefreshScreen()
 		}
-	case DragResizeTopRight:
+	case cons.DragResizeTopRight:
 		newY += dy
 		newW += dx
 		newH -= dy
@@ -490,16 +492,16 @@ func (c *TPacker) processWindowDrag(ev Event) {
 
 			w.SetPos(newX, newY)
 			w.SetSize(newW, newH)
-			event := Event{Type: EventMove, X: newX, Y: newY}
+			event := event.TEvent{Type: cons.EventMove, X: newX, Y: newY}
 			c.sendEventToActiveWindow(event)
-			event.Type = EventResize
+			event.Type = cons.EventResize
 			c.sendEventToActiveWindow(event)
 			RefreshScreen()
 		}
 	}
 }
 
-func (c *TPacker) processMouse(ev Event) {
+func (c *TPacker) processMouse(ev event.TEvent) {
 	if c.consumer != nil {
 		tmp := c.consumer
 		tmp.ProcessEvent(ev)
@@ -509,53 +511,53 @@ func (c *TPacker) processMouse(ev Event) {
 	}
 
 	view, hit := c.checkWindowUnderMouse(ev.X, ev.Y)
-	if c.dragType != DragNone {
+	if c.dragType != cons.DragNone {
 		view = c.topWindow()
 	}
 
 	if c.topWindow() == view {
-		if ev.Key == term.MouseRelease && c.dragType != DragNone {
-			c.dragType = DragNone
+		if ev.Key == term.MouseRelease && c.dragType != cons.DragNone {
+			c.dragType = cons.DragNone
 			return
 		}
 
-		if ev.Mod == term.ModMotion && c.dragType != DragNone {
+		if ev.Mod == term.ModMotion && c.dragType != cons.DragNone {
 			c.processWindowDrag(ev)
 			return
 		}
 
-		if hit != HitInside && ev.Key == term.MouseLeft {
-			if hit != HitButtonClose && hit != HitButtonBottom && hit != HitButtonMaximize {
+		if hit != cons.HitInside && ev.Key == term.MouseLeft {
+			if hit != cons.HitButtonClose && hit != cons.HitButtonBottom && hit != cons.HitButtonMaximize {
 				c.lastX = ev.X
 				c.lastY = ev.Y
 				c.mdownX = ev.X
 				c.mdownY = ev.Y
 			}
 			switch hit {
-			case HitButtonClose:
+			case cons.HitButtonClose:
 				c.closeTopWindow()
-			case HitButtonBottom:
+			case cons.HitButtonBottom:
 				c.moveActiveWindowToBottom()
-			case HitButtonMaximize:
-				v := c.topWindow().(*Window)
+			case cons.HitButtonMaximize:
+				v := c.topWindow().(*window.TWindow)
 				maximized := v.Maximized()
 				v.SetMaximized(!maximized)
-			case HitTop:
-				c.dragType = DragMove
-			case HitBottom:
-				c.dragType = DragResizeBottom
-			case HitLeft:
-				c.dragType = DragResizeLeft
-			case HitRight:
-				c.dragType = DragResizeRight
-			case HitTopLeft:
-				c.dragType = DragResizeTopLeft
-			case HitTopRight:
-				c.dragType = DragResizeTopRight
-			case HitBottomRight:
-				c.dragType = DragResizeBottomRight
-			case HitBottomLeft:
-				c.dragType = DragResizeBottomLeft
+			case cons.HitTop:
+				c.dragType = cons.DragMove
+			case cons.HitBottom:
+				c.dragType = cons.DragResizeBottom
+			case cons.HitLeft:
+				c.dragType = types.ADragType(cons.DragResizeLeft)
+			case cons.HitRight:
+				c.dragType = cons.DragResizeRight
+			case cons.HitTopLeft:
+				c.dragType = cons.DragResizeTopLeft
+			case cons.HitTopRight:
+				c.dragType = cons.DragResizeTopRight
+			case cons.HitBottomRight:
+				c.dragType = cons.DragResizeBottomRight
+			case cons.HitBottomLeft:
+				c.dragType = cons.DragResizeBottomLeft
 			}
 
 			return
@@ -578,7 +580,7 @@ func (c *TPacker) processMouse(ev Event) {
 			return
 		}
 
-		ev.Type = EventClick
+		ev.Type = cons.EventClick
 		c.sendEventToActiveWindow(ev)
 		return
 	default:
@@ -590,13 +592,13 @@ func (c *TPacker) processMouse(ev Event) {
 // Stop -- sends termination event to Composer. Composer should stop
 // console management and quit application
 func Stop() {
-	ev := Event{Type: EventQuit}
+	ev := event.TEvent{Type: cons.EventQuit}
 	go PutEvent(ev)
 }
 
 // DestroyWindow removes the Window from the list of managed Windows
 func (c *TPacker) DestroyWindow(view types.IWidget) {
-	ev := Event{Type: EventClose}
+	ev := event.TEvent{Type: cons.EventClose}
 	c.sendEventToActiveWindow(ev)
 
 	windows := c.getWindowList()
@@ -630,7 +632,7 @@ func IsDeadKey(key term.Key) bool {
 	return false
 }
 
-func (c *TPacker) processKey(ev Event) {
+func (c *TPacker) processKey(ev event.TEvent) {
 	if ev.Key == term.KeyEsc {
 		if IsDeadKey(c.lastKey) {
 			c.lastKey = term.KeyEsc
@@ -684,8 +686,8 @@ func (c *TPacker) processKey(ev Event) {
 		case term.KeyCtrlH:
 			c.moveActiveWindowToBottom()
 		case term.KeyCtrlM:
-			w := c.topWindow().(*Window)
-			if w.Sizable() && (w.TitleButtons()&ButtonMaximize == ButtonMaximize) {
+			w := c.topWindow().(*window.TWindow)
+			if w.Sizable() && (w.TitleButtons()&cons.ButtonMaximize == cons.ButtonMaximize) {
 				maxxed := w.Maximized()
 				w.SetMaximized(!maxxed)
 				RefreshScreen()
@@ -698,7 +700,7 @@ func (c *TPacker) processKey(ev Event) {
 	}
 
 	if newKey != term.KeyEsc {
-		event := Event{Key: c.lastKey, Type: EventKey}
+		event := event.TEvent{Key: c.lastKey, Type: cons.EventKey}
 		c.sendEventToActiveWindow(event)
 		event.Key = newKey
 		c.sendEventToActiveWindow(event)
@@ -706,16 +708,16 @@ func (c *TPacker) processKey(ev Event) {
 	}
 }
 
-func ProcessEvent(ev Event) {
+func ProcessEvent(ev event.TEvent) {
 	switch ev.Type {
-	case EventCloseWindow:
+	case cons.EventCloseWindow:
 		comp.closeTopWindow()
-	case EventRedraw:
+	case cons.EventRedraw:
 		RefreshScreen()
-	case EventResize:
+	case cons.EventResize:
 		SetScreenSize(ev.Width, ev.Height)
 		for _, c := range comp.windows {
-			wnd := c.(*Window)
+			wnd := c.(*window.TWindow)
 			if wnd.Maximized() {
 				wnd.SetSize(ev.Width, ev.Height)
 				wnd.ResizeChildren()
@@ -728,11 +730,11 @@ func ProcessEvent(ev Event) {
 			}
 
 		}
-	case EventKey:
+	case cons.EventKey:
 		comp.processKey(ev)
-	case EventMouse:
+	case cons.EventMouse:
 		comp.processMouse(ev)
-	case EventLayout:
+	case cons.EventLayout:
 		for _, c := range comp.windows {
 			if c == ev.Target {
 				c.ResizeChildren()

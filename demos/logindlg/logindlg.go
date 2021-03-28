@@ -2,40 +2,41 @@ package main
 
 import (
 	"github.com/prospero78/goTV/tv"
-	"github.com/prospero78/goTV/tv/types"
+	"github.com/prospero78/goTV/tv/cons"
+	"github.com/prospero78/goTV/tv/widgets/event"
 )
 
 func createView() {
 	view := tv.AddWindow(0, 0, 30, 7, "Login dialog")
-	view.SetPack(tv.Vertical)
+	view.SetPack(cons.Vertical)
 	view.SetGaps(0, 1)
 	view.SetPaddings(2, 2)
 
-	frmOpts := tv.CreateFrame(view, 1, 1, tv.BorderNone, types.Fixed)
-	frmOpts.SetPack(tv.Horizontal)
-	cbCheck := tv.CreateCheckBox(frmOpts, types.AutoSize, "Use callback to test data", types.Fixed)
+	frmOpts := tv.CreateFrame(view, 1, 1, cons.BorderNone, cons.Fixed)
+	frmOpts.SetPack(cons.Horizontal)
+	cbCheck := tv.CreateCheckBox(frmOpts, cons.AutoSize, "Use callback to test data", cons.Fixed)
 
-	tv.CreateLabel(view, types.AutoSize, types.AutoSize, "Correct credentials", types.Fixed)
+	tv.CreateLabel(view, cons.AutoSize, cons.AutoSize, "Correct credentials", cons.Fixed)
 
-	frmCreds := tv.CreateFrame(view, 1, 1, tv.BorderNone, types.Fixed)
-	frmCreds.SetPack(tv.Horizontal)
+	frmCreds := tv.CreateFrame(view, 1, 1, cons.BorderNone, cons.Fixed)
+	frmCreds.SetPack(cons.Horizontal)
 	frmCreds.SetGaps(1, 0)
-	tv.CreateLabel(frmCreds, types.AutoSize, types.AutoSize, "Username", types.Fixed)
+	tv.CreateLabel(frmCreds, cons.AutoSize, cons.AutoSize, "Username", cons.Fixed)
 	edUser := tv.CreateEditField(frmCreds, 8, "", 1)
-	tv.CreateLabel(frmCreds, types.AutoSize, types.AutoSize, "Password", types.Fixed)
+	tv.CreateLabel(frmCreds, cons.AutoSize, cons.AutoSize, "Password", cons.Fixed)
 	edPass := tv.CreateEditField(frmCreds, 8, "", 1)
 
-	lbRes := tv.CreateLabel(view, types.AutoSize, types.AutoSize, "Result:", types.Fixed)
+	lbRes := tv.CreateLabel(view, cons.AutoSize, cons.AutoSize, "Result:", cons.Fixed)
 
-	frmBtns := tv.CreateFrame(view, 1, 1, tv.BorderNone, types.Fixed)
-	frmBtns.SetPack(tv.Horizontal)
-	btnDlg := tv.CreateButton(frmBtns, types.AutoSize, 4, "Login", types.Fixed)
-	btnQuit := tv.CreateButton(frmBtns, types.AutoSize, 4, "Quit", types.Fixed)
-	tv.CreateFrame(frmBtns, 1, 1, tv.BorderNone, 1)
+	frmBtns := tv.CreateFrame(view, 1, 1, cons.BorderNone, cons.Fixed)
+	frmBtns.SetPack(cons.Horizontal)
+	btnDlg := tv.CreateButton(frmBtns, cons.AutoSize, 4, "Login", cons.Fixed)
+	btnQuit := tv.CreateButton(frmBtns, cons.AutoSize, 4, "Quit", cons.Fixed)
+	tv.CreateFrame(frmBtns, 1, 1, cons.BorderNone, 1)
 
 	tv.ActivateControl(view, edUser)
 
-	btnDlg.OnClick(func(ev tv.Event) {
+	btnDlg.OnClick(func(ev event.TEvent) {
 		dlg := tv.CreateLoginDialog(
 			"Enter credentials",
 			edUser.Title(),
@@ -71,7 +72,7 @@ func createView() {
 		})
 	})
 
-	btnQuit.OnClick(func(ev tv.Event) {
+	btnQuit.OnClick(func(ev event.TEvent) {
 		go tv.Stop()
 	})
 }

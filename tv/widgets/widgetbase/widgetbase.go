@@ -5,8 +5,11 @@ import (
 	"sync"
 
 	mTerm "github.com/nsf/termbox-go"
+	"github.com/prospero78/goTV/tv/cons"
 	"github.com/prospero78/goTV/tv/types"
+	"github.com/prospero78/goTV/tv/widgets/event"
 	"github.com/prospero78/goTV/tv/widgets/widgetbase/widgetid"
+	"github.com/prospero78/goTV/tv/widgets/widgetbase/widgetvisible"
 )
 
 // TWidgetBase -- основа для всех виджетов.
@@ -22,7 +25,7 @@ type TWidgetBase struct {
 	gapX, gapY    int
 	isTabSkip     bool // Пропускать при нажатии клавиши TAB
 	isDisabled    bool // Признак отключенности окна
-	isHidden      bool // Признак скрытости элемента
+	isVisible     widgetvisible.TWidgetVisible // Признак скрытости элемента
 	isInactive    bool
 	isModal       bool // Признак модальности окна
 	isClipped     bool // Признак обрезки виджета
@@ -44,6 +47,7 @@ type TWidgetBase struct {
 func New() TWidgetBase {
 	return TWidgetBase{
 		widgetID: widgetid.GetWidgetID().NextID(),
+		isVisible: widgetvisible.New(),
 	}
 }
 
@@ -178,22 +182,24 @@ func (c *TWidgetBase) SetEnabled(enabled bool) {
 	c.isDisabled = !enabled
 }
 
-func (c *TWidgetBase) Visible() bool {
-	c.block.RLock()
-	defer c.block.RUnlock()
-
-	return !c.isHidden
+func (c *TWidgetBase) IsVisible() types.AVisible {
+	return c.isVisible.Get()
 }
 
-func (c *TWidgetBase) SetVisible(visible bool) {
+func (c *TWidgetBase) IsHidden() types.AVisible {
+	return !c.isVisible.Get()
+}
+
+func (c *TWidgetBase) SetVisible(isVisible bool) {
 	c.block.Lock()
 	defer c.block.Unlock()
 
-	if visible == !c.isHidden {
-		return
+	switch isVisible{
+	case true:
+		c.isVisible.Set()
+	default:
+		c.isVisible.Reset()
 	}
-
-	c.isHidden = !visible
 	if c.parent == nil {
 		return
 	}
@@ -205,9 +211,9 @@ func (c *TWidgetBase) SetVisible(visible bool) {
 
 	go func() {
 		if FindFirstActiveControl(c) != nil && !c.isInactive {
-			PutEvent(Event{Type: EventKey, Key: mTerm.KeyTab})
+			PutEvent(event.TEvent{Type: cons.EventKey, Key: mTerm.KeyTab})
 		}
-		PutEvent(Event{Type: EventLayout, Target: p})
+		PutEvent(event.TEvent{Type: cons.EventLayout, Target: p})
 	}()
 }
 
@@ -255,11 +261,11 @@ func (c *TWidgetBase) SetGaps(dx, dy int) {
 	}
 }
 
-func (c *TWidgetBase) Pack() PackType {
+func (c *TWidgetBase) Pack() cons.PackType {
 	return c.pack
 }
 
-func (c *TWidgetBase) SetPack(pack PackType) {
+func (c *TWidgetBase) SetPack(pack types.APackDirect) {
 	c.pack = pack
 }
 
@@ -273,11 +279,11 @@ func (c *TWidgetBase) SetScale(scale int) {
 	}
 }
 
-func (c *TWidgetBase) Align() Align {
+func (c *TWidgetBase) Align() types.AAlign {
 	return c.align
 }
 
-func (c *TWidgetBase) SetAlign(align Align) {
+func (c *TWidgetBase) SetAlign(align types.AAlign) {
 	c.align = align
 }
 
@@ -300,7 +306,7 @@ func (c *TWidgetBase) SetBackColor(clr mTerm.Attribute) {
 func (c *TWidgetBase) childCount() int {
 	cnt := 0
 	for _, child := range c.children {
-		if child.Visible() {
+		if child.IsVisible() {
 			cnt++
 		}
 	}
@@ -316,7 +322,7 @@ func (c *TWidgetBase) ResizeChildren() {
 
 	fullWidth := c.width - 2*c.padX
 	fullHeight := c.height - 2*c.padY
-	if c.pack == Horizontal {
+	if c.pack == cons.Horizontal {
 		fullWidth -= (children - 1) * c.gapX
 	} else {
 		fullHeight -= (children - 1) * c.gapY
@@ -326,12 +332,12 @@ func (c *TWidgetBase) ResizeChildren() {
 	minWidth := 0
 	minHeight := 0
 	for _, child := range c.children {
-		if !child.Visible() {
+		if child.IsHidden() {
 			continue
 		}
 
 		cw, ch := child.MinimalSize()
-		if c.pack == Horizontal {
+		if c.pack == cons.Horizontal {
 			minWidth += cw
 		} else {
 			minHeight += ch
@@ -340,7 +346,7 @@ func (c *TWidgetBase) ResizeChildren() {
 
 	aStep := 0
 	diff := fullWidth - minWidth
-	if c.pack == Vertical {
+	if c.pack == cons.Vertical {
 		diff = fullHeight - minHeight
 	}
 	if totalSc > 0 {
@@ -348,14 +354,14 @@ func (c *TWidgetBase) ResizeChildren() {
 	}
 
 	for _, ctrl := range c.children {
-		if !ctrl.Visible() {
+		if !ctrl.IsVisible() {
 			continue
 		}
 
 		tw, th := ctrl.MinimalSize()
 		sc := ctrl.Scale()
 		d := ctrl.Scale() * aStep
-		if c.pack == Horizontal {
+		if c.pack == cons.Horizontal {
 			if sc != 0 {
 				if sc == totalSc {
 					tw += diff
@@ -472,7 +478,7 @@ func (c *TWidgetBase) MinimalSize() (w int, h int) {
 	totalX := 2 * c.padX
 	totalY := 2 * c.padY
 
-	if c.pack == Vertical {
+	if c.pack == cons.Vertical {
 		totalY += (children - 1) * c.gapY
 	} else {
 		totalX += (children - 1) * c.gapX
@@ -483,11 +489,11 @@ func (c *TWidgetBase) MinimalSize() (w int, h int) {
 			continue
 		}
 
-		if !ctrl.Visible() {
+		if ctrl.IsHidden() {
 			continue
 		}
 		ww, hh := ctrl.MinimalSize()
-		if c.pack == Vertical {
+		if c.pack == cons.Vertical {
 			totalY += hh
 			if ww+2*c.padX > totalX {
 				totalX = ww + 2*c.padX
@@ -515,7 +521,7 @@ func (c *TWidgetBase) Draw() {
 }
 
 func (c *TWidgetBase) DrawChildren() {
-	if c.isHidden {
+	if c.IsVisible.Get() {
 		return
 	}
 
@@ -553,7 +559,7 @@ func (c *TWidgetBase) setClipper() {
 	c.clipper = &rect{x: x, y: y, w: w, h: h}
 }
 
-func (c *TWidgetBase) HitTest(x, y int) HitResult {
+func (c *TWidgetBase) HitTest(x, y int) types.AHitResult {
 	if x > c.x && x < c.x+c.width-1 &&
 		y > c.y && y < c.y+c.height-1 {
 		return HitInside
@@ -561,18 +567,18 @@ func (c *TWidgetBase) HitTest(x, y int) HitResult {
 
 	if (x == c.x || x == c.x+c.width-1) &&
 		y >= c.y && y < c.y+c.height {
-		return HitBorder
+		return cons.HitBorder
 	}
 
 	if (y == c.y || y == c.y+c.height-1) &&
 		x >= c.x && x < c.x+c.width {
-		return HitBorder
+		return cons.HitBorder
 	}
 
-	return HitOutside
+	return cons.HitOutside
 }
 
-func (c *TWidgetBase) ProcessEvent(ev Event) bool {
+func (c *TWidgetBase) ProcessEvent(ev event.TEvent) bool {
 	return SendEventToChild(c, ev)
 }
 
@@ -590,7 +596,7 @@ func (c *TWidgetBase) PlaceChildren() {
 
 		ctrl.SetPos(xx, yy)
 		ww, hh := ctrl.Size()
-		if c.pack == Vertical {
+		if c.pack == cons.Vertical {
 			yy += c.gapY + hh
 		} else {
 			xx += c.gapX + ww

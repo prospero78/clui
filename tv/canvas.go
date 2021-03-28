@@ -6,6 +6,7 @@ import (
 
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+	"github.com/prospero78/goTV/tv/cons"
 )
 
 type attr struct {
@@ -93,8 +94,8 @@ func Reset() {
 	canvas.width, canvas.height = term.Size()
 	canvas.clipX, canvas.clipY = 0, 0
 	canvas.clipW, canvas.clipH = canvas.width, canvas.height
-	canvas.textColor = ColorWhite
-	canvas.backColor = ColorBlack
+	canvas.textColor = cons.ColorWhite
+	canvas.backColor = cons.ColorBlack
 
 	canvas.attrStack = make([]attr, 0)
 	canvas.clipStack = make([]rect, 0)
@@ -378,14 +379,14 @@ func DrawRawTextVertical(x, y int, text string) {
 }
 
 // DrawFrame paints the frame without changing area inside it
-func DrawFrame(x, y, w, h int, border BorderStyle) {
+func DrawFrame(x, y, w, h int, border cons.BorderStyle) {
 	var chars string
 	switch {
-	case border == BorderThick:
-		chars = SysObject(ObjDoubleBorder)
-	case border == BorderThin:
-		chars = SysObject(ObjSingleBorder)
-	case border == BorderNone:
+	case border == cons.BorderThick:
+		chars = SysObject(cons.ObjDoubleBorder)
+	case border == cons.BorderThin:
+		chars = SysObject(cons.ObjSingleBorder)
+	case border == cons.BorderNone:
 		chars = "      "
 	default:
 		chars = "      "
@@ -438,13 +439,13 @@ func DrawScrollBar(x, y, w, h, pos int) {
 	PushAttributes()
 	defer PopAttributes()
 
-	fg, bg := RealColor(ColorDefault, "", ColorScrollText), RealColor(ColorDefault, "", ColorScrollBack)
+	fg, bg := RealColor(cons.ColorDefault, "", cons.ColorScrollText), RealColor(cons.ColorDefault, "", cons.ColorScrollBack)
 	// TODO: add thumb styling
 	// fgThumb, bgThumb := RealColor(ColorDefault, "", ColorThumbText), RealColor(ColorDefault, "", ColorThumbBack)
 	SetTextColor(fg)
 	SetBackColor(bg)
 
-	parts := []rune(SysObject(ObjScrollBar))
+	parts := []rune(SysObject(cons.ObjScrollBar))
 	chLine, chThumb, chUp, chDown := parts[0], parts[1], parts[2], parts[3]
 	chLeft, chRight := parts[4], parts[5]
 

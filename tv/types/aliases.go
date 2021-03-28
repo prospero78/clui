@@ -26,4 +26,7 @@ type ( // Алисы типов для контроля данных
 	// ASortOrder -- путь сортировки записей в TableView
 	ASortOrder int
 	ADragType  int
+
+	// AVisible -- признак видимости виджета
+	AVisible bool
 )

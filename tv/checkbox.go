@@ -3,7 +3,9 @@ package tv
 import (
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+	"github.com/prospero78/goTV/tv/cons"
 	"github.com/prospero78/goTV/tv/types"
+	"github.com/prospero78/goTV/tv/widgets/event"
 	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 )
 
@@ -30,10 +32,10 @@ CheckBox state can be changed using mouse or pressing space on keyboard while th
 */
 func CreateCheckBox(parent types.IWidget, width int, title string, scale int) *CheckBox {
 	c := new(CheckBox)
-	c.TBaseControl = NewBaseControl()
+	c.TWidgetBase = widgetbase.New()
 	c.parent = parent
 
-	if width == AutoSize {
+	if width == cons.AutoSize {
 		width = xs.Len(title) + 4
 	}
 
@@ -55,7 +57,7 @@ func CreateCheckBox(parent types.IWidget, width int, title string, scale int) *C
 
 // Repaint draws the control on its View surface
 func (c *CheckBox) Draw() {
-	if c.isHidden {
+	if c.IsHidden() {
 		return
 	}
 
@@ -68,14 +70,14 @@ func (c *CheckBox) Draw() {
 	x, y := c.Pos()
 	w, h := c.Size()
 
-	fg, bg := RealColor(c.fg, c.Style(), ColorControlText), RealColor(c.bg, c.Style(), ColorControlBack)
+	fg, bg := RealColor(c.fg, c.Style(), cons.ColorControlText), RealColor(c.bg, c.Style(), cons.ColorControlBack)
 	if !c.Enabled() {
-		fg, bg = RealColor(c.fg, c.Style(), ColorControlDisabledText), RealColor(c.bg, c.Style(), ColorControlDisabledBack)
+		fg, bg = RealColor(c.fg, c.Style(), cons.ColorControlDisabledText), RealColor(c.bg, c.Style(), cons.ColorControlDisabledBack)
 	} else if c.Active() {
-		fg, bg = RealColor(c.fg, c.Style(), ColorControlActiveText), RealColor(c.bg, c.Style(), ColorControlActiveBack)
+		fg, bg = RealColor(c.fg, c.Style(), cons.ColorControlActiveText), RealColor(c.bg, c.Style(), cons.ColorControlActiveBack)
 	}
 
-	parts := []rune(SysObject(ObjCheckBox))
+	parts := []rune(SysObject(cons.ObjCheckBox))
 
 	cOpen, cClose, cEmpty, cCheck, cUnknown := parts[0], parts[1], parts[2], parts[3], parts[4]
 	cState := []rune{cEmpty, cCheck, cUnknown}
@@ -103,12 +105,12 @@ func (c *CheckBox) Draw() {
 //   processes an event it should return true. If the method returns false it means
 //   that the control do not want or cannot process the event and the caller sends
 //   the event to the control parent
-func (c *CheckBox) ProcessEvent(event Event) bool {
-	if (!c.Active() && event.Type == EventKey) || !c.Enabled() {
+func (c *CheckBox) ProcessEvent(event event.TEvent) bool {
+	if (!c.Active() && event.Type == types.AEventType(cons.EventKey)) || !c.Enabled() {
 		return false
 	}
 
-	if (event.Type == EventKey && event.Key == term.KeySpace) || (event.Type == EventClick) {
+	if (event.Type == types.AEventType(cons.EventKey) && event.Key == term.KeySpace) || (event.Type == cons.EventClick) {
 		switch {
 		case c.state == 0:
 			c.SetState(1)
@@ -184,14 +186,14 @@ func (c *CheckBox) Allow3State() bool {
 // Method does nothing if new size is less than minimal size
 // CheckBox height cannot be changed - it equals 1 always
 func (c *CheckBox) SetSize(width, height int) {
-	if width != KeepValue && (width > 1000 || width < c.minW) {
+	if width != cons.KeepValue && (width > 1000 || width < c.minW) {
 		return
 	}
-	if height != KeepValue && (height > 200 || height < c.minH) {
+	if height != cons.KeepValue && (height > 200 || height < c.minH) {
 		return
 	}
 
-	if width != KeepValue {
+	if width != cons.KeepValue {
 		c.width = width
 	}
 

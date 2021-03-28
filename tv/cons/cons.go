@@ -1,10 +1,34 @@
-package tv
+// Package cons -- описатель констант
+package cons
 
 import (
 	term "github.com/nsf/termbox-go"
+
 	"github.com/prospero78/goTV/tv/types"
-	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 )
+
+const (// константы BorderStyle
+	ABorderAuto types.ABorderStyle = iota - 1
+	ABorderNone
+	ABorderThin
+	ABorderThick
+)
+
+const (
+	// Fixed means 'never change size of the object when its parent resizes'
+	Fixed int = 0
+	// AutoSize is used only in constructors. It means that the constructor
+	// should either calculate the size of an object, e.g. for Label it is its text
+	// length, or use default intial values
+	AutoSize int = -1
+	// KeepSize is used as a placeholder when you want to change only one
+	// value and keep other ones untouched. Used in SetSize and SetConstraints
+	// methods only
+	// Example: control.SetConstraint(10, KeepValue) changes only minimal width
+	// of the control and do not change the current minimal control height
+	KeepValue int = -1
+)
+
 
 // Predefined types
 type (
@@ -39,7 +63,7 @@ type (
 )
 
 const (
-	DragNone DragType = iota
+	DragNone types.ADragType = iota
 	DragMove
 	DragResizeLeft
 	DragResizeRight
@@ -108,7 +132,7 @@ const (
 
 // HitResult constants
 const (
-	HitOutside HitResult = iota
+	HitOutside types.AHitResult = iota
 	HitInside
 	HitBorder
 	HitTop
@@ -246,7 +270,7 @@ const (
 // Note: Do not change events from EventKey to EventNone - they correspond to the same named events in termbox library
 const (
 	// a key pressed
-	EventKey EventType = iota
+	EventKey types.AEventType = iota
 	// an object or console size changed. X and Y are new width and height
 	EventResize
 	// Mouse button clicked. X and Y are coordinates of mouse click
