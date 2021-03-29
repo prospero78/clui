@@ -3,6 +3,11 @@ package tv
 import (
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+
+	"github.com/prospero78/goTV/tv/cons"
+	"github.com/prospero78/goTV/tv/types"
+	"github.com/prospero78/goTV/tv/widgets/event"
+	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 )
 
 /*
@@ -10,7 +15,7 @@ Radio button control. Unite a few radios in one radio group to
 make a user select one of available choices.
 */
 type Radio struct {
-	TBaseControl
+	widgetbase.TWidgetBase
 	group    *RadioGroup
 	selected bool
 
@@ -28,9 +33,9 @@ control should keep its original size.
 */
 func CreateRadio(parent types.IWidget, width int, title string, scale int) *Radio {
 	c := new(Radio)
-	c.TBaseControl = NewBaseControl()
+	c.TWidgetBase = widgetbase.New()
 
-	if width == AutoSize {
+	if width == cons.AutoSize {
 		width = xs.Len(title) + 4
 	}
 
@@ -63,14 +68,14 @@ func (c *Radio) Draw() {
 	x, y := c.Pos()
 	w, h := c.Size()
 
-	fg, bg := RealColor(c.fg, c.Style(), ColorControlText), RealColor(c.bg, c.Style(), ColorControlBack)
+	fg, bg := RealColor(c.fg, c.Style(), cons.ColorControlText), RealColor(c.bg, c.Style(), cons.ColorControlBack)
 	if !c.Enabled() {
-		fg, bg = RealColor(c.fg, c.Style(), ColorControlDisabledText), RealColor(c.bg, c.Style(), ColorControlDisabledBack)
+		fg, bg = RealColor(c.fg, c.Style(), cons.ColorControlDisabledText), RealColor(c.bg, c.Style(), cons.ColorControlDisabledBack)
 	} else if c.Active() {
-		fg, bg = RealColor(c.fg, c.Style(), ColorControlActiveText), RealColor(c.bg, c.Style(), ColorControlActiveBack)
+		fg, bg = RealColor(c.fg, c.Style(), cons.ColorControlActiveText), RealColor(c.bg, c.Style(), cons.ColorControlActiveBack)
 	}
 
-	parts := []rune(SysObject(ObjRadio))
+	parts := []rune(SysObject(cons.ObjRadio))
 	cOpen, cClose, cEmpty, cCheck := parts[0], parts[1], parts[2], parts[3]
 	cState := cEmpty
 	if c.selected {
@@ -103,12 +108,12 @@ func (c *Radio) Draw() {
 // The control processes only space button and mouse clicks to make control selected.
 // Deselecting control is not possible: one has to click another radio of the radio
 // group to deselect this button
-func (c *Radio) ProcessEvent(event Event) bool {
-	if (!c.Active() && event.Type == EventKey) || !c.Enabled() {
+func (c *Radio) ProcessEvent(_event event.TEvent) bool {
+	if (!c.Active() && _event.Type == cons.EventKey) || !c.Enabled() {
 		return false
 	}
 
-	if (event.Type == EventKey && event.Key == term.KeySpace) || event.Type == EventClick {
+	if (_event.Type == cons.EventKey && _event.Key == term.KeySpace) || _event.Type == cons.EventClick {
 		if c.group == nil {
 			c.SetSelected(true)
 		} else {

@@ -83,14 +83,14 @@ func (b *Button) Draw() {
 	w, h := b.Size()
 
 	fg, bg := b.fg, b.bg
-	shadow := RealColor(b.shadowColor, b.Style(), ColorButtonShadow)
+	shadow := RealColor(b.shadowColor, b.Style(), cons.ColorButtonShadow)
 	switch {
 	case b.IsDisabled():
-		fg, bg = RealColor(fg, b.Style(), ColorButtonDisabledText), RealColor(bg, b.Style(), ColorButtonDisabledBack)
+		fg, bg = RealColor(fg, b.Style(), cons.ColorButtonDisabledText), RealColor(bg, b.Style(), cons.ColorButtonDisabledBack)
 	case b.Active():
-		fg, bg = RealColor(b.fgActive, b.Style(), ColorButtonActiveText), RealColor(b.bgActive, b.Style(), ColorButtonActiveBack)
+		fg, bg = RealColor(b.fgActive, b.Style(), cons.ColorButtonActiveText), RealColor(b.bgActive, b.Style(), cons.ColorButtonActiveBack)
 	default:
-		fg, bg = RealColor(fg, b.Style(), ColorButtonText), RealColor(bg, b.Style(), ColorButtonBack)
+		fg, bg = RealColor(fg, b.Style(), cons.ColorButtonText), RealColor(bg, b.Style(), cons.ColorButtonBack)
 	}
 
 	dy := (h - 1) / 2
@@ -98,12 +98,12 @@ func (b *Button) Draw() {
 	shift, text := AlignColorizedText(b.title, w-1, b.align)
 	if b.isPressed() == 0 {
 		switch b.shadowType {
-		case ShadowFull:
+		case cons.ShadowFull:
 			SetBackColor(shadow)
 			FillRect(x+1, y+h-1, w-1, 1, ' ')
 			FillRect(x+w-1, y+1, 1, h-1, ' ')
-		case ShadowHalf:
-			parts := []rune(SysObject(ObjButton))
+		case cons.ShadowHalf:
+			parts := []rune(SysObject(cons.ObjButton))
 			var bottomCh, rightCh rune
 			if len(parts) < 2 {
 				bottomCh, rightCh = '▀', '█'
@@ -139,15 +139,15 @@ processes an event it should return true. If the method returns false it means
 that the control do not want or cannot process the event and the caller sends
 the event to the control parent
 */
-func (b *Button) ProcessEvent(event Event) bool {
+func (b *Button) ProcessEvent(_event event.TEvent) bool {
 	if !b.Enabled() {
 		return false
 	}
 
-	if event.Type == EventKey {
-		if event.Key == term.KeySpace && b.isPressed() == 0 {
+	if _event.Type == cons.EventKey {
+		if _event.Key == term.KeySpace && b.isPressed() == 0 {
 			b.setPressed(1)
-			ev := Event{Type: EventRedraw}
+			ev := event.TEvent{Type: cons.EventRedraw}
 
 			go func() {
 				PutEvent(ev)
@@ -157,24 +157,24 @@ func (b *Button) ProcessEvent(event Event) bool {
 			}()
 
 			if b.onClick != nil {
-				b.onClick(event)
+				b.onClick(_event)
 			}
 			return true
-		} else if event.Key == term.KeyEsc && b.isPressed() != 0 {
+		} else if _event.Key == term.KeyEsc && b.isPressed() != 0 {
 			b.setPressed(0)
 			ReleaseEvents()
 			return true
 		}
-	} else if event.Type == EventMouse {
-		if event.Key == term.MouseLeft {
+	} else if _event.Type == cons.EventMouse {
+		if _event.Key == term.MouseLeft {
 			b.setPressed(1)
 			GrabEvents(b)
 			return true
-		} else if event.Key == term.MouseRelease && b.isPressed() != 0 {
+		} else if _event.Key == term.MouseRelease && b.isPressed() != 0 {
 			ReleaseEvents()
-			if event.X >= b.x && event.Y >= b.y && event.X < b.x+b.width && event.Y < b.y+b.height {
+			if _event.X >= b.x && _event.Y >= b.y && _event.X < b.x+b.width && _event.Y < b.y+b.height {
 				if b.onClick != nil {
-					b.onClick(event)
+					b.onClick(_event)
 				}
 			}
 			b.setPressed(0)
@@ -187,7 +187,7 @@ func (b *Button) ProcessEvent(event Event) bool {
 
 // OnClick sets the callback that is called when one clicks button
 // with mouse or pressing space on keyboard while the button is active
-func (b *Button) OnClick(fn func(Event)) {
+func (b *Button) OnClick(fn func(event.TEvent)) {
 	b.onClick = fn
 }
 

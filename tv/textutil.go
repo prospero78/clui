@@ -6,6 +6,8 @@ import (
 
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+	"github.com/prospero78/goTV/tv/cons"
+	"github.com/prospero78/goTV/tv/types"
 )
 
 var (
@@ -66,16 +68,16 @@ func CutText(str string, maxWidth int) string {
 // to draw a label aligned but with transparent beginning
 // and ending. If you do not need transparency you can
 // add spaces manually using the returned shift value
-func AlignText(str string, width int, align Align) (shift int, out string) {
+func AlignText(str string, width int, align types.AAlign) (shift int, out string) {
 	length := xs.Len(str)
 
 	if length >= width {
 		return 0, CutText(str, width)
 	}
 
-	if align == AlignRight {
+	if align == cons.AlignRight {
 		return width - length, str
-	} else if align == AlignCenter {
+	} else if align == cons.AlignCenter {
 		return (width - length) / 2, str
 	}
 
@@ -87,7 +89,7 @@ func AlignText(str string, width int, align Align) (shift int, out string) {
 // color tags to the line beginning.
 // Note: function is ineffective and a bit slow - do not use
 // it everywhere
-func AlignColorizedText(str string, width int, align Align) (int, string) {
+func AlignColorizedText(str string, width int, align types.AAlign) (int, string) {
 	rawText := UnColorizeText(str)
 	length := xs.Len(rawText)
 
@@ -97,9 +99,9 @@ func AlignColorizedText(str string, width int, align Align) (int, string) {
 	}
 
 	skip := 0
-	if align == AlignRight {
+	if align == cons.AlignRight {
 		skip = length - width
-	} else if align == AlignCenter {
+	} else if align == cons.AlignCenter {
 		skip = (length - width) / 2
 	}
 

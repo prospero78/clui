@@ -3,7 +3,9 @@ package tv
 import (
 	term "github.com/nsf/termbox-go"
 
+	"github.com/prospero78/goTV/tv/cons"
 	"github.com/prospero78/goTV/tv/types"
+	"github.com/prospero78/goTV/tv/widgets/event"
 )
 
 // ThumbPosition returns a scrollbar thumb position depending
@@ -92,7 +94,7 @@ func DeactivateControls(parent types.IWidget) {
 	for _, ctrl := range parent.Children() {
 		if ctrl.Active() {
 			ctrl.SetActive(false)
-			ctrl.ProcessEvent(Event{Type: EventActivate, X: 0})
+			ctrl.ProcessEvent(event.TEvent{Type: cons.EventActivate, X: 0})
 		}
 
 		DeactivateControls(ctrl)
@@ -108,7 +110,7 @@ func ActivateControl(parent, control types.IWidget) bool {
 	if ctrl != nil {
 		res = true
 		if !ctrl.Active() {
-			ctrl.ProcessEvent(Event{Type: EventActivate, X: 1})
+			ctrl.ProcessEvent(event.TEvent{Type: cons.EventActivate, X: 1})
 			ctrl.SetActive(true)
 		}
 	}
@@ -140,11 +142,11 @@ func FindChild(parent, control types.IWidget) types.IWidget {
 }
 
 // IsMouseClickEvent returns if a user action can be treated as mouse click.
-func IsMouseClickEvent(ev Event) bool {
-	if ev.Type == EventClick {
+func IsMouseClickEvent(ev event.TEvent) bool {
+	if ev.Type == cons.EventClick {
 		return true
 	}
-	if ev.Type == EventMouse && ev.Key == term.MouseLeft {
+	if ev.Type == cons.EventMouse && ev.Key == term.MouseLeft {
 		return true
 	}
 
@@ -274,7 +276,7 @@ func NextControl(parent types.IWidget, curr types.IWidget, next bool) types.IWid
 // makes it active, and then sends the event to it.
 // If it is not mouse click event then it looks for the first active child and
 // sends the event to it if it is not nil
-func SendEventToChild(parent types.IWidget, ev Event) bool {
+func SendEventToChild(parent types.IWidget, ev event.TEvent) bool {
 	var child types.IWidget
 	if IsMouseClickEvent(ev) {
 		child = ChildAt(parent, ev.X, ev.Y)

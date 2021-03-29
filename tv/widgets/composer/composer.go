@@ -42,7 +42,7 @@ var (
 func initComposer() {
 	comp = new(TPacker)
 	comp.windows = make([]types.IWidget, 0)
-	comp.windowBorder = types.ABorderAuto
+	comp.windowBorder = cons.ABorderAuto
 	comp.consumer = nil
 	comp.lastKey = term.KeyEsc
 }
@@ -70,7 +70,7 @@ func ReleaseEvents() {
 }
 
 func termboxEventToLocal(ev term.Event) types.Event {
-	e := types.Event{Type: EventType(ev.Type), Ch: ev.Ch,
+	e := event.TEvent{Type: EventType(ev.Type), Ch: ev.Ch,
 		Key: ev.Key, Err: ev.Err, X: ev.MouseX, Y: ev.MouseY,
 		Mod: ev.Mod, Width: ev.Width, Height: ev.Height}
 	return e
@@ -79,14 +79,14 @@ func termboxEventToLocal(ev term.Event) types.Event {
 // Repaints everything on the screen
 func RefreshScreen() {
 	comp.BeginUpdate()
-	if err := term.Clear(ColorWhite, ColorBlack); err != nil {
+	if err := term.Clear(cons.ColorWhite, cons.ColorBlack); err != nil {
 		logrus.WithError(err).Fatalf("composer.go/RefreshScreen(): in clear terminal")
 	}
 	comp.EndUpdate()
 
 	windows := comp.getWindowList()
 	for _, wnd := range windows {
-		v := wnd.(*Window)
+		v := wnd.(*window.TWindow)
 		if v.Visible() {
 			wnd.Draw()
 
@@ -109,7 +109,7 @@ func RefreshScreen() {
 // posX and posY are top left coordinates of the Window
 // width and height are Window size
 // title is a Window title
-func AddWindow(posX, posY, width, height int, title string) *Window {
+func AddWindow(posX, posY, width, height int, title string) *window.TWindow {
 	window := CreateWindow(posX, posY, width, height, title)
 	window.SetBorder(comp.windowBorder)
 
@@ -127,12 +127,12 @@ func AddWindow(posX, posY, width, height int, title string) *Window {
 }
 
 // Border returns the default window border
-func (c *TPacker) BorderStyle() BorderStyle {
+func (c *TPacker) BorderStyle() cons.BorderStyle {
 	return c.windowBorder
 }
 
 // SetBorder changes the default window border
-func (c *TPacker) SetBorder(border BorderStyle) {
+func (c *TPacker) SetBorder(border cons.BorderStyle) {
 	c.windowBorder = border
 }
 
@@ -163,21 +163,21 @@ func (c *TPacker) getWindowList() []types.IWidget {
 	return arr_copy
 }
 
-func (c *TPacker) checkWindowUnderMouse(screenX, screenY int) (types.IWidget, HitResult) {
+func (c *TPacker) checkWindowUnderMouse(screenX, screenY int) (types.IWidget, cons.HitResult) {
 	windows := c.getWindowList()
 	if len(windows) == 0 {
-		return nil, HitOutside
+		return nil, cons.HitOutside
 	}
 
 	for i := len(windows) - 1; i >= 0; i-- {
 		window := windows[i]
 		hit := window.HitTest(screenX, screenY)
-		if hit != HitOutside {
+		if hit != cons.HitOutside {
 			return window, hit
 		}
 	}
 
-	return nil, HitOutside
+	return nil, cons.HitResult(cons.HitOutside)
 }
 
 func (c *TPacker) activateWindow(window types.IWidget) bool {
@@ -225,7 +225,7 @@ func (c *TPacker) moveActiveWindowToBottom() bool {
 
 	anyVisible := false
 	for _, w := range windows {
-		v := w.(*Window)
+		v := w.(*window.TWindow)
 		if v.Visible() {
 			anyVisible = true
 			break
@@ -235,8 +235,8 @@ func (c *TPacker) moveActiveWindowToBottom() bool {
 		return false
 	}
 
-	event := Event{Type: EventActivate, X: 0} // send deactivated
-	c.sendEventToActiveWindow(event)
+	_event := event.TEvent{Type: cons.EventActivate, X: 0} // send deactivated
+	c.sendEventToActiveWindow(_event)
 
 	for {
 		last := c.topWindow()
@@ -247,7 +247,7 @@ func (c *TPacker) moveActiveWindowToBottom() bool {
 		c.windows[0] = last
 		c.EndUpdate()
 
-		v := c.topWindow().(*Window)
+		v := c.topWindow().(*window.TWindow)
 		if v.Visible() {
 			if !c.activateWindow(c.topWindow()) {
 				return false
@@ -257,14 +257,14 @@ func (c *TPacker) moveActiveWindowToBottom() bool {
 		}
 	}
 
-	event = Event{Type: EventActivate, X: 1} // send 'activated'
-	c.sendEventToActiveWindow(event)
+	_event = event.TEvent{Type: cons.EventActivate, X: 1} // send 'activated'
+	c.sendEventToActiveWindow(_event)
 	RefreshScreen()
 
 	return true
 }
 
-func (c *TPacker) sendEventToActiveWindow(ev Event) bool {
+func (c *TPacker) sendEventToActiveWindow(ev event.TEvent) bool {
 	view := c.topWindow()
 	if view != nil {
 		return view.ProcessEvent(ev)
@@ -289,7 +289,7 @@ func (c *TPacker) resizeTopWindow(ev types.IWidget) bool {
 		return false
 	}
 
-	topwindow, ok := view.(*Window)
+	topwindow, ok := view.(*window.TWindow)
 	if ok && !topwindow.Sizable() {
 		return false
 	}
@@ -310,18 +310,18 @@ func (c *TPacker) resizeTopWindow(ev types.IWidget) bool {
 
 	if w1 != w || h1 != h {
 		view.SetSize(w, h)
-		event := Event{Type: EventResize, X: w, Y: h}
-		c.sendEventToActiveWindow(event)
+		_event := event.TEvent{Type: cons.EventResize, X: w, Y: h}
+		c.sendEventToActiveWindow(_event)
 		RefreshScreen()
 	}
 
 	return true
 }
 
-func (c *TPacker) moveTopWindow(ev Event) bool {
+func (c *TPacker) moveTopWindow(ev event.TEvent) bool {
 	view := c.topWindow()
 	if view != nil {
-		topwindow, ok := view.(*Window)
+		topwindow, ok := view.(*window.TWindow)
 		if ok && !topwindow.Movable() {
 			return false
 		}
@@ -343,8 +343,8 @@ func (c *TPacker) moveTopWindow(ev Event) bool {
 
 		if x1 != x || y1 != y {
 			view.SetPos(x, y)
-			event := Event{Type: EventMove, X: x, Y: y}
-			c.sendEventToActiveWindow(event)
+			_event := event.TEvent{Type: cons.EventMove, X: x, Y: y}
+			c.sendEventToActiveWindow(_event)
 			RefreshScreen()
 		}
 		return true
@@ -356,14 +356,14 @@ func (c *TPacker) moveTopWindow(ev Event) bool {
 func (c *TPacker) closeTopWindow() {
 	if len(c.windows) > 1 {
 		view := c.topWindow()
-		event := Event{Type: EventClose, X: 1}
+		_event := event.TEvent{Type: cons.EventClose, X: 1}
 
-		if c.sendEventToActiveWindow(event) {
+		if c.sendEventToActiveWindow(_event) {
 			c.DestroyWindow(view)
 			activate := c.topWindow()
 			c.activateWindow(activate)
-			event = Event{Type: EventActivate, X: 1} // send 'activated'
-			c.sendEventToActiveWindow(event)
+			_event = event.TEvent{Type: cons.EventActivate, X: 1} // send 'activated'
+			c.sendEventToActiveWindow(_event)
 		}
 
 		RefreshScreen()
@@ -372,8 +372,8 @@ func (c *TPacker) closeTopWindow() {
 	}
 }
 
-func (c *TPacker) processWindowDrag(ev Event) {
-	if ev.Mod != term.ModMotion || c.dragType == DragNone {
+func (c *TPacker) processWindowDrag(ev event.TEvent) {
+	if ev.Mod != term.ModMotion || c.dragType == cons.DragNone {
 		return
 	}
 	dx := ev.X - c.lastX

@@ -4,7 +4,9 @@ import (
 	"math"
 
 	xs "github.com/huandu/xstrings"
+	"github.com/prospero78/goTV/tv/cons"
 	"github.com/prospero78/goTV/tv/types"
+	"github.com/prospero78/goTV/tv/widgets/event"
 	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 )
 
@@ -16,9 +18,9 @@ is required
 */
 type Frame struct {
 	widgetbase.TWidgetBase
-	border         BorderStyle
+	border         cons.BorderStyle
 	children       []types.IWidget
-	pack           PackType
+	pack           cons.PackType
 	scrollable     bool
 	lastScrollProp int
 }
@@ -32,19 +34,19 @@ bs - type of border: no border, single or double.
 scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 control should keep its original size.
 */
-func CreateFrame(parent types.IWidget, width, height int, bs BorderStyle, scale int) *Frame {
+func CreateFrame(parent types.IWidget, width, height int, bs cons.BorderStyle, scale int) *Frame {
 	f := new(Frame)
-	f.TBaseControl = NewBaseControl()
+	f.TWidgetBase = widgetbase.New()
 
-	if width == AutoSize {
+	if width == cons.AutoSize {
 		width = 5
 	}
-	if height == AutoSize {
+	if height == cons.AutoSize {
 		height = 3
 	}
 
-	if bs == BorderAuto {
-		bs = BorderNone
+	if bs == cons.BorderAuto {
+		bs = cons.BorderNone
 	}
 
 	f.SetSize(width, height)
@@ -55,7 +57,7 @@ func CreateFrame(parent types.IWidget, width, height int, bs BorderStyle, scale 
 	f.SetScale(scale)
 
 	f.SetGaps(0,0)
-	if bs == BorderNone {
+	if bs == cons.BorderNone {
 		f.SetPaddings()
 		f.padX, f.padY = 0, 0
 	} else {
@@ -75,11 +77,11 @@ func (f *Frame) SetScrollable(scrollable bool) {
 	if scrollable {
 		px, py := f.Paddings()
 
-		if f.Pack() == Vertical {
+		if f.Pack() == cons.Vertical {
 			px += 1
 		}
 
-		if f.Pack() == Horizontal {
+		if f.Pack() == cons.Horizontal {
 			py += 1
 		}
 
@@ -135,10 +137,10 @@ func (f *Frame) Draw() {
 		DrawScrollBar(x+w, y, 1, h, f.lastScrollProp)
 	}
 
-	fg, bg := RealColor(f.fg, f.Style(), ColorViewText), RealColor(f.bg, f.Style(), ColorViewBack)
+	fg, bg := RealColor(f.fg, f.Style(), cons.ColorViewText), RealColor(f.bg, f.Style(), cons.ColorViewBack)
 
-	if f.border == BorderNone {
-		if bg != ColorDefault {
+	if f.border == cons.BorderNone {
+		if bg != cons.ColorDefault {
 			SetBackColor(bg)
 			FillRect(x, y, w, h, ' ')
 		}
@@ -177,8 +179,8 @@ func (f *Frame) ScrollTo(x int, y int) {
 	f.PlaceChildren()
 }
 
-func (f *Frame) ProcessEvent(ev Event) bool {
-	if ev.Type != EventActivateChild || (!f.scrollable || ev.Target == nil) {
+func (f *Frame) ProcessEvent(ev event.TEvent) bool {
+	if ev.Type != cons.EventActivateChild || (!f.scrollable || ev.Target == nil) {
 		return false
 	}
 

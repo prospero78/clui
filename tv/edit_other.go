@@ -6,8 +6,12 @@ import (
 	"github.com/atotto/clipboard"
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
-	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 	"github.com/sirupsen/logrus"
+
+	"github.com/prospero78/goTV/tv/cons"
+	"github.com/prospero78/goTV/tv/types"
+	"github.com/prospero78/goTV/tv/widgets/event"
+	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 )
 
 /*
@@ -29,7 +33,7 @@ type EditField struct {
 	maxWidth  int
 	showStars bool
 
-	onChange   func(Event)
+	onChange   func(event.TEvent)
 	onKeyPress func(term.Key, rune) bool
 }
 
@@ -42,12 +46,12 @@ type EditField struct {
 //  control should keep its original size.
 func CreateEditField(parent types.IWidget, width int, text string, scale int) *EditField {
 	e := new(EditField)
-	e.TBaseControl = NewBaseControl()
+	e.TWidgetBase = widgetbase.New()
 	e.onChange = nil
 	e.SetTitle(text)
 	e.SetEnabled(true)
 
-	if width == AutoSize {
+	if width == cons.AutoSize {
 		width = xs.Len(text) + 1
 	}
 
@@ -75,24 +79,24 @@ processes an event it should return true. If the method returns false it means
 that the control do not want or cannot process the event and the caller sends
 the event to the control parent
 */
-func (e *EditField) ProcessEvent(event Event) bool {
+func (e *EditField) ProcessEvent(_event event.TEvent) bool {
 	if !e.Active() || !e.Enabled() {
 		return false
 	}
 
-	if event.Type == EventActivate && event.X == 0 {
+	if _event.Type == cons.EventActivate && _event.X == 0 {
 		term.HideCursor()
 	}
 
-	if event.Type == EventKey && event.Key != term.KeyTab {
+	if _event.Type == cons.EventKey && _event.Key != term.KeyTab {
 		if e.onKeyPress != nil {
-			res := e.onKeyPress(event.Key, event.Ch)
+			res := e.onKeyPress(_event.Key, _event.Ch)
 			if res {
 				return true
 			}
 		}
 
-		switch event.Key {
+		switch _event.Key {
 		case term.KeyEnter:
 			return false
 		case term.KeySpace:
@@ -136,8 +140,8 @@ func (e *EditField) ProcessEvent(event Event) bool {
 			}
 			return true
 		default:
-			if event.Ch != 0 {
-				e.insertRune(event.Ch)
+			if _event.Ch != 0 {
+				e.insertRune(_event.Ch)
 				return true
 			}
 		}

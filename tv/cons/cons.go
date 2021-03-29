@@ -162,7 +162,7 @@ const (
 
 // Alignment constants
 const (
-	AlignLeft Align = iota
+	AlignLeft types.AAlign = iota
 	AlignRight
 	AlignCenter
 )

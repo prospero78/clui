@@ -5,10 +5,12 @@ import (
 
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+	"github.com/prospero78/goTV/tv/cons"
+	"github.com/prospero78/goTV/tv/widgets/event"
 )
 
 // OnChange sets the callback that is called when EditField content is changed
-func (e *EditField) OnChange(fn func(Event)) {
+func (e *EditField) OnChange(fn func(event.TEvent)) {
 	e.onChange = fn
 }
 
@@ -32,7 +34,7 @@ func (e *EditField) setTitleInternal(title string) {
 		e.title = title
 
 		if e.onChange != nil {
-			ev := Event{Msg: title}
+			ev := event.TEvent{Msg: title}
 			e.onChange(ev)
 		}
 	}
@@ -54,7 +56,7 @@ func (e *EditField) Draw() {
 	x, y := e.Pos()
 	w, _ := e.Size()
 
-	parts := []rune(SysObject(ObjEdit))
+	parts := []rune(SysObject(cons.ObjEdit))
 	chLeft, chRight := string(parts[0]), string(parts[1])
 	chStar := "*"
 	if len(parts) > 3 {
@@ -100,11 +102,11 @@ func (e *EditField) Draw() {
 		}
 	}
 
-	fg, bg := RealColor(e.fg, e.Style(), ColorEditText), RealColor(e.bg, e.Style(), ColorEditBack)
+	fg, bg := RealColor(e.fg, e.Style(), cons.ColorEditText), RealColor(e.bg, e.Style(), cons.ColorEditBack)
 	if !e.Enabled() {
-		fg, bg = RealColor(e.fg, e.Style(), ColorDisabledText), RealColor(e.fg, e.Style(), ColorDisabledBack)
+		fg, bg = RealColor(e.fg, e.Style(), cons.ColorDisabledText), RealColor(e.fg, e.Style(), cons.ColorDisabledBack)
 	} else if e.Active() {
-		fg, bg = RealColor(e.fg, e.Style(), ColorEditActiveText), RealColor(e.bg, e.Style(), ColorEditActiveBack)
+		fg, bg = RealColor(e.fg, e.Style(), cons.ColorEditActiveText), RealColor(e.bg, e.Style(), cons.ColorEditActiveBack)
 	}
 
 	SetTextColor(fg)
@@ -255,14 +257,14 @@ func (e *EditField) MaxWidth() int {
 // Method does nothing if new size is less than minimal size
 // EditField height cannot be changed - it equals 1 always
 func (e *EditField) SetSize(width, height int) {
-	if width != KeepValue && (width > 1000 || width < e.minW) {
+	if width != cons.KeepValue && (width > 1000 || width < e.minW) {
 		return
 	}
-	if height != KeepValue && (height > 200 || height < e.minH) {
+	if height != cons.KeepValue && (height > 200 || height < e.minH) {
 		return
 	}
 
-	if width != KeepValue {
+	if width != cons.KeepValue {
 		e.width = width
 	}
 

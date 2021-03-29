@@ -2,11 +2,13 @@ package tv
 
 import (
 	"testing"
+
+	"github.com/prospero78/goTV/tv/cons"
 )
 
 func TestListBox(t *testing.T) {
 	width, height := 10, 5
-	lbox := CreateListBox(nil, width, height, Fixed)
+	lbox := CreateListBox(nil, width, height, cons.Fixed)
 
 	w, h := lbox.Size()
 	if w != width {

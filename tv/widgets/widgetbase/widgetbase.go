@@ -562,7 +562,7 @@ func (c *TWidgetBase) setClipper() {
 func (c *TWidgetBase) HitTest(x, y int) types.AHitResult {
 	if x > c.x && x < c.x+c.width-1 &&
 		y > c.y && y < c.y+c.height-1 {
-		return HitInside
+		return cons.HitInside
 	}
 
 	if (x == c.x || x == c.x+c.width-1) &&

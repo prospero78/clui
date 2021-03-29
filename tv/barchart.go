@@ -122,7 +122,7 @@ func (b *TBarChart) Draw() {
 	PushAttributes()
 	defer PopAttributes()
 
-	fg, bg := RealColor(b.fg, b.Style(), ColorBarChartText), RealColor(b.bg, b.Style(), ColorBarChartBack)
+	fg, bg := RealColor(b.fg, b.Style(), cons.ColorBarChartText), RealColor(b.bg, b.Style(), cons.ColorBarChartBack)
 	SetTextColor(fg)
 	SetBackColor(bg)
 
@@ -170,7 +170,7 @@ func (b *TBarChart) drawBars() {
 
 	h := b.barHeight()
 	pos := start
-	parts := []rune(SysObject(ObjBarChart))
+	parts := []rune(SysObject(cons.ObjBarChart))
 	fg, bg := TextColor(), BackColor()
 
 	for idx, d := range b.data {
@@ -180,10 +180,10 @@ func (b *TBarChart) drawBars() {
 
 		fColor, bColor := d.Fg, d.Bg
 		ch := d.Ch
-		if fColor == ColorDefault {
+		if fColor == cons.ColorDefault {
 			fColor = fg
 		}
-		if bColor == ColorDefault {
+		if bColor == cons.ColorDefault {
 			bColor = bg
 		}
 		if ch == 0 {
@@ -223,7 +223,7 @@ func (b *TBarChart) drawBars() {
 			if xs.Len(d.Title) > barW {
 				s = CutText(d.Title, barW)
 			} else {
-				shift, s = AlignText(d.Title, barW, AlignCenter)
+				shift, s = AlignText(d.Title, barW, cons.AlignCenter)
 			}
 			DrawRawText(b.x+pos+shift, b.y+h+1, s)
 		}

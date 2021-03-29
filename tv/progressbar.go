@@ -6,6 +6,10 @@ import (
 
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+
+	"github.com/prospero78/goTV/tv/cons"
+	"github.com/prospero78/goTV/tv/widgets/widgetbase"
+	"github.com/prospero78/goTV/tv/types"
 )
 
 /*
@@ -16,8 +20,8 @@ one set: foreground and background colors): for filled part and for
 empty one. By default colors are the same.
 */
 type ProgressBar struct {
-	TBaseControl
-	direction        Direction
+	widgetbase.TWidgetBase
+	direction        cons.Direction
 	min, max         int
 	value            int
 	emptyFg, emptyBg term.Attribute
@@ -33,12 +37,12 @@ control should keep its original size.
 */
 func CreateProgressBar(parent types.IWidget, width, height int, scale int) *ProgressBar {
 	b := new(ProgressBar)
-	b.TBaseControl = NewBaseControl()
+	b.TWidgetBase = widgetbase.New()
 
-	if height == AutoSize {
+	if height == cons.AutoSize {
 		height = 1
 	}
-	if width == AutoSize {
+	if width == cons.AutoSize {
 		width = 10
 	}
 
@@ -48,9 +52,9 @@ func CreateProgressBar(parent types.IWidget, width, height int, scale int) *Prog
 	b.SetScale(scale)
 	b.min = 0
 	b.max = 10
-	b.direction = Horizontal
+	b.direction = cons.Horizontal
 	b.parent = parent
-	b.align = AlignCenter
+	b.align = cons.AlignCenter
 
 	if parent != nil {
 		parent.AddChild(b)
@@ -86,10 +90,10 @@ func (b *ProgressBar) Draw() {
 	PushAttributes()
 	defer PopAttributes()
 
-	fgOff, fgOn := RealColor(b.fg, b.Style(), ColorProgressText), RealColor(b.fgActive, b.Style(), ColorProgressActiveText)
-	bgOff, bgOn := RealColor(b.bg, b.Style(), ColorProgressBack), RealColor(b.bgActive, b.Style(), ColorProgressActiveBack)
+	fgOff, fgOn := RealColor(b.fg, b.Style(), cons.ColorProgressText), RealColor(b.fgActive, b.Style(), cons.ColorProgressActiveText)
+	bgOff, bgOn := RealColor(b.bg, b.Style(), cons.ColorProgressBack), RealColor(b.bgActive, b.Style(), cons.ColorProgressActiveBack)
 
-	parts := []rune(SysObject(ObjProgressBar))
+	parts := []rune(SysObject(cons.ObjProgressBar))
 	cFilled, cEmpty := parts[0], parts[1]
 
 	prc := 0
@@ -100,7 +104,7 @@ func (b *ProgressBar) Draw() {
 	}
 
 	var title string
-	if b.direction == Horizontal && b.Title() != "" {
+	if b.direction == cons.Horizontal && b.Title() != "" {
 		title = b.Title()
 		title = strings.ReplaceAll(title, "{{percent}}", strconv.Itoa(prc))
 		title = strings.ReplaceAll(title, "{{value}}", strconv.Itoa(b.value))
@@ -111,7 +115,7 @@ func (b *ProgressBar) Draw() {
 	x, y := b.Pos()
 	w, h := b.Size()
 
-	if b.direction == Horizontal {
+	if b.direction == cons.Horizontal {
 		filled := prc * w / 100
 		sFilled := strings.Repeat(string(cFilled), filled)
 		sEmpty := strings.Repeat(string(cEmpty), w-filled)
@@ -127,7 +131,7 @@ func (b *ProgressBar) Draw() {
 
 		if title != "" {
 			shift, str := AlignText(title, w, b.align)
-			titleClr := RealColor(b.titleFg, b.Style(), ColorProgressTitleText)
+			titleClr := RealColor(b.titleFg, b.Style(), cons.ColorProgressTitleText)
 			var sOn, sOff string
 			switch {
 			case filled == 0 || shift >= filled:

@@ -30,7 +30,7 @@ type Composer struct {
 	// last processed coordinates: e.g, for mouse move
 	lastX, lastY int
 	// Type of dragging
-	dragType cons.DragType
+	dragType types.ADragType
 	// For safe Window manipulations
 	mtx sync.RWMutex
 }
@@ -501,7 +501,7 @@ func (c *Composer) processWindowDrag(ev event.TEvent) {
 	}
 }
 
-func (c *Composer) processMouse(ev Event) {
+func (c *Composer) processMouse(ev event.TEvent) {
 	if c.consumer != nil {
 		tmp := c.consumer
 		tmp.ProcessEvent(ev)
@@ -511,53 +511,53 @@ func (c *Composer) processMouse(ev Event) {
 	}
 
 	view, hit := c.checkWindowUnderMouse(ev.X, ev.Y)
-	if c.dragType != DragNone {
+	if c.dragType != cons.DragNone {
 		view = c.topWindow()
 	}
 
 	if c.topWindow() == view {
-		if ev.Key == term.MouseRelease && c.dragType != DragNone {
-			c.dragType = DragNone
+		if ev.Key == term.MouseRelease && c.dragType != cons.DragNone {
+			c.dragType = cons.DragNone
 			return
 		}
 
-		if ev.Mod == term.ModMotion && c.dragType != DragNone {
+		if ev.Mod == term.ModMotion && c.dragType != cons.DragNone {
 			c.processWindowDrag(ev)
 			return
 		}
 
-		if hit != HitInside && ev.Key == term.MouseLeft {
-			if hit != HitButtonClose && hit != HitButtonBottom && hit != HitButtonMaximize {
+		if hit != cons.HitInside && ev.Key == term.MouseLeft {
+			if hit != cons.HitButtonClose && hit != cons.HitButtonBottom && hit != cons.HitButtonMaximize {
 				c.lastX = ev.X
 				c.lastY = ev.Y
 				c.mdownX = ev.X
 				c.mdownY = ev.Y
 			}
 			switch hit {
-			case HitButtonClose:
+			case cons.HitButtonClose:
 				c.closeTopWindow()
-			case HitButtonBottom:
+			case cons.HitButtonBottom:
 				c.moveActiveWindowToBottom()
-			case HitButtonMaximize:
+			case cons.HitButtonMaximize:
 				v := c.topWindow().(*window.TWindow)
 				maximized := v.Maximized()
 				v.SetMaximized(!maximized)
-			case HitTop:
-				c.dragType = DragMove
-			case HitBottom:
-				c.dragType = DragResizeBottom
-			case HitLeft:
-				c.dragType = DragResizeLeft
-			case HitRight:
-				c.dragType = DragResizeRight
-			case HitTopLeft:
-				c.dragType = DragResizeTopLeft
-			case HitTopRight:
-				c.dragType = DragResizeTopRight
-			case HitBottomRight:
-				c.dragType = DragResizeBottomRight
-			case HitBottomLeft:
-				c.dragType = DragResizeBottomLeft
+			case cons.HitTop:
+				c.dragType = cons.DragMove
+			case cons.HitBottom:
+				c.dragType = cons.DragResizeBottom
+			case cons.HitLeft:
+				c.dragType = cons.DragResizeLeft
+			case cons.HitRight:
+				c.dragType = cons.DragResizeRight
+			case cons.HitTopLeft:
+				c.dragType = cons.DragResizeTopLeft
+			case cons.HitTopRight:
+				c.dragType = cons.DragResizeTopRight
+			case cons.HitBottomRight:
+				c.dragType = cons.DragResizeBottomRight
+			case cons.HitBottomLeft:
+				c.dragType = cons.DragResizeBottomLeft
 			}
 
 			return
@@ -580,7 +580,7 @@ func (c *Composer) processMouse(ev Event) {
 			return
 		}
 
-		ev.Type = EventClick
+		ev.Type = cons.EventClick
 		c.sendEventToActiveWindow(ev)
 		return
 	default:
@@ -592,13 +592,13 @@ func (c *Composer) processMouse(ev Event) {
 // Stop -- sends termination event to Composer. Composer should stop
 // console management and quit application
 func Stop() {
-	ev := Event{Type: EventQuit}
+	ev := event.TEvent{Type: cons.EventQuit}
 	go PutEvent(ev)
 }
 
 // DestroyWindow removes the Window from the list of managed Windows
 func (c *Composer) DestroyWindow(view types.IWidget) {
-	ev := Event{Type: EventClose}
+	ev := event.TEvent{Type: cons.EventClose}
 	c.sendEventToActiveWindow(ev)
 
 	windows := c.getWindowList()
@@ -632,7 +632,7 @@ func IsDeadKey(key term.Key) bool {
 	return false
 }
 
-func (c *Composer) processKey(ev Event) {
+func (c *Composer) processKey(ev event.TEvent) {
 	if ev.Key == term.KeyEsc {
 		if IsDeadKey(c.lastKey) {
 			c.lastKey = term.KeyEsc
@@ -687,7 +687,7 @@ func (c *Composer) processKey(ev Event) {
 			c.moveActiveWindowToBottom()
 		case term.KeyCtrlM:
 			w := c.topWindow().(*window.TWindow)
-			if w.Sizable() && (w.TitleButtons()&ButtonMaximize == ButtonMaximize) {
+			if w.Sizable() && (w.TitleButtons()&cons.ButtonMaximize == cons.ButtonMaximize) {
 				maxxed := w.Maximized()
 				w.SetMaximized(!maxxed)
 				RefreshScreen()
@@ -700,7 +700,7 @@ func (c *Composer) processKey(ev Event) {
 	}
 
 	if newKey != term.KeyEsc {
-		event := Event{Key: c.lastKey, Type: EventKey}
+		event := event.TEvent{Key: c.lastKey, Type: cons.EventKey}
 		c.sendEventToActiveWindow(event)
 		event.Key = newKey
 		c.sendEventToActiveWindow(event)
@@ -708,13 +708,13 @@ func (c *Composer) processKey(ev Event) {
 	}
 }
 
-func ProcessEvent(ev Event) {
+func ProcessEvent(ev event.TEvent) {
 	switch ev.Type {
-	case EventCloseWindow:
+	case cons.EventCloseWindow:
 		comp.closeTopWindow()
-	case EventRedraw:
+	case cons.EventRedraw:
 		RefreshScreen()
-	case EventResize:
+	case cons.EventResize:
 		SetScreenSize(ev.Width, ev.Height)
 		for _, c := range comp.windows {
 			wnd := c.(*window.TWindow)
@@ -730,11 +730,11 @@ func ProcessEvent(ev Event) {
 			}
 
 		}
-	case EventKey:
+	case cons.EventKey:
 		comp.processKey(ev)
-	case EventMouse:
+	case cons.EventMouse:
 		comp.processMouse(ev)
-	case EventLayout:
+	case cons.EventLayout:
 		for _, c := range comp.windows {
 			if c == ev.Target {
 				c.ResizeChildren()

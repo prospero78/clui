@@ -4,6 +4,10 @@ import (
 	"fmt"
 	// xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+
+	"github.com/prospero78/goTV/tv/cons"
+	"github.com/prospero78/goTV/tv/types"
+	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 )
 
 /*
@@ -26,7 +30,7 @@ AutoScale to false and Top value to 100.
 Note: negative and zero values are displayed as empty bar
 */
 type SparkChart struct {
-	TBaseControl
+	widgetbase.TWidgetBase
 	data         []float64
 	valueWidth   int
 	hiliteMax    bool
@@ -45,12 +49,12 @@ control should keep its original size.
 */
 func CreateSparkChart(parent types.IWidget, w, h int, scale int) *SparkChart {
 	c := new(SparkChart)
-	c.TBaseControl = NewBaseControl()
+	c.TWidgetBase = widgetbase.New()
 
-	if w == AutoSize {
+	if w == cons.AutoSize {
 		w = 10
 	}
-	if h == AutoSize {
+	if h == cons.AutoSize {
 		h = 5
 	}
 
@@ -83,7 +87,7 @@ func (b *SparkChart) Draw() {
 	PushAttributes()
 	defer PopAttributes()
 
-	fg, bg := RealColor(b.fg, b.Style(), ColorSparkChartText), RealColor(b.bg, b.Style(), ColorSparkChartBack)
+	fg, bg := RealColor(b.fg, b.Style(), cons.ColorSparkChartText), RealColor(b.bg, b.Style(), cons.ColorSparkChartBack)
 	SetTextColor(fg)
 	SetBackColor(bg)
 	FillRect(b.x, b.y, b.width, b.height, ' ')
@@ -117,9 +121,9 @@ func (b *SparkChart) drawBars() {
 	h := b.height
 	pos := b.x + start
 
-	mxFg, mxBg := RealColor(b.maxFg, b.Style(), ColorSparkChartMaxText), RealColor(b.maxBg, b.Style(), ColorSparkChartMaxBack)
-	brFg, brBg := RealColor(b.fg, b.Style(), ColorSparkChartBarText), RealColor(b.bg, b.Style(), ColorSparkChartBarBack)
-	parts := []rune(SysObject(ObjSparkChart))
+	mxFg, mxBg := RealColor(b.maxFg, b.Style(), cons.ColorSparkChartMaxText), RealColor(b.maxBg, b.Style(), cons.ColorSparkChartMaxBack)
+	brFg, brBg := RealColor(b.fg, b.Style(), cons.ColorSparkChartBarText), RealColor(b.bg, b.Style(), cons.ColorSparkChartBarBack)
+	parts := []rune(SysObject(cons.ObjSparkChart))
 
 	var dt []float64
 	if len(b.data) > width {

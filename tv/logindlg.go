@@ -1,5 +1,11 @@
 package tv
 
+import (
+	"github.com/prospero78/goTV/tv/cons"
+	"github.com/prospero78/goTV/tv/widgets/event"
+	"github.com/prospero78/goTV/tv/widgets/window"
+)
+
 const (
 	LoginOk = iota
 	LoginCanceled
@@ -17,7 +23,7 @@ const (
 //         only in case of callback is used and button "OK" is clicked
 //         while entered username or password is incorrect
 type LoginDialog struct {
-	View     *Window
+	View     *window.TWindow
 	Username string
 	Password string
 	Action   int
@@ -50,34 +56,34 @@ func CreateLoginDialog(title, userName string) *LoginDialog {
 	defer WindowManager().EndUpdate()
 
 	dlg.View.SetModal(true)
-	dlg.View.SetPack(Vertical)
+	dlg.View.SetPack(cons.Vertical)
 
-	userfrm := CreateFrame(dlg.View, 1, 1, BorderNone, Fixed)
+	userfrm := CreateFrame(dlg.View, 1, 1, cons.BorderNone, cons.Fixed)
 	userfrm.SetPaddings(1, 1)
-	userfrm.SetPack(Horizontal)
+	userfrm.SetPack(cons.Horizontal)
 	userfrm.SetGaps(1, 0)
-	CreateLabel(userfrm, AutoSize, AutoSize, "User name", Fixed)
+	CreateLabel(userfrm, cons.AutoSize, cons.AutoSize, "User name", cons.Fixed)
 	edUser := CreateEditField(userfrm, 20, userName, 1)
 
-	passfrm := CreateFrame(dlg.View, 1, 1, BorderNone, 1)
+	passfrm := CreateFrame(dlg.View, 1, 1, cons.BorderNone, 1)
 	passfrm.SetPaddings(1, 1)
-	passfrm.SetPack(Horizontal)
+	passfrm.SetPack(cons.Horizontal)
 	passfrm.SetGaps(1, 0)
-	CreateLabel(passfrm, AutoSize, AutoSize, "Password", Fixed)
+	CreateLabel(passfrm, cons.AutoSize, cons.AutoSize, "Password", cons.Fixed)
 	edPass := CreateEditField(passfrm, 20, "", 1)
 	edPass.SetPasswordMode(true)
 
-	filler := CreateFrame(dlg.View, 1, 1, BorderNone, 1)
-	filler.SetPack(Horizontal)
-	lbRes := CreateLabel(filler, AutoSize, AutoSize, "", 1)
+	filler := CreateFrame(dlg.View, 1, 1, cons.BorderNone, 1)
+	filler.SetPack(cons.Horizontal)
+	lbRes := CreateLabel(filler, cons.AutoSize, cons.AutoSize, "", 1)
 
-	blist := CreateFrame(dlg.View, 1, 1, BorderNone, Fixed)
-	blist.SetPack(Horizontal)
+	blist := CreateFrame(dlg.View, 1, 1, cons.BorderNone, cons.Fixed)
+	blist.SetPack(cons.Horizontal)
 	blist.SetPaddings(1, 1)
-	btnOk := CreateButton(blist, 10, 4, "OK", Fixed)
-	btnCancel := CreateButton(blist, 10, 4, "Cancel", Fixed)
+	btnOk := CreateButton(blist, 10, 4, "OK", cons.Fixed)
+	btnCancel := CreateButton(blist, 10, 4, "Cancel", cons.Fixed)
 
-	btnCancel.OnClick(func(ev Event) {
+	btnCancel.OnClick(func(ev event.TEvent) {
 		WindowManager().DestroyWindow(dlg.View)
 		WindowManager().BeginUpdate()
 		dlg.Action = LoginCanceled
@@ -88,7 +94,7 @@ func CreateLoginDialog(title, userName string) *LoginDialog {
 		}
 	})
 
-	btnOk.OnClick(func(ev Event) {
+	btnOk.OnClick(func(ev event.TEvent) {
 		if dlg.onCheck != nil && !dlg.onCheck(edUser.Title(), edPass.Title()) {
 			lbRes.SetTitle("Invalid username or password")
 			dlg.Action = LoginInvalid
@@ -111,9 +117,9 @@ func CreateLoginDialog(title, userName string) *LoginDialog {
 		}
 	})
 
-	dlg.View.OnClose(func(ev Event) bool {
-		if dlg.result == DialogAlive {
-			dlg.result = DialogClosed
+	dlg.View.OnClose(func(ev event.TEvent) bool {
+		if dlg.result == cons.DialogAlive {
+			dlg.result = cons.DialogClosed
 			if ev.X != 1 {
 				WindowManager().DestroyWindow(dlg.View)
 			}
@@ -124,10 +130,10 @@ func CreateLoginDialog(title, userName string) *LoginDialog {
 		return true
 	})
 
-	edUser.OnChange(func(ev Event) {
+	edUser.OnChange(func(ev event.TEvent) {
 		lbRes.SetTitle("")
 	})
-	edPass.OnChange(func(ev Event) {
+	edPass.OnChange(func(ev event.TEvent) {
 		lbRes.SetTitle("")
 	})
 

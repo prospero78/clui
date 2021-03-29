@@ -4,6 +4,11 @@ import (
 	"strings"
 
 	term "github.com/nsf/termbox-go"
+
+	"github.com/prospero78/goTV/tv/cons"
+	"github.com/prospero78/goTV/tv/types"
+	"github.com/prospero78/goTV/tv/widgets/event"
+	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 )
 
 /*
@@ -17,14 +22,14 @@ Y - selected item number in list(-1 if nothing is selected),
 Msg - text of the selected item.
 */
 type ListBox struct {
-	TBaseControl
+	widgetbase.TWidgetBase
 	// own listbox members
 	items         []string
 	currSelection int
 	topLine       int
 	buttonPos     int
 
-	onSelectItem func(Event)
+	onSelectItem func(event.TEvent)
 	onKeyPress   func(term.Key) bool
 }
 
@@ -38,12 +43,12 @@ control should keep its original size.
 */
 func CreateListBox(parent types.IWidget, width, height int, scale int) *ListBox {
 	l := new(ListBox)
-	l.TBaseControl = NewBaseControl()
+	l.TWidgetBase = widgetbase.New()
 
-	if height == AutoSize {
+	if height == cons.AutoSize {
 		height = 3
 	}
-	if width == AutoSize {
+	if width == cons.AutoSize {
 		width = 5
 	}
 
@@ -87,11 +92,11 @@ func (l *ListBox) drawItems() {
 	maxDy := l.height - 1
 	maxWidth := l.width - 1
 
-	fg, bg := RealColor(l.fg, l.Style(), ColorEditText), RealColor(l.bg, l.Style(), ColorEditBack)
+	fg, bg := RealColor(l.fg, l.Style(), cons.ColorEditText), RealColor(l.bg, l.Style(), cons.ColorEditBack)
 	if l.Active() {
-		fg, bg = RealColor(l.fg, l.Style(), ColorEditActiveText), RealColor(l.bg, l.Style(), ColorEditActiveBack)
+		fg, bg = RealColor(l.fg, l.Style(), cons.ColorEditActiveText), RealColor(l.bg, l.Style(), cons.ColorEditActiveBack)
 	}
-	fgSel, bgSel := RealColor(l.fgActive, l.Style(), ColorSelectionText), RealColor(l.bgActive, l.Style(), ColorSelectionBack)
+	fgSel, bgSel := RealColor(l.fgActive, l.Style(), cons.ColorSelectionText), RealColor(l.bgActive, l.Style(), cons.ColorSelectionBack)
 
 	for curr <= maxCurr && dy <= maxDy {
 		f, b := fg, bg
@@ -122,9 +127,9 @@ func (l *ListBox) Draw() {
 	x, y := l.Pos()
 	w, h := l.Size()
 
-	fg, bg := RealColor(l.fg, l.Style(), ColorEditText), RealColor(l.bg, l.Style(), ColorEditBack)
+	fg, bg := RealColor(l.fg, l.Style(), cons.ColorEditText), RealColor(l.bg, l.Style(), cons.ColorEditBack)
 	if l.Active() {
-		fg, bg = RealColor(l.fg, l.Style(), ColorEditActiveText), RealColor(l.bg, l.Style(), ColorEditActiveBack)
+		fg, bg = RealColor(l.fg, l.Style(), cons.ColorEditActiveText), RealColor(l.bg, l.Style(), cons.ColorEditActiveBack)
 	}
 	SetTextColor(fg)
 	SetBackColor(bg)
@@ -144,7 +149,7 @@ func (l *ListBox) home() {
 	l.topLine = 0
 
 	if l.onSelectItem != nil {
-		ev := Event{Y: l.currSelection, Msg: l.SelectedItemText()}
+		ev := event.TEvent{Y: l.currSelection, Msg: l.SelectedItemText()}
 		l.onSelectItem(ev)
 	}
 }
@@ -162,7 +167,7 @@ func (l *ListBox) end() {
 	}
 
 	if l.onSelectItem != nil {
-		ev := Event{Y: l.currSelection, Msg: l.SelectedItemText()}
+		ev := event.TEvent{Y: l.currSelection, Msg: l.SelectedItemText()}
 		l.onSelectItem(ev)
 	}
 }
@@ -188,7 +193,7 @@ func (l *ListBox) moveUp(dy int) {
 	l.EnsureVisible()
 
 	if l.onSelectItem != nil {
-		ev := Event{Y: l.currSelection, Msg: l.SelectedItemText()}
+		ev := event.TEvent{Y: l.currSelection, Msg: l.SelectedItemText()}
 		l.onSelectItem(ev)
 	}
 }
@@ -209,7 +214,7 @@ func (l *ListBox) moveDown(dy int) {
 	l.EnsureVisible()
 
 	if l.onSelectItem != nil {
-		ev := Event{Y: l.currSelection, Msg: l.SelectedItemText()}
+		ev := event.TEvent{Y: l.currSelection, Msg: l.SelectedItemText()}
 		l.onSelectItem(ev)
 	}
 }
@@ -246,7 +251,7 @@ func (l *ListBox) Clear() {
 	l.topLine = 0
 }
 
-func (l *ListBox) processMouseClick(ev Event) bool {
+func (l *ListBox) processMouseClick(ev event.TEvent) bool {
 	if ev.Key != term.MouseLeft {
 		return false
 	}
@@ -286,7 +291,7 @@ func (l *ListBox) processMouseClick(ev Event) bool {
 	onSelFunc := l.onSelectItem
 	WindowManager().EndUpdate()
 	if onSelFunc != nil {
-		ev := Event{Y: l.topLine + dy, Msg: l.SelectedItemText()}
+		ev := event.TEvent{Y: l.topLine + dy, Msg: l.SelectedItemText()}
 		onSelFunc(ev)
 	}
 
@@ -309,21 +314,21 @@ processes an event it should return true. If the method returns false it means
 that the control do not want or cannot process the event and the caller sends
 the event to the control parent
 */
-func (l *ListBox) ProcessEvent(event Event) bool {
+func (l *ListBox) ProcessEvent(_event event.TEvent) bool {
 	if !l.Active() || !l.Enabled() {
 		return false
 	}
 
-	switch event.Type {
-	case EventKey:
+	switch _event.Type {
+	case cons.EventKey:
 		if l.onKeyPress != nil {
-			res := l.onKeyPress(event.Key)
+			res := l.onKeyPress(_event.Key)
 			if res {
 				return true
 			}
 		}
 
-		switch event.Key {
+		switch _event.Key {
 		case term.KeyHome:
 			l.home()
 			return true
@@ -344,14 +349,14 @@ func (l *ListBox) ProcessEvent(event Event) bool {
 			return true
 		case term.KeyCtrlM:
 			if l.currSelection != -1 && l.onSelectItem != nil {
-				ev := Event{Y: l.currSelection, Msg: l.SelectedItemText()}
+				ev := event.TEvent{Y: l.currSelection, Msg: l.SelectedItemText()}
 				l.onSelectItem(ev)
 			}
 		default:
 			return false
 		}
-	case EventMouse:
-		return l.processMouseClick(event)
+	case cons.EventMouse:
+		return l.processMouseClick(_event)
 	}
 
 	return false
@@ -455,7 +460,7 @@ func (l *ListBox) RemoveItem(id int) bool {
 
 // OnSelectItem sets a callback that is called every time
 // the selected item is changed
-func (l *ListBox) OnSelectItem(fn func(Event)) {
+func (l *ListBox) OnSelectItem(fn func(event.TEvent)) {
 	l.onSelectItem = fn
 }
 

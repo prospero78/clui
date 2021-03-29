@@ -17,7 +17,7 @@ is always left aligned
 */
 type Label struct {
 	widgetbase.TWidgetBase
-	direction   Direction
+	direction   cons.Direction
 	multiline   bool
 	textDisplay types.AAlign
 }
@@ -38,7 +38,7 @@ func CreateLabel(parent types.IWidget, w, h int, title string, scale int) *Label
 	if w == cons.AutoSize {
 		w = xs.Len(title)
 	}
-	if h == AutoSize {
+	if h == cons.AutoSize {
 		h = 1
 	}
 
@@ -49,7 +49,7 @@ func CreateLabel(parent types.IWidget, w, h int, title string, scale int) *Label
 	c.SetConstraints(w, h)
 	c.SetScale(scale)
 	c.isTabSkip = true
-	c.textDisplay = AlignLeft
+	c.textDisplay = cons.AlignLeft
 
 	if parent != nil {
 		parent.AddChild(c)
@@ -59,12 +59,12 @@ func CreateLabel(parent types.IWidget, w, h int, title string, scale int) *Label
 }
 
 // Direction returns direction of text output: vertical or horizontal
-func (l *Label) Direction() Direction {
+func (l *Label) Direction() cons.Direction {
 	return l.direction
 }
 
 // SetDirection sets the text output direction
-func (l *Label) SetDirection(dir Direction) {
+func (l *Label) SetDirection(dir cons.Direction) {
 	l.direction = dir
 }
 
@@ -76,9 +76,9 @@ func (l *Label) Draw() {
 	PushAttributes()
 	defer PopAttributes()
 
-	fg, bg := RealColor(l.fg, l.Style(), ColorText), RealColor(l.bg, l.Style(), ColorBack)
+	fg, bg := RealColor(l.fg, l.Style(), cons.ColorText), RealColor(l.bg, l.Style(), cons.ColorBack)
 	if !l.Enabled() {
-		fg = RealColor(l.fg, l.Style(), ColorDisabledText)
+		fg = RealColor(l.fg, l.Style(), cons.ColorDisabledText)
 	}
 
 	SetTextColor(fg)
@@ -106,7 +106,7 @@ func (l *Label) Draw() {
 				SetBackColor(elem.Bg)
 				putCharUnsafe(xx, yy, elem.Ch)
 
-				if l.direction == Horizontal {
+				if l.direction == cons.Horizontal {
 					xx += 1
 					if xx >= l.x+l.width {
 						xx = l.x
@@ -124,7 +124,7 @@ func (l *Label) Draw() {
 			elem = parser.NextElement()
 		}
 	} else {
-		if l.direction == Horizontal {
+		if l.direction == cons.Horizontal {
 			shift, str := AlignColorizedText(l.title, l.width, l.align)
 			if str != l.title && l.align != l.textDisplay {
 				shift, str = AlignColorizedText(l.title, l.width, l.textDisplay)
@@ -158,7 +158,7 @@ func (l *Label) SetMultiline(multi bool) {
 // - AlignLeft - the head of the title is shown
 // - AlignRight - the tail of the title is shown
 // The property is used only by single line Label
-func (l *Label) TextDisplay() Align {
+func (l *Label) TextDisplay() cons.Align {
 	return l.textDisplay
 }
 
@@ -166,8 +166,8 @@ func (l *Label) TextDisplay() Align {
 // is longer than the lable. Only AlignLeft and AlignRigth are valid values
 // for the property. Any other value does is skipped and does not affect
 // displaying the title
-func (l *Label) SetTextDisplay(align Align) {
-	if align != AlignLeft && align != AlignRight {
+func (l *Label) SetTextDisplay(align cons.Align) {
+	if align != cons.AlignLeft && align != cons.AlignRight {
 		return
 	}
 

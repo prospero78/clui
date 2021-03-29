@@ -3,10 +3,15 @@ package tv
 import (
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+
+	"github.com/prospero78/goTV/tv/cons"
+	"github.com/prospero78/goTV/tv/types"
+	"github.com/prospero78/goTV/tv/widgets/event"
+	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 )
 
 type TextDisplay struct {
-	TBaseControl
+	widgetbase.TWidgetBase
 	colorized bool
 	topLine   int
 	lineCount int
@@ -25,12 +30,12 @@ func CreateTextReader(parent types.IWidget, width, height int, scale int) *TextD
 
 func CreateTextDisplay(parent types.IWidget, width, height int, scale int) *TextDisplay {
 	l := new(TextDisplay)
-	l.TBaseControl = NewBaseControl()
+	l.TWidgetBase = widgetbase.New()
 
-	if height == AutoSize {
+	if height == cons.AutoSize {
 		height = 10
 	}
-	if width == AutoSize {
+	if width == cons.AutoSize {
 		width = 20
 	}
 
@@ -58,9 +63,9 @@ func (l *TextDisplay) drawText() {
 	PushAttributes()
 	defer PopAttributes()
 
-	bg, fg := RealColor(l.bg, l.Style(), ColorEditBack), RealColor(l.fg, l.Style(), ColorEditText)
+	bg, fg := RealColor(l.bg, l.Style(), cons.ColorEditBack), RealColor(l.fg, l.Style(), cons.ColorEditText)
 	if l.Active() {
-		bg, fg = RealColor(l.bg, l.Style(), ColorEditActiveBack), RealColor(l.fg, l.Style(), ColorEditActiveText)
+		bg, fg = RealColor(l.bg, l.Style(), cons.ColorEditActiveBack), RealColor(l.fg, l.Style(), cons.ColorEditActiveText)
 	}
 	SetTextColor(fg)
 	SetBackColor(bg)
@@ -99,9 +104,9 @@ func (l *TextDisplay) Draw() {
 	x, y := l.Pos()
 	w, h := l.Size()
 
-	bg, fg := RealColor(l.bg, l.Style(), ColorEditBack), RealColor(l.fg, l.Style(), ColorEditText)
+	bg, fg := RealColor(l.bg, l.Style(), cons.ColorEditBack), RealColor(l.fg, l.Style(), cons.ColorEditText)
 	if l.Active() {
-		bg, fg = RealColor(l.bg, l.Style(), ColorEditActiveBack), RealColor(l.fg, l.Style(), ColorEditActiveText)
+		bg, fg = RealColor(l.bg, l.Style(), cons.ColorEditActiveBack), RealColor(l.fg, l.Style(), cons.ColorEditActiveText)
 	}
 
 	SetTextColor(fg)
@@ -156,7 +161,7 @@ func (l *TextDisplay) moveDown(count int) {
 	}
 }
 
-func (l *TextDisplay) processMouseClick(ev Event) bool {
+func (l *TextDisplay) processMouseClick(ev event.TEvent) bool {
 	if ev.Key != term.MouseLeft {
 		return false
 	}
@@ -179,13 +184,13 @@ processes an event it should return true. If the method returns false it means
 that the control do not want or cannot process the event and the caller sends
 the event to the control parent
 */
-func (l *TextDisplay) ProcessEvent(event Event) bool {
+func (l *TextDisplay) ProcessEvent(event event.TEvent) bool {
 	if !l.Active() || !l.Enabled() {
 		return false
 	}
 
 	switch event.Type {
-	case EventKey:
+	case cons.EventKey:
 		switch event.Key {
 		case term.KeyHome:
 			l.home()
@@ -223,7 +228,7 @@ func (l *TextDisplay) ProcessEvent(event Event) bool {
 		default:
 			return false
 		}
-	case EventMouse:
+	case cons.EventMouse:
 		return l.processMouseClick(event)
 	}
 

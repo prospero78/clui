@@ -4,6 +4,10 @@ import (
 	"fmt"
 
 	term "github.com/nsf/termbox-go"
+	"github.com/prospero78/goTV/tv/cons"
+	"github.com/prospero78/goTV/tv/types"
+	"github.com/prospero78/goTV/tv/widgets/event"
+	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 )
 
 /*
@@ -47,7 +51,7 @@ Events:
         number of visible columns, number of visible rows.
 */
 type TableView struct {
-	TBaseControl
+	widgetbase.TWidgetBase
 	// own TableView members
 	topRow        int
 	topCol        int
@@ -78,9 +82,9 @@ type TableView struct {
 type Column struct {
 	Title     string
 	Width     int
-	Alignment Align
+	Alignment cons.Align
 	Fg, Bg    term.Attribute
-	Sort      SortOrder
+	Sort      cons.SortOrder
 }
 
 // ColumnDrawInfo is a structure used in OnDrawCell event.
@@ -100,7 +104,7 @@ type ColumnDrawInfo struct {
 	// cell displayed text
 	Text string
 	// text alignment
-	Alignment Align
+	Alignment types.AAlign
 	// is the row that contains the cell selected(active)
 	RowSelected bool
 	// is the column that contains the cell selected(active)
@@ -121,7 +125,7 @@ type TableEvent struct {
 	// Currently selected row (it is not used for TableActionSort)
 	Row int
 	// Sort order (it is used only in TableActionSort event)
-	Sort SortOrder
+	Sort cons.SortOrder
 }
 
 /*
@@ -134,12 +138,12 @@ control should keep its original size.
 */
 func CreateTableView(parent types.IWidget, width, height int, scale int) *TableView {
 	l := new(TableView)
-	l.TBaseControl = NewBaseControl()
+	l.TWidgetBase = widgetbase.New()
 
-	if height == AutoSize {
+	if height == cons.AutoSize {
 		height = 3
 	}
-	if width == AutoSize {
+	if width == cons.AutoSize {
 		width = 10
 	}
 
@@ -171,14 +175,14 @@ func (l *TableView) drawHeader() {
 	PushAttributes()
 	defer PopAttributes()
 
-	fg, bg := RealColor(l.fg, l.Style(), ColorTableHeaderText), RealColor(l.bg, l.Style(), ColorTableHeaderBack)
-	fgLine := RealColor(l.fg, l.Style(), ColorTableLineText)
+	fg, bg := RealColor(l.fg, l.Style(), cons.ColorTableHeaderText), RealColor(l.bg, l.Style(), cons.ColorTableHeaderBack)
+	fgLine := RealColor(l.fg, l.Style(), cons.ColorTableLineText)
 	x, y := l.Pos()
 	w, _ := l.Size()
 	SetTextColor(fg)
 	SetBackColor(bg)
 	FillRect(x, y, w, 1, ' ')
-	parts := []rune(SysObject(ObjTableView))
+	parts := []rune(SysObject(cons.ObjTableView))
 
 	for i := 0; i < w; i++ {
 		PutChar(x+i, y+1, parts[0])
@@ -194,7 +198,7 @@ func (l *TableView) drawHeader() {
 	SetBackColor(bg)
 	if l.showRowNo {
 		cW := l.counterWidth()
-		shift, str := AlignText("#", cW, AlignRight)
+		shift, str := AlignText("#", cW, cons.AlignRight)
 		SetTextColor(fg)
 		DrawRawText(x+pos+shift, y, str)
 		if l.showVLines {
@@ -217,10 +221,10 @@ func (l *TableView) drawHeader() {
 		}
 
 		dw := 0
-		if l.columns[idx].Sort != SortNone {
+		if l.columns[idx].Sort != cons.SortNone {
 			dw = -1
 			ch := parts[3]
-			if l.columns[idx].Sort == SortDesc {
+			if l.columns[idx].Sort == cons.SortDesc {
 				ch = parts[4]
 			}
 			SetTextColor(fg)
@@ -276,11 +280,11 @@ func (l *TableView) drawCells() {
 	dy := 2
 	maxDy := l.height - 2
 
-	fg, bg := RealColor(l.fg, l.Style(), ColorTableText), RealColor(l.bg, l.Style(), ColorTableBack)
-	fgRow, bgRow := RealColor(l.fg, l.Style(), ColorTableSelectedText), RealColor(l.bg, l.Style(), ColorTableSelectedBack)
-	fgCell, bgCell := RealColor(l.fg, l.Style(), ColorTableActiveCellText), RealColor(l.bg, l.Style(), ColorTableActiveCellBack)
-	fgLine := RealColor(l.fg, l.Style(), ColorTableLineText)
-	parts := []rune(SysObject(ObjTableView))
+	fg, bg := RealColor(l.fg, l.Style(), cons.ColorTableText), RealColor(l.bg, l.Style(), cons.ColorTableBack)
+	fgRow, bgRow := RealColor(l.fg, l.Style(), cons.ColorTableSelectedText), RealColor(l.bg, l.Style(), cons.ColorTableSelectedBack)
+	fgCell, bgCell := RealColor(l.fg, l.Style(), cons.ColorTableActiveCellText), RealColor(l.bg, l.Style(), cons.ColorTableActiveCellBack)
+	fgLine := RealColor(l.fg, l.Style(), cons.ColorTableLineText)
+	parts := []rune(SysObject(cons.ObjTableView))
 
 	start := 0
 	if l.showRowNo {
@@ -290,7 +294,7 @@ func (l *TableView) drawCells() {
 				break
 			}
 			s := fmt.Sprintf("%v", idx+l.topRow)
-			shift, str := AlignText(s, start, AlignRight)
+			shift, str := AlignText(s, start, cons.AlignRight)
 			SetTextColor(fg)
 			SetBackColor(bg)
 			DrawText(l.x+shift, l.y+dy+idx-1, str)
@@ -675,7 +679,7 @@ func (l *TableView) verticalScrollClick(dy int) {
 	}
 }
 
-func (l *TableView) processMouseClick(ev Event) bool {
+func (l *TableView) processMouseClick(ev event.TEvent) bool {
 	if ev.Key != term.MouseLeft {
 		return false
 	}
@@ -737,16 +741,16 @@ func (l *TableView) headerClicked(dx int) {
 		sort := l.columns[colID].Sort
 
 		for idx := range l.columns {
-			l.columns[idx].Sort = SortNone
+			l.columns[idx].Sort = cons.SortNone
 		}
 
 		switch {
-		case sort == SortAsc:
-			sort = SortDesc
-		case sort == SortNone:
-			sort = SortAsc
+		case sort == cons.SortAsc:
+			sort = cons.SortDesc
+		case sort == cons.SortNone:
+			sort = cons.SortAsc
 		default:
-			sort = SortNone
+			sort = cons.SortNone
 		}
 		l.columns[colID].Sort = sort
 
@@ -763,13 +767,13 @@ processes an event it should return true. If the method returns false it means
 that the control do not want or cannot process the event and the caller sends
 the event to the control parent
 */
-func (l *TableView) ProcessEvent(event Event) bool {
+func (l *TableView) ProcessEvent(event event.TEvent) bool {
 	if !l.Active() || !l.Enabled() {
 		return false
 	}
 
 	switch event.Type {
-	case EventKey:
+	case cons.EventKey:
 		if l.onKeyPress != nil {
 			res := l.onKeyPress(event.Key)
 			if res {
@@ -835,16 +839,16 @@ func (l *TableView) ProcessEvent(event Event) bool {
 				sort := l.columns[colID].Sort
 
 				for idx := range l.columns {
-					l.columns[idx].Sort = SortNone
+					l.columns[idx].Sort = cons.SortNone
 				}
 
 				switch {
-				case sort == SortAsc:
-					sort = SortDesc
-				case sort == SortNone:
-					sort = SortAsc
+				case sort == cons.SortAsc:
+					sort = cons.SortDesc
+				case sort == cons.SortNone:
+					sort = cons.SortAsc
 				default:
-					sort = SortNone
+					sort = cons.SortNone
 				}
 
 				l.columns[colID].Sort = sort
@@ -855,7 +859,7 @@ func (l *TableView) ProcessEvent(event Event) bool {
 		default:
 			return false
 		}
-	case EventMouse:
+	case cons.EventMouse:
 		return l.processMouseClick(event)
 	}
 
