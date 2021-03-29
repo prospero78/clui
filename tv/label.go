@@ -69,7 +69,7 @@ func (l *Label) SetDirection(dir cons.Direction) {
 }
 
 func (l *Label) Draw() {
-	if l.isHidden {
+	if l.IsHidden() {
 		return
 	}
 
@@ -83,7 +83,7 @@ func (l *Label) Draw() {
 
 	SetTextColor(fg)
 	SetBackColor(bg)
-	FillRect(l.x, l.y, l.width, l.height, ' ')
+	FillRect(l.GetX(), l.GetY(), l.GetWidth(), l.GetHidth(), ' ')
 
 	if l.title == "" {
 		return
@@ -92,9 +92,9 @@ func (l *Label) Draw() {
 	if l.multiline {
 		parser := NewColorParser(l.title, fg, bg)
 		elem := parser.NextElement()
-		xx, yy := l.x, l.y
+		xx, yy := l.GetX(), l.y
 		for elem.Type != ElemEndOfText {
-			if xx >= l.x+l.width || yy >= l.y+l.height {
+			if xx >= l.GetX()+l.width || yy >= l.y+l.height {
 				break
 			}
 

@@ -46,7 +46,7 @@ func (e *EditField) setTitleInternal(title string) {
 
 // Repaint draws the control on its View surface
 func (e *EditField) Draw() {
-	if e.isHidden {
+	if e.IsHidden() {
 		return
 	}
 
@@ -186,7 +186,7 @@ func (e *EditField) del() {
 		e.setTitleInternal(xs.Slice(e.title, 0, e.cursorPos) + xs.Slice(e.title, e.cursorPos+1, -1))
 	}
 
-	if length-1 < e.width {
+	if length-1 < e.GetWidth() {
 		e.offset = 0
 	}
 }
@@ -210,7 +210,7 @@ func (e *EditField) charRight() {
 	}
 
 	e.cursorPos++
-	if e.cursorPos != length && e.cursorPos >= e.offset+e.width-2 {
+	if e.cursorPos != length && e.cursorPos >= e.offset+e.GetWidth()-2 {
 		e.offset++
 	}
 }
@@ -224,11 +224,11 @@ func (e *EditField) end() {
 	length := xs.Len(e.title)
 	e.cursorPos = length
 
-	if length < e.width {
+	if length < e.GetWidth() {
 		return
 	}
 
-	e.offset = length - (e.width - 2)
+	e.offset = length - (e.GetWidth() - 2)
 }
 
 // Clear empties the EditField and emits OnChange event
@@ -265,10 +265,10 @@ func (e *EditField) SetSize(width, height int) {
 	}
 
 	if width != cons.KeepValue {
-		e.width = width
+		e.SetWidth(width)
 	}
 
-	e.height = 1
+	e.SetHidth(1)
 }
 
 // PasswordMode returns whether password mode is enabled for the control

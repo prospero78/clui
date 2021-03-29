@@ -93,7 +93,7 @@ func (wnd *TWindow) drawFrame() {
 		bs = wnd.border
 	}
 
-	DrawFrame(wnd.x, wnd.y, wnd.width, wnd.height, bs)
+	DrawFrame(wnd.rect.GetX(), wnd.y, wnd.width, wnd.height, bs)
 }
 
 func (wnd *TWindow) drawTitle() {

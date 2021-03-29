@@ -172,7 +172,7 @@ func (b *Button) ProcessEvent(_event event.TEvent) bool {
 			return true
 		} else if _event.Key == term.MouseRelease && b.isPressed() != 0 {
 			ReleaseEvents()
-			if _event.X >= b.x && _event.Y >= b.y && _event.X < b.x+b.width && _event.Y < b.y+b.height {
+			if _event.X >= b.GetX() && _event.Y >= b.GetY() && _event.X < b.GetX()+b.GetWidth() && _event.Y < b.GetY()+b.GetHidth() {
 				if b.onClick != nil {
 					b.onClick(_event)
 				}

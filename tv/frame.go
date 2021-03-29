@@ -56,7 +56,7 @@ func CreateFrame(parent types.IWidget, width, height int, bs cons.BorderStyle, s
 	f.SetTabStop(false)
 	f.SetScale(scale)
 
-	f.SetGaps(0,0)
+	f.SetGaps(0, 0)
 	if bs == cons.BorderNone {
 		f.SetPaddings()
 		f.padX, f.padY = 0, 0
@@ -172,8 +172,8 @@ func (f *Frame) ScrollTo(x int, y int) {
 		return
 	}
 
-	f.x = x
-	f.y = y
+	f.SetX(x)
+	f.SetY(y)
 
 	f.ResizeChildren()
 	f.PlaceChildren()
@@ -215,8 +215,8 @@ func (f *Frame) ProcessEvent(ev event.TEvent) bool {
 		xx = x + delta
 	}
 
-	f.x = xx
-	f.y = yy
+	f.SetX(xx)
+	f.SetY(yy)
 
 	f.ResizeChildren()
 	f.PlaceChildren()

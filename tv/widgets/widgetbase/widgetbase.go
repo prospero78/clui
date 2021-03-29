@@ -8,6 +8,7 @@ import (
 	"github.com/prospero78/goTV/tv/cons"
 	"github.com/prospero78/goTV/tv/types"
 	"github.com/prospero78/goTV/tv/widgets/event"
+	"github.com/prospero78/goTV/tv/widgets/widgetbase/rectangle"
 	"github.com/prospero78/goTV/tv/widgets/widgetbase/widgetid"
 	"github.com/prospero78/goTV/tv/widgets/widgetbase/widgetvisible"
 )
@@ -16,38 +17,38 @@ import (
 // Каждый новый виджет должен включать его или реализовывать
 // его методы
 type TWidgetBase struct {
-	widgetID      types.AWidgetID
-	x, y          int
-	width, height int // Высота и ширина виджета
-	minW, minH    int // Минимальные размеры виджеты
-	scale         int
-	padX, padY    int
-	gapX, gapY    int
-	isTabSkip     bool // Пропускать при нажатии клавиши TAB
-	isDisabled    bool // Признак отключенности окна
-	isVisible     widgetvisible.TWidgetVisible // Признак скрытости элемента
-	isInactive    bool
-	isModal       bool // Признак модальности окна
-	isClipped     bool // Признак обрезки виджета
-	fg, bg        mTerm.Attribute
-	fgActive      mTerm.Attribute
-	bgActive      mTerm.Attribute
-	align         types.AAlign
-	parent        types.IWidget
-	pack          types.APackDirect
-	children      []types.IWidget
-	block         sync.RWMutex
-	onActive      func(active bool)
-	clipper       *rect
-	title         string // Заголовок окна
-	style         string // Стиль окна
+	widgetID types.AWidgetID
+	*rectangle.TRectangle
+	minW, minH int // Минимальные размеры виджеты
+	scale      int
+	padX, padY int
+	gapX, gapY int
+	isTabSkip  bool                         // Пропускать при нажатии клавиши TAB
+	isDisabled bool                         // Признак отключенности окна
+	isVisible  widgetvisible.TWidgetVisible // Признак скрытости элемента
+	isInactive bool
+	isModal    bool // Признак модальности окна
+	isClipped  bool // Признак обрезки виджета
+	fg, bg     mTerm.Attribute
+	fgActive   mTerm.Attribute
+	bgActive   mTerm.Attribute
+	align      types.AAlign
+	parent     types.IWidget
+	pack       types.APackDirect
+	children   []types.IWidget
+	block      sync.RWMutex
+	onActive   func(active bool)
+	clipper    *rectangle.TRectangle
+	title      string // Заголовок окна
+	style      string // Стиль окна
 }
 
 // New -- возвращает новый TBaseControl
 func New() TWidgetBase {
 	return TWidgetBase{
-		widgetID: widgetid.GetWidgetID().NextID(),
-		isVisible: widgetvisible.New(),
+		widgetID:             widgetid.GetWidgetID().NextID(),
+		isVisible:            widgetvisible.New(),
+		TRectangle: rectangle.New(),
 	}
 }
 
@@ -81,7 +82,7 @@ func (c *TWidgetBase) SetTitle(title string) {
 }
 
 func (c *TWidgetBase) Size() (widht int, height int) {
-	return c.width, c.height
+	return c.GetWidth(), c.GetHidth()
 }
 
 func (c *TWidgetBase) SetSize(width, height int) {
@@ -92,14 +93,14 @@ func (c *TWidgetBase) SetSize(width, height int) {
 		height = c.minH
 	}
 
-	if height != c.height || width != c.width {
-		c.height = height
-		c.width = width
+	if height != c.GetHidth() || width != c.GetWidth() {
+		c.SetHidth(height)
+		c.SetWidth(width)
 	}
 }
 
 func (c *TWidgetBase) Pos() (x int, y int) {
-	return c.x, c.y
+	return c.GetX(), c.GetY()
 }
 
 func (c *TWidgetBase) SetPos(x, y int) {
@@ -107,29 +108,29 @@ func (c *TWidgetBase) SetPos(x, y int) {
 		cx, cy, _, _ := c.Clipper()
 		px, py := c.Paddings()
 
-		distX := cx - c.x
-		distY := cy - c.y
+		distX := cx - c.GetX()
+		distY := cy - c.GetY()
 
-		c.clipper.x = x + px
-		c.clipper.y = y + py
+		c.clipper.SetX(x + px)
+		c.clipper.SetY(y + py)
 
-		c.x = (x - distX) + px
-		c.y = (y - distY) + py
+		c.SetX(x - distX + px)
+		c.SetY(y - distY + py)
 	} else {
-		c.x = x
-		c.y = y
+		c.SetX(x)
+		c.SetY(y)
 	}
 }
 
 func (c *TWidgetBase) applyConstraints() {
-	ww, hh := c.width, c.height
+	ww, hh := c.GetWidth(), c.GetHidth()
 	if ww < c.minW {
 		ww = c.minW
 	}
 	if hh < c.minH {
 		hh = c.minH
 	}
-	if hh != c.height || ww != c.width {
+	if hh != c.GetHidth() || ww != c.GetWidth() {
 		c.SetSize(ww, hh)
 	}
 }
@@ -194,7 +195,7 @@ func (c *TWidgetBase) SetVisible(isVisible bool) {
 	c.block.Lock()
 	defer c.block.Unlock()
 
-	switch isVisible{
+	switch isVisible {
 	case true:
 		c.isVisible.Set()
 	default:
@@ -261,7 +262,7 @@ func (c *TWidgetBase) SetGaps(dx, dy int) {
 	}
 }
 
-func (c *TWidgetBase) Pack() cons.PackType {
+func (c *TWidgetBase) Pack() types.APackDirect {
 	return c.pack
 }
 
@@ -320,8 +321,8 @@ func (c *TWidgetBase) ResizeChildren() {
 		return
 	}
 
-	fullWidth := c.width - 2*c.padX
-	fullHeight := c.height - 2*c.padY
+	fullWidth := c.GetWidth() - 2*c.padX
+	fullHeight := c.GetWidth() - 2*c.padY
 	if c.pack == cons.Horizontal {
 		fullWidth -= (children - 1) * c.gapX
 	} else {
@@ -461,7 +462,7 @@ func (c *TWidgetBase) ChildrenScale() int {
 
 	total := 0
 	for _, ctrl := range c.children {
-		if ctrl.Visible() {
+		if ctrl.IsVisible() {
 			total += ctrl.Scale()
 		}
 	}
@@ -521,7 +522,7 @@ func (c *TWidgetBase) Draw() {
 }
 
 func (c *TWidgetBase) DrawChildren() {
-	if c.IsVisible.Get() {
+	if c.IsVisible() {
 		return
 	}
 
@@ -548,7 +549,7 @@ func (c *TWidgetBase) Clipper() (int, int, int, int) {
 	clipped := ClippedParent(c)
 
 	if clipped == nil || (c.isClipped && c.clipper != nil) {
-		return c.clipper.x, c.clipper.y, c.clipper.w, c.clipper.h
+		return c.clipper.GetX(), c.clipper.GetY(), c.clipper.GetWidth(), c.clipper.GetHidth()
 	}
 
 	return CalcClipper(c)
@@ -556,22 +557,26 @@ func (c *TWidgetBase) Clipper() (int, int, int, int) {
 
 func (c *TWidgetBase) setClipper() {
 	x, y, w, h := CalcClipper(c)
-	c.clipper = &rect{x: x, y: y, w: w, h: h}
+	c.clipper = rectangle.New()
+	c.clipper.SetX(x)
+	c.clipper.SetY(y)
+	c.clipper.SetWidth(w)
+	c.clipper.SetHidth(h)
 }
 
 func (c *TWidgetBase) HitTest(x, y int) types.AHitResult {
-	if x > c.x && x < c.x+c.width-1 &&
-		y > c.y && y < c.y+c.height-1 {
+	if x > c.GetX() && x < c.GetX()+c.GetWidth()-1 &&
+		y > c.GetY() && y < c.GetY()+c.GetHidth()-1 {
 		return cons.HitInside
 	}
 
-	if (x == c.x || x == c.x+c.width-1) &&
-		y >= c.y && y < c.y+c.height {
+	if (x == c.GetX() || x == c.GetX()+c.GetWidth()-1) &&
+		y >= c.GetY() && y < c.GetY()+c.GetHidth() {
 		return cons.HitBorder
 	}
 
-	if (y == c.y || y == c.y+c.height-1) &&
-		x >= c.x && x < c.x+c.width {
+	if (y == c.GetY() || y == c.GetY()+c.GetHidth()-1) &&
+		x >= c.GetX() && x < c.GetX()+c.GetWidth() {
 		return cons.HitBorder
 	}
 
@@ -588,9 +593,9 @@ func (c *TWidgetBase) PlaceChildren() {
 		return
 	}
 
-	xx, yy := c.x+c.padX, c.y+c.padY
+	xx, yy := c.GetX()+c.padX, c.GetY()+c.padY
 	for _, ctrl := range c.children {
-		if !ctrl.Visible() {
+		if ctrl.IsHidden() {
 			continue
 		}
 

@@ -35,7 +35,7 @@ func createView() *tv.TBarChart {
 	view := tv.AddWindow(0, 0, 10, 7, "BarChart Demo")
 	bch := tv.CreateBarChart(view, 40, 12, 1)
 
-	frmChk := tv.CreateFrame(view, 8, 5, cons.ABorderNone, cons.Fixed)
+	frmChk := tv.CreateFrame(view, 8, 5, cons.BorderNone, cons.Fixed)
 	frmChk.SetPack(cons.Vertical)
 	chkTitles := tv.CreateCheckBox(frmChk, cons.AutoSize, "Show Titles", cons.Fixed)
 	chkMarks := tv.CreateCheckBox(frmChk, cons.AutoSize, "Show Marks", cons.Fixed)

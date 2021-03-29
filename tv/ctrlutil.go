@@ -75,7 +75,7 @@ func ChildAt(parent types.IWidget, x, y int) types.IWidget {
 	var ctrl types.IWidget
 	ctrl = parent
 	for _, child := range parent.Children() {
-		if !child.Visible() {
+		if child.IsHidden() {
 			continue
 		}
 
@@ -221,21 +221,21 @@ func getLinearControlList(parent types.IWidget, fn func(types.IWidget) bool) []t
 // that has tab-stop feature on. Used by library when processing TAB key
 func NextControl(parent types.IWidget, curr types.IWidget, next bool) types.IWidget {
 	fnTab := func(c types.IWidget) bool {
-		isVisible := func() bool {
+		isVisible := func() types.AVisible {
 			ctrl := c.Parent()
 
 			for ctrl != nil {
-				if !ctrl.Visible() {
+				if ctrl.IsHidden() {
 					return false
 				}
 
 				ctrl = ctrl.Parent()
 			}
 
-			return c.Visible()
+			return c.IsVisible()
 		}
 
-		return c.TabStop() && isVisible() && c.Enabled()
+		return c.TabStop() && bool(isVisible()) && c.Enabled()
 	}
 
 	linear := getLinearControlList(parent, fnTab)

@@ -126,7 +126,7 @@ func (b *TBarChart) Draw() {
 	SetTextColor(fg)
 	SetBackColor(bg)
 
-	FillRect(b.x, b.y, b.width, b.height, ' ')
+	FillRect(b.GetX(), b.GetY(), b.GetWidth(), b.GetHidth(), ' ')
 
 	if len(b.data) == 0 {
 		return
@@ -140,9 +140,9 @@ func (b *TBarChart) Draw() {
 
 func (b *TBarChart) barHeight() int {
 	if b.showTitles {
-		return b.height - 2
+		return b.GetHidth() - 2
 	}
-	return b.height
+	return b.GetHidth()
 }
 
 func (b *TBarChart) drawBars() {
@@ -194,7 +194,7 @@ func (b *TBarChart) drawBars() {
 		if b.onDrawCell == nil {
 			SetTextColor(fColor)
 			SetBackColor(bColor)
-			FillRect(b.x+pos, b.y+h-barH, barW, barH, ch)
+			FillRect(b.GetX()+pos, b.GetY()+h-barH, barW, barH, ch)
 		} else {
 			cellDef := BarDataCell{Item: d.Title, ID: idx,
 				Value: 0, BarMax: d.Value, TotalMax: max,
@@ -206,7 +206,7 @@ func (b *TBarChart) drawBars() {
 				SetTextColor(req.Fg)
 				SetBackColor(req.Bg)
 				for dx := 0; dx < barW; dx++ {
-					PutChar(b.x+pos+dx, b.y+h-1-dy, req.Ch)
+					PutChar(b.GetX()+pos+dx, b.GetY()+h-1-dy, req.Ch)
 				}
 			}
 		}
@@ -216,7 +216,7 @@ func (b *TBarChart) drawBars() {
 			SetBackColor(bg)
 			if b.showMarks {
 				c := parts[7]
-				PutChar(b.x+pos+barW/2, b.y+h, c)
+				PutChar(b.GetX()+pos+barW/2, b.GetY()+h, c)
 			}
 			var s string
 			shift := 0
@@ -225,7 +225,7 @@ func (b *TBarChart) drawBars() {
 			} else {
 				shift, s = AlignText(d.Title, barW, cons.AlignCenter)
 			}
-			DrawRawText(b.x+pos+shift, b.y+h+1, s)
+			DrawRawText(b.GetX()+pos+shift, b.GetY()+h+1, s)
 		}
 
 		pos += barW + int(b.BarGap())
@@ -234,18 +234,18 @@ func (b *TBarChart) drawBars() {
 
 func (b *TBarChart) drawLegend() {
 	pos, width := b.calculateBarArea()
-	if pos+width >= b.width-3 {
+	if pos+width >= b.GetWidth()-3 {
 		return
 	}
 
 	PushAttributes()
 	defer PopAttributes()
-	fg, bg := RealColor(b.fg, b.Style(), ColorBarChartText), RealColor(b.bg, b.Style(), ColorBarChartBack)
+	fg, bg := RealColor(b.fg, b.Style(), ColorBarChartText), RealColor(b.bg, b.Style(), cons.ColorBarChartBack)
 
 	parts := []rune(SysObject(ObjBarChart))
 	defRune := parts[0]
 	for idx, d := range b.data {
-		if idx >= b.height {
+		if idx >= b.GetHidth() {
 			break
 		}
 
@@ -255,11 +255,11 @@ func (b *TBarChart) drawLegend() {
 		}
 		SetTextColor(d.Fg)
 		SetBackColor(d.Bg)
-		PutChar(b.x+pos+width, b.y+idx, c)
+		PutChar(b.GetX()+pos+width, b.GetY()+idx, c)
 		s := CutText(fmt.Sprintf(" - %v", d.Title), int(b.LegendWidth()))
 		SetTextColor(fg)
 		SetBackColor(bg)
-		DrawRawText(b.x+pos+width+1, b.y+idx, s)
+		DrawRawText(b.GetX()+pos+width+1, b.GetY()+idx, s)
 	}
 }
 
@@ -286,7 +286,7 @@ func (b *TBarChart) drawValues() {
 		v := float64(h-dy) / float64(h) * max
 		s := fmt.Sprintf(format, v)
 		s = CutText(s, valVal)
-		DrawRawText(b.x, b.y+dy, s)
+		DrawRawText(b.GetX(), b.GetY()+dy, s)
 
 		dy += 2
 	}
@@ -312,21 +312,21 @@ func (b *TBarChart) drawRulers() {
 
 	if pos > 0 {
 		for dy := 0; dy < h; dy++ {
-			PutChar(b.x+pos, b.y+dy, cV)
+			PutChar(b.GetX()+pos, b.GetY()+dy, cV)
 		}
 	}
 	if b.showTitles {
 		for dx := 0; dx < vWidth; dx++ {
-			PutChar(b.x+pos+dx, b.y+h, cH)
+			PutChar(b.GetX()+pos+dx, b.GetY()+h, cH)
 		}
 	}
 	if pos > 0 && b.showTitles {
-		PutChar(b.x+pos, b.y+h, cC)
+		PutChar(b.GetX()+pos, b.GetY()+h, cC)
 	}
 }
 
 func (b *TBarChart) calculateBarArea() (int, int) {
-	w := b.width
+	w := b.GetWidth()
 	pos := 0
 
 	valVal := int(b.ValueWidth())
@@ -352,7 +352,7 @@ func (b *TBarChart) calculateBarWidth() int {
 		return int(b.MinBarWidth())
 	}
 
-	w := b.width
+	w := b.GetWidth()
 	legVal := int(b.LegendWidth())
 	valVal := int(b.ValueWidth())
 	if valVal < w/2 {
