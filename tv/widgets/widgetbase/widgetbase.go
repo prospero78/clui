@@ -21,7 +21,8 @@ type TWidgetBase struct {
 	*rectangle.TRectangle
 	minW, minH int // Минимальные размеры виджеты
 	scale      int
-	padX, padY int
+	padX       types.ACoordX
+	padY       types.ACoordY
 	gapX, gapY int
 	isTabSkip  bool                         // Пропускать при нажатии клавиши TAB
 	isDisabled bool                         // Признак отключенности окна
@@ -46,8 +47,8 @@ type TWidgetBase struct {
 // New -- возвращает новый TBaseControl
 func New() TWidgetBase {
 	return TWidgetBase{
-		widgetID:             widgetid.GetWidgetID().NextID(),
-		isVisible:            widgetvisible.New(),
+		widgetID:   widgetid.GetWidgetID().NextID(),
+		isVisible:  widgetvisible.New(),
 		TRectangle: rectangle.New(),
 	}
 }
@@ -82,7 +83,7 @@ func (c *TWidgetBase) SetTitle(title string) {
 }
 
 func (c *TWidgetBase) Size() (widht int, height int) {
-	return c.GetWidth(), c.GetHidth()
+	return c.GetSize()
 }
 
 func (c *TWidgetBase) SetSize(width, height int) {
@@ -93,44 +94,39 @@ func (c *TWidgetBase) SetSize(width, height int) {
 		height = c.minH
 	}
 
-	if height != c.GetHidth() || width != c.GetWidth() {
-		c.SetHidth(height)
-		c.SetWidth(width)
+	if height != c.GetHeight() || width != c.GetWidth() {
+		c.SetSize(width, height)
 	}
 }
 
-func (c *TWidgetBase) Pos() (x int, y int) {
-	return c.GetX(), c.GetY()
-}
-
-func (c *TWidgetBase) SetPos(x, y int) {
+func (c *TWidgetBase) SetPos(x types.ACoordX, y types.ACoordY) {
 	if c.isClipped && c.clipper != nil {
 		cx, cy, _, _ := c.Clipper()
 		px, py := c.Paddings()
 
-		distX := cx - c.GetX()
-		distY := cy - c.GetY()
+		distX := cx - c.GetX().Get()
+		distY := cy - c.GetY().Get()
 
-		c.clipper.SetX(x + px)
-		c.clipper.SetY(y + py)
+		c.clipper.GetX().Set(x + px)
+		c.clipper.GetY().Set(y + py)
 
-		c.SetX(x - distX + px)
-		c.SetY(y - distY + py)
+		c.GetX().Set(x - distX + px)
+		c.GetY().Set(y - distY + py)
 	} else {
-		c.SetX(x)
-		c.SetY(y)
+		c.GetX().Set(x)
+		c.GetY().Set(y)
 	}
 }
 
 func (c *TWidgetBase) applyConstraints() {
-	ww, hh := c.GetWidth(), c.GetHidth()
+	ww, hh := c.GetWidth(), c.GetHeight()
 	if ww < c.minW {
 		ww = c.minW
 	}
 	if hh < c.minH {
 		hh = c.minH
 	}
-	if hh != c.GetHidth() || ww != c.GetWidth() {
+	if hh != c.GetHeight() || ww != c.GetWidth() {
 		c.SetSize(ww, hh)
 	}
 }
@@ -236,11 +232,11 @@ func (c *TWidgetBase) SetModal(modal bool) {
 	c.isModal = modal
 }
 
-func (c *TWidgetBase) Paddings() (px int, py int) {
+func (c *TWidgetBase) Paddings() (px types.ACoordX, py types.ACoordY) {
 	return c.padX, c.padY
 }
 
-func (c *TWidgetBase) SetPaddings(px, py int) {
+func (c *TWidgetBase) SetPaddings(px types.ACoordX, py types.ACoordY) {
 	if px >= 0 {
 		c.padX = px
 	}
@@ -545,7 +541,7 @@ func (c *TWidgetBase) DrawChildren() {
 	}
 }
 
-func (c *TWidgetBase) Clipper() (int, int, int, int) {
+func (c *TWidgetBase) Clipper() (types.ACoordX, types.ACoordY, int, int) {
 	clipped := ClippedParent(c)
 
 	if clipped == nil || (c.isClipped && c.clipper != nil) {

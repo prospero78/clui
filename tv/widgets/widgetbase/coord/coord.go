@@ -1,41 +1,36 @@
 // Package coord -- тип координат
 package coord
 
+import "github.com/prospero78/goTV/tv/types"
+
 // TCoord -- операции с координатами
 type TCoord struct {
-	x int
-	y int
+	x types.ICoordX
+	y types.ICoordY
 }
 
 // New -- возвращает новый *TCoord
 func New() *TCoord {
-	return &TCoord{
-		x: x,
-		y: y,
-	}
+	return &TCoord{}
 }
 
-// GetX -- возвращает координату X
-func (sf *TCoord) GetX() int {
+// GetX -- возвращает  X
+func (sf *TCoord) GetX() types.ICoordX {
 	return sf.x
 }
 
-// SetX -- устанавливает координату X
-func (sf *TCoord) SetX(x int) {
-	sf.x = x
-}
-
-// GetY -- возвращает координату Y
-func (sf *TCoord) GetY() int {
+// GetY -- возвращает  Y
+func (sf *TCoord) GetY() types.ICoordY {
 	return sf.y
 }
 
-// SetY -- устанавливает координату Y
-func (sf *TCoord) SetY(y int) {
-	sf.y = y
+// GetPos -- возвращает позицию точки
+func (sf *TCoord) GetPos() (types.ACoordX, types.ACoordY) {
+	return sf.x.Get(), sf.y.Get()
 }
 
-// GetPos -- возвращает позицию точки
-func (sf *TCoord) GetPos() (x, y int) {
-	return sf.x, sf.y
+// SetPos -- устанавливает обе координаты
+func (sf *TCoord) SetPos(x types.ACoordX, y types.ACoordY) {
+	sf.x.Set(x)
+	sf.y.Set(y)
 }

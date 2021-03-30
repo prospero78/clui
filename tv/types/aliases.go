@@ -2,6 +2,16 @@
 package types
 
 type ( // Алисы типов для контроля данных
+	// ACoordX -- координата Х
+	ACoordX int
+	// ACoordY -- координата Y
+	ACoordY int
+
+	// AHeight --высота объекта
+	AHeight int
+	// AWidth -- ширина объекта
+	AWidth int
+
 	// AWidgetID -- уникальный ID виджета
 	AWidgetID int64
 

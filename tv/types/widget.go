@@ -7,22 +7,11 @@ import (
 
 // IWidget -- интерфейс для каждого визуального виджета, должен быть реализован
 type IWidget interface {
+	IRectangle
 	// Title -- возвращает текущий заголовок или текст виджета
 	Title() ATitle
 	// SetTitle -- Устанавливает заголовок или текст виджета
 	SetTitle(title ATitle)
-	// Size returns current control width and height
-	Size() (widht int, height int)
-	// SetSize changes control size. Constant KeepValue can be
-	// used as placeholder to indicate that the control attrubute
-	// should be unchanged.
-	SetSize(width, height int)
-	// Pos returns the current absolute control position: X and Y.
-	Pos() (x int, y int)
-	// SetPos changes contols position. Manual call of the method does not
-	// make sense for any control except for Window because control positions
-	// inside of container always recalculated after its parent resizes
-	SetPos(x, y int)
 	// Constraints return minimal control widht and height
 	Constraints() (minw int, minh int)
 	SetConstraints(minw, minh int)

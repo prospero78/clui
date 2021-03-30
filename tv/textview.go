@@ -78,8 +78,8 @@ func CreateTextView(parent types.IWidget, width, height int, scale int) *TextVie
 	return l
 }
 
-func (l *TextView) outputHeight() int {
-	h := l.height
+func (l *TextView) outputHeight() types.AHeight {
+	h := l.GetHeight().Get()
 	if !l.wordWrap {
 		h--
 	}
