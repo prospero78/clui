@@ -79,7 +79,7 @@ func (b *Button) Draw() {
 	PushAttributes()
 	defer PopAttributes()
 
-	x, y := b.Pos()
+	x, y := b.GetPos()
 	w, h := b.Size()
 
 	fg, bg := b.fg, b.bg

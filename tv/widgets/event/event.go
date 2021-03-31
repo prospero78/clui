@@ -7,7 +7,8 @@ import (
 )
 
 type TEvent struct {
-	X, Y int
+	X types.ACoordX
+	Y types.ACoordY
 	// Err is error got from termbox library
 	// Event type - the first events are mapped to termbox Event and then a few
 	// own events added to the end

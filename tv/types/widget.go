@@ -13,8 +13,8 @@ type IWidget interface {
 	// SetTitle -- Устанавливает заголовок или текст виджета
 	SetTitle(title ATitle)
 	// Constraints return minimal control widht and height
-	Constraints() (minw int, minh int)
-	SetConstraints(minw, minh int)
+	Constraints() (minw AWidth, minh AHeight)
+	SetConstraints(minw AWidth, minh AHeight)
 	// Active returns if a control is active. Only active controls can
 	// process keyboard events. Parent looks for active controls to
 	// make sure that there is only one active control at a time
@@ -48,10 +48,10 @@ type IWidget interface {
 	// Paddings returns a number of spaces used to auto-arrange children inside
 	// a container: indent from left and right sides, indent from top and bottom
 	// sides.
-	Paddings() (px int, py int)
+	Paddings() (px ACoordX, py ACoordY)
 	// SetPaddings changes indents for the container. Use KeepValue as a placeholder
 	// if you do not want to touch a parameter
-	SetPaddings(px, py int)
+	SetPaddings(px ACoordX, py ACoordY)
 	// Gaps returns number of spaces inserted between child controls. dx is used
 	// by horizontally-packed parents and dy by vertically-packed ones
 	Gaps() (dx int, dy int)
@@ -109,7 +109,7 @@ type IWidget interface {
 	ChildExists(control IWidget) bool
 	// MinimalSize returns the minimal size required by a control to show
 	// it and all its children.
-	MinimalSize() (w int, h int)
+	MinimalSize() (w AWidth, h AHeight)
 	// ChildrenScale returns the sum of all scales of all control decendants
 	ChildrenScale() int
 	// ResizeChildren recalculates new size of all control's children. Calling
@@ -140,11 +140,11 @@ type IWidget interface {
 	// the event to the control parent
 	ProcessEvent(event IEvent) bool
 	// RefID returns the controls internal reference id
-	RefID() int64
-	// removeChild removes a child from a container
+	RefID() AWidgetID
+	// RemoveChild removes a child from a container
 	// It's used to "destroy" controls whenever a control is no longer used
 	// by the user
-	removeChild(control IWidget)
+	RemoveChild(widget IWidget)
 	// Destroy is the public interface to remove an object from its parental chain
 	// it implies this control will stop receiving events and will not be drawn nor
 	// will impact on other objects position and size calculation
@@ -164,5 +164,5 @@ type IWidget interface {
 	Clipped() bool
 	// Clipper if the component is clipped then return the clipper geometry, however
 	// the size and pos is returned
-	Clipper() (int, int, int, int)
+	Clipper() (ACoordX, ACoordY, int, int)
 }

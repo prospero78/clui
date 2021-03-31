@@ -6,7 +6,12 @@ import (
 
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+
 	"github.com/prospero78/goTV/tv/cons"
+	"github.com/prospero78/goTV/tv/types"
+	"github.com/prospero78/goTV/tv/widgets/widgetbase/coord"
+	"github.com/prospero78/goTV/tv/widgets/widgetbase/rectangle"
+	"github.com/prospero78/goTV/tv/widgets/widgetbase/size"
 )
 
 type attr struct {
@@ -14,24 +19,18 @@ type attr struct {
 	back term.Attribute
 }
 
-type rect struct {
-	x, y, w, h int
-}
-
 /*
 Canvas is a 'graphical' engine to draw primitives.
 */
 type Canvas struct {
-	width     int
-	height    int
+	size      *size.TSize
+	coord     *coord.TCoord
 	textColor term.Attribute
 	backColor term.Attribute
-	clipX     int
-	clipY     int
-	clipW     int
-	clipH     int
+	clipPos   *coord.TCoord
+	clipSize  *size.TSize
 	attrStack []attr
-	clipStack []rect
+	clipStack []*rectangle.TRectangle
 }
 
 var (
@@ -73,7 +72,9 @@ func PopAttributes() {
 
 // PushClip saves the current clipping window
 func PushClip() {
-	c := rect{x: canvas.clipX, y: canvas.clipY, w: canvas.clipW, h: canvas.clipH}
+	c := rectangle.New()
+	c.SetSize(canvas.size.GetSize())
+	c.SetPos(canvas.clipPos.GetPos())
 	canvas.clipStack = append(canvas.clipStack, c)
 }
 
@@ -84,7 +85,7 @@ func PopClip() {
 	}
 	c := canvas.clipStack[len(canvas.clipStack)-1]
 	canvas.clipStack = canvas.clipStack[:len(canvas.clipStack)-1]
-	SetClipRect(c.x, c.y, c.w, c.h)
+	SetClipRect(c.GetPos(), c.GetSize())
 }
 
 // Reset reinitializes canvas: set clipping rectangle to the whole
@@ -109,25 +110,31 @@ func InClipRect(x, y int) bool {
 		y < canvas.clipY+canvas.clipH
 }
 
-func clip(x, y, w, h int) (cx int, cy int, cw int, ch int) {
-	if x+w < canvas.clipX || x > canvas.clipX+canvas.clipW ||
-		y+h < canvas.clipY || y > canvas.clipY+canvas.clipH {
+func clip(x types.ACoordX, 
+	y types.ACoordY, 
+	w types.AWidth, 
+	h types.AHeight) (cx types.ACoordX, 
+		cy types.ACoordY, cw types.AWidth, ch types.AHeight) {
+	if x+types.ACoordX(w) < canvas.clipPos.GetX().Get() ||
+	x > canvas.clipPos.GetX().Get()+types.ACoordX(canvas.clipSize.GetWidth().Get()) ||
+		y+types.ACoordY(h) < canvas.clipPos.GetY().Get() || 
+		y > canvas.clipPos.GetY().Get()+types.ACoordY(canvas.clipSize.GetHeight().Get()) {
 		return 0, 0, 0, 0
 	}
 
-	if x < canvas.clipX {
-		w -= canvas.clipX - x
-		x = canvas.clipX
+	if x < canvas.clipPos.GetX().Get() {
+		w -= types.AWidth(canvas.clipPos.GetX().Get() - x)
+		x = canvas.clipPos.GetX().Get()
 	}
-	if y < canvas.clipY {
-		h -= canvas.clipY - y
-		y = canvas.clipY
+	if y < canvas.clipPos.GetY().Get() {
+		h -= types.AHeight(canvas.clipPos.GetY().Get() - y)
+		y = canvas.clipPos.GetY().Get()
 	}
-	if x+w > canvas.clipX+canvas.clipW {
-		w = canvas.clipW - (x - canvas.clipX)
+	if types.AWidth(x)+w > types.AWidth(canvas.clipPos.GetX().Get())+canvas.clipSize.GetWidth().Get() {
+		w = canvas.clipSize.GetWidth().Get() - types.AWidth(x - canvas.clipPos.GetX().Get())
 	}
-	if y+h > canvas.clipY+canvas.clipH {
-		h = canvas.clipH - (y - canvas.clipY)
+	if types.AHeight(y)+h > types.AHeight(canvas.clipPos.GetY().Get())+canvas.clipSize.GetHeight().Get() {
+		h = canvas.clipSize.GetHeight().Get() - types.AHeight(y - canvas.clipPos.GetY().Get())
 	}
 
 	return x, y, w, h
@@ -142,21 +149,20 @@ func Flush() {
 // equal old size then Canvas is recreated and cleared
 // with default colors. Both Canvas width and height must
 // be greater than 2
-func SetScreenSize(width int, height int) {
-	if canvas.width == width && canvas.height == height {
+func SetScreenSize(width types.AWidth, height types.AHeight) {
+	if canvas.size.GetWidth().Get() == width && canvas.size.GetHeight().Get() == height {
 		return
 	}
 
-	canvas.width = width
-	canvas.height = height
+	canvas.size.SetSize( width, height)
 
-	canvas.clipStack = make([]rect, 0)
+	canvas.clipStack = make([]*rectangle.TRectangle, 0)
 	SetClipRect(0, 0, width, height)
 }
 
 // Size returns current Canvas size
-func ScreenSize() (width int, height int) {
-	return canvas.width, canvas.height
+func ScreenSize() (width types.AWidth, height types.AHeight) {
+	return canvas.size.GetSize()
 }
 
 // SetCursorPos sets text caret position. Used by controls like EditField
@@ -209,34 +215,34 @@ func BackColor() term.Attribute {
 
 // SetClipRect defines a new clipping rect. Maybe useful with PopClip and
 // PushClip functions
-func SetClipRect(x, y, w, h int) {
+func SetClipRect(x types.ACoordX, y types.ACoordY, w types.AWidth, h types.AHeight) {
 	if x < 0 {
 		x = 0
 	}
 	if y < 0 {
 		y = 0
 	}
-	if x+w > canvas.width {
-		w = canvas.width - x
+	if types.AWidth(x)+w > canvas.size.GetWidth().Get() {
+		w = canvas.size.GetWidth().Get() - types.AWidth(x)
 	}
-	if y+h > canvas.height {
-		h = canvas.height - h
+	if types.AHeight(y)+h > canvas.size.GetHeight().Get() {
+		h = canvas.size.GetHeight().Get() - h
 	}
 
-	canvas.clipX = x
-	canvas.clipY = y
-	canvas.clipW = w
-	canvas.clipH = h
+	canvas.clipPos.SetPos(x, y)
+	canvas.clipSize.SetSize(w, h)
 }
 
 // ClipRect returns the current clipping rectangle
-func ClipRect() (x int, y int, w int, h int) {
-	return canvas.clipX, canvas.clipY, canvas.clipW, canvas.clipH
+func ClipRect() (x types.ACoordX, y types.ACoordY, w types.AWidth, h types.AHeight) {
+	x, y = canvas.clipPos.GetPos()
+	w, h = canvas.clipSize.GetSize()
+	return x, y, w, h
 }
 
 // DrawHorizontalLine draws the part of the horizontal line that is inside
 // current clipping rectangle
-func DrawHorizontalLine(x, y, w int, r rune) {
+func DrawHorizontalLine(x types.ACoordX, y types.ACoordY, w types.AWidth, r rune) {
 	x, y, w, _ = clip(x, y, w, 1)
 	if w == 0 {
 		return
@@ -501,7 +507,7 @@ func DrawScrollBar(x, y, w, h, pos int) {
 }
 
 // FillRect paints the area with r character using the current colors
-func FillRect(x, y, w, h int, r rune) {
+func FillRect(x types.CoordX, y, w, h int, r rune) {
 	x, y, w, h = clip(x, y, w, h)
 	if w < 1 || y < -1 {
 		return

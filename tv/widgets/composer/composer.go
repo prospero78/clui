@@ -71,7 +71,7 @@ func ReleaseEvents() {
 
 func termboxEventToLocal(ev term.Event) types.Event {
 	e := event.TEvent{Type: EventType(ev.Type), Ch: ev.Ch,
-		Key: ev.Key, Err: ev.Err, X: ev.MouseX, Y: ev.MouseY,
+		Key: ev.Key, Err: ev.Err, X: types.ACoordX(ev.MouseX), Y: types.ACoordY(ev.MouseY),
 		Mod: ev.Mod, Width: ev.Width, Height: ev.Height}
 	return e
 }
@@ -294,7 +294,7 @@ func (c *TPacker) resizeTopWindow(ev types.IWidget) bool {
 		return false
 	}
 
-	w, h := view.Size()
+	w, h := view.GetSize()
 	w1, h1 := w, h
 	minW, minH := view.Constraints()
 	switch {
@@ -326,8 +326,8 @@ func (c *TPacker) moveTopWindow(ev event.TEvent) bool {
 			return false
 		}
 
-		x, y := view.Pos()
-		w, h := view.Size()
+		x, y := view.GetPos()
+		w, h := view.GetSize()
 		x1, y1 := x, y
 		cx, cy := term.Size()
 		switch {
@@ -383,8 +383,8 @@ func (c *TPacker) processWindowDrag(ev event.TEvent) {
 	}
 
 	w := c.topWindow()
-	newX, newY := w.Pos()
-	newW, newH := w.Size()
+	newX, newY := w.GetPos()
+	newW, newH := w.GetSize()
 	cw, ch := ScreenSize()
 
 	switch c.dragType {

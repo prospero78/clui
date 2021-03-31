@@ -17,9 +17,9 @@ import (
 // Каждый новый виджет должен включать его или реализовывать
 // его методы
 type TWidgetBase struct {
-	widgetID types.AWidgetID
 	*rectangle.TRectangle
-	minW, minH int // Минимальные размеры виджеты
+	widgetID   types.AWidgetID
+	minSize    types.ISize // Минимальные размеры виджеты
 	scale      int
 	padX       types.ACoordX
 	padY       types.ACoordY
@@ -40,7 +40,7 @@ type TWidgetBase struct {
 	block      sync.RWMutex
 	onActive   func(active bool)
 	clipper    *rectangle.TRectangle
-	title      string // Заголовок окна
+	title      types.ATitle // Заголовок окна
 	style      string // Стиль окна
 }
 
@@ -74,27 +74,23 @@ func (c *TWidgetBase) RefID() types.AWidgetID {
 	return c.widgetID
 }
 
-func (c *TWidgetBase) Title() string {
+func (c *TWidgetBase) Title() types.ATitle {
 	return c.title
 }
 
-func (c *TWidgetBase) SetTitle(title string) {
+func (c *TWidgetBase) SetTitle(title types.ATitle) {
 	c.title = title
 }
 
-func (c *TWidgetBase) Size() (widht int, height int) {
-	return c.GetSize()
-}
-
-func (c *TWidgetBase) SetSize(width, height int) {
-	if width < c.minW {
-		width = c.minW
+func (c *TWidgetBase) SetSize(width types.AWidth, height types.AHeight) {
+	if width < c.minSize.Width().Get() {
+		width = c.minSize.Width().Get()
 	}
-	if height < c.minH {
-		height = c.minH
+	if height < c.minSize.Height().Get() {
+		height = c.minSize.Height().Get()
 	}
 
-	if height != c.GetHeight() || width != c.GetWidth() {
+	if height != c.Size().Height().Get() || width != c.Size().Width().Get() {
 		c.SetSize(width, height)
 	}
 }
@@ -104,40 +100,36 @@ func (c *TWidgetBase) SetPos(x types.ACoordX, y types.ACoordY) {
 		cx, cy, _, _ := c.Clipper()
 		px, py := c.Paddings()
 
-		distX := cx - c.GetX().Get()
-		distY := cy - c.GetY().Get()
+		distX := cx - c.Coord().GetX().Get()
+		distY := cy - c.Coord().GetY().Get()
 
-		c.clipper.GetX().Set(x + px)
-		c.clipper.GetY().Set(y + py)
+		c.clipper.Coord().Set(x + px, y + py)
 
-		c.GetX().Set(x - distX + px)
-		c.GetY().Set(y - distY + py)
+		c.Coord().Set(x - distX + px, y - distY + py)
 	} else {
-		c.GetX().Set(x)
-		c.GetY().Set(y)
+		c.Coord().Set(x, y)
 	}
 }
 
 func (c *TWidgetBase) applyConstraints() {
-	ww, hh := c.GetWidth(), c.GetHeight()
-	if ww < c.minW {
-		ww = c.minW
+	ww, hh := c.Size().Get()
+	if ww < c.minSize.Width().Get() {
+		ww = c.minSize.Width().Get()
 	}
-	if hh < c.minH {
-		hh = c.minH
+	if hh < c.minSize.Height().Get() {
+		hh = c.minSize.Height().Get()
 	}
-	if hh != c.GetHeight() || ww != c.GetWidth() {
+	if hh != c.Size().Height().Get() || ww != c.Size().Width().Get() {
 		c.SetSize(ww, hh)
 	}
 }
 
-func (c *TWidgetBase) Constraints() (minw int, minh int) {
-	return c.minW, c.minH
+func (c *TWidgetBase) Constraints() (minw types.AWidth, minh types.AHeight) {
+	return c.minSize.Width().Get(), c.minSize.Height().Get()
 }
 
-func (c *TWidgetBase) SetConstraints(minw, minh int) {
-	c.minW = minw
-	c.minH = minh
+func (c *TWidgetBase) SetConstraints(minw types.AWidth, minh types.AHeight) {
+	c.minSize.Set(minw, minh)
 	c.applyConstraints()
 }
 
@@ -187,7 +179,7 @@ func (c *TWidgetBase) IsHidden() types.AVisible {
 	return !c.isVisible.Get()
 }
 
-func (c *TWidgetBase) SetVisible(isVisible bool) {
+func (c *TWidgetBase) SetVisible(isVisible types.AVisible) {
 	c.block.Lock()
 	defer c.block.Unlock()
 
@@ -317,8 +309,8 @@ func (c *TWidgetBase) ResizeChildren() {
 		return
 	}
 
-	fullWidth := c.GetWidth() - 2*c.padX
-	fullHeight := c.GetWidth() - 2*c.padY
+	fullWidth := c.Size().Width().Get() - types.AWidth(2*c.padX)
+	fullHeight := c.Size().Height().Get() - types.AHeight( 2*c.padY)
 	if c.pack == cons.Horizontal {
 		fullWidth -= (children - 1) * c.gapX
 	} else {
@@ -326,8 +318,8 @@ func (c *TWidgetBase) ResizeChildren() {
 	}
 
 	totalSc := c.ChildrenScale()
-	minWidth := 0
-	minHeight := 0
+	minWidth := types.AWidth(0)
+	minHeight := types.AHeight(0)
 	for _, child := range c.children {
 		if child.IsHidden() {
 			continue
@@ -382,7 +374,7 @@ func (c *TWidgetBase) ResizeChildren() {
 		diff -= d
 		totalSc -= sc
 
-		ctrl.SetSize(tw, th)
+		ctrl.Size().Set(tw, th)
 		ctrl.ResizeChildren()
 	}
 }
@@ -404,7 +396,7 @@ func (c *TWidgetBase) AddChild(control types.IWidget) {
 	ctrl = c
 	for ctrl != nil {
 		ww, hh := ctrl.MinimalSize()
-		cw, ch := ctrl.Size()
+		cw, ch := ctrl.Size().Get()
 		if ww > cw || hh > ch {
 			if ww > cw {
 				cw = ww
@@ -466,10 +458,10 @@ func (c *TWidgetBase) ChildrenScale() int {
 	return total
 }
 
-func (c *TWidgetBase) MinimalSize() (w int, h int) {
+func (c *TWidgetBase) MinimalSize() (w types.AWidth, h types.AHeight) {
 	children := c.childCount()
 	if children == 0 {
-		return c.minW, c.minH
+		return c.minSize.Get()
 	}
 
 	totalX := 2 * c.padX
@@ -545,7 +537,7 @@ func (c *TWidgetBase) Clipper() (types.ACoordX, types.ACoordY, int, int) {
 	clipped := ClippedParent(c)
 
 	if clipped == nil || (c.isClipped && c.clipper != nil) {
-		return c.clipper.GetX(), c.clipper.GetY(), c.clipper.GetWidth(), c.clipper.GetHidth()
+		return c.clipper.Coord().Get(), c.clipper.Size().Get()
 	}
 
 	return CalcClipper(c)
@@ -579,7 +571,7 @@ func (c *TWidgetBase) HitTest(x, y int) types.AHitResult {
 	return cons.HitOutside
 }
 
-func (c *TWidgetBase) ProcessEvent(ev event.TEvent) bool {
+func (c *TWidgetBase) ProcessEvent(ev types.IEvent) bool {
 	return SendEventToChild(c, ev)
 }
 
@@ -623,7 +615,7 @@ func (c *TWidgetBase) SetActiveBackColor(clr mTerm.Attribute) {
 	c.bgActive = clr
 }
 
-func (c *TWidgetBase) removeChild(control types.IWidget) {
+func (c *TWidgetBase) RemoveChild(control types.IWidget) {
 	children := []types.IWidget{}
 
 	for _, child := range c.children {
@@ -642,6 +634,6 @@ func (c *TWidgetBase) removeChild(control types.IWidget) {
 
 // Destroy removes an object from its parental chain
 func (c *TWidgetBase) Destroy() {
-	c.parent.removeChild(c)
+	c.parent.RemoveChild(c)
 	c.parent.SetConstraints(0, 0)
 }

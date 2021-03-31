@@ -23,10 +23,10 @@ type ICoord interface {
 	GetX() ICoordX
 	// GetY -- возвращает ICoordY
 	GetY() ICoordY
-	// GetPos -- возвращает обе координаты X, Y
-	GetPos() (ACoordX, ACoordY)
-	// SetPos -- устанавливает обе координаты X, Y
-	SetPos(ACoordX, ACoordY)
+	// Get -- возвращает обе координаты X, Y
+	Get() (ACoordX, ACoordY)
+	// Set -- устанавливает обе координаты X, Y
+	Set(ACoordX, ACoordY)
 }
 
 // IHeight -- интерфейс к высоте объекта
@@ -37,8 +37,8 @@ type IHeight interface {
 	Get() AHeight
 }
 
-// IWight -- интерфейс к длине объекта
-type IWight interface {
+// IWidth -- интерфейс к длине объекта
+type IWidth interface {
 	// Set -- устанавливает длину объекта
 	Set(AWidth) error
 	// Get -- возвращает длину объекта
@@ -47,20 +47,20 @@ type IWight interface {
 
 // ISize -- интерфейс к размеру объекта
 type ISize interface {
-	// GetHeight -- возвращает объект-высоту
-	GetHeight() IHeight
-	// GetWidth -- возвращает объект-длину
-	GetWidth() IWight
-	// GetSize -- возвращает ширину и высоту объекта
-	GetSize() (width, height int)
-	// SetWidth -- устанавливает ширину объекта
-	SetWidth(int) error
-	// SetSize -- устанавливает высоту и ширину объекта
-	SetSize(width, height int) error
+	// Height -- возвращает объект-высоту
+	Height() IHeight
+	// Width -- возвращает объект-длину
+	Width() IWidth
+	// Get -- возвращает ширину и высоту объекта
+	Get() (width AWidth, height AHeight)
+	// Set -- устанавливает высоту и ширину объекта
+	Set(width AWidth, height AHeight) error
 }
 
 // IRectangle -- интерфейс к прямоугольнику
 type IRectangle interface {
-	ICoord
-	ISize
+	// Coord -- возвращает координаты
+	Coord() ICoord
+	// Size -- возвращает размер
+	Size() ISize
 }

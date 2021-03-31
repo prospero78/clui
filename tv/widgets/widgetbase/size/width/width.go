@@ -14,8 +14,8 @@ type TWidth struct {
 	block sync.RWMutex
 }
 
-// New -- возвращает новый IWight
-func New() types.IWight {
+// New -- возвращает новый TWidth
+func New() types.IWidth {
 	return &TWidth{}
 }
 

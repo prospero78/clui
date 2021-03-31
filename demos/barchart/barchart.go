@@ -3,12 +3,13 @@ package main
 import (
 	"github.com/prospero78/goTV/tv"
 	"github.com/prospero78/goTV/tv/cons"
+	"github.com/prospero78/goTV/tv/widgets/barchart/bardatacell"
 	"github.com/prospero78/goTV/tv/widgets/event"
 )
 
-func customColored(d *tv.BarDataCell) {
+func customColored(d *bardatacell.TBarDataCell) {
 	part := d.TotalMax / 3
-	if d.ID%2 == 0 {
+	if d.ID %2 == 0 {
 		switch {
 		case d.Value <= part:
 			d.Fg = cons.ColorGreen

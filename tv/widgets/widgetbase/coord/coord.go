@@ -1,7 +1,11 @@
 // Package coord -- тип координат
 package coord
 
-import "github.com/prospero78/goTV/tv/types"
+import (
+	"github.com/prospero78/goTV/tv/types"
+	"github.com/prospero78/goTV/tv/widgets/widgetbase/coord/coordx"
+	"github.com/prospero78/goTV/tv/widgets/widgetbase/coord/coordy"
+)
 
 // TCoord -- операции с координатами
 type TCoord struct {
@@ -10,8 +14,11 @@ type TCoord struct {
 }
 
 // New -- возвращает новый *TCoord
-func New() *TCoord {
-	return &TCoord{}
+func New() types.ICoord {
+	return &TCoord{
+		x: coordx.New(),
+		y: coordy.New(),
+	}
 }
 
 // GetX -- возвращает  X
@@ -24,13 +31,13 @@ func (sf *TCoord) GetY() types.ICoordY {
 	return sf.y
 }
 
-// GetPos -- возвращает позицию точки
-func (sf *TCoord) GetPos() (types.ACoordX, types.ACoordY) {
+// Get -- возвращает позицию точки
+func (sf *TCoord) Get() (types.ACoordX, types.ACoordY) {
 	return sf.x.Get(), sf.y.Get()
 }
 
-// SetPos -- устанавливает обе координаты
-func (sf *TCoord) SetPos(x types.ACoordX, y types.ACoordY) {
+// Set -- устанавливает обе координаты
+func (sf *TCoord) Set(x types.ACoordX, y types.ACoordY) {
 	sf.x.Set(x)
 	sf.y.Set(y)
 }
