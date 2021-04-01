@@ -7,20 +7,22 @@ import (
 func customColored(d *ui.BarDataCell) {
 	part := d.TotalMax / 3
 	if d.ID%2 == 0 {
-		if d.Value <= part {
+		switch {
+		case d.Value <= part:
 			d.Fg = ui.ColorGreen
-		} else if d.Value > 2*part {
+		case d.Value > 2*part:
 			d.Fg = ui.ColorRed
-		} else {
+		default:
 			d.Fg = ui.ColorBlue
 		}
 	} else {
 		d.Ch = '#'
-		if d.Value <= part {
+		switch {
+		case d.Value <= part:
 			d.Fg = ui.ColorGreenBold
-		} else if d.Value > 2*part {
+		case d.Value > 2*part:
 			d.Fg = ui.ColorRedBold
-		} else {
+		default:
 			d.Fg = ui.ColorBlueBold
 		}
 	}
