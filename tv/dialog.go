@@ -246,12 +246,13 @@ func CreateSelectDialog(title string, items []string, selectedItem int, typ Sele
 	btn1 := CreateButton(frm1, AutoSize, AutoSize, "OK", Fixed)
 	btn1.OnClick(func(ev Event) {
 		dlg.result = DialogButton1
-		if dlg.typ == SelectDialogList {
+		switch {
+		case dlg.typ == SelectDialogList:
 			dlg.value = dlg.list.SelectedItem()
-		} else if dlg.typ == SelectDialogEdit {
+		case dlg.typ == SelectDialogEdit:
 			dlg.edtResult = dlg.edit.Title()
 			dlg.value = -1
-		} else {
+		default:
 			dlg.value = dlg.rg.Selected()
 		}
 		WindowManager().DestroyWindow(dlg.View)
