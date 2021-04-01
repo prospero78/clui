@@ -356,7 +356,7 @@ func (c *BaseControl) ResizeChildren() {
 
 		tw, th := ctrl.MinimalSize()
 		sc := ctrl.Scale()
-		d := int(ctrl.Scale() * aStep)
+		d := ctrl.Scale() * aStep
 		if c.pack == Horizontal {
 			if sc != 0 {
 				if sc == totalSc {
