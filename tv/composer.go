@@ -558,15 +558,14 @@ func (c *Composer) processMouse(ev Event) {
 		c.activateWindow(view)
 		return
 	}
-
-	if ev.Key == term.MouseLeft {
+	switch {
+	case ev.Key == term.MouseLeft:
 		c.lastX = ev.X
 		c.lastY = ev.Y
 		c.mdownX = ev.X
 		c.mdownY = ev.Y
 		c.sendEventToActiveWindow(ev)
-		return
-	} else if ev.Key == term.MouseRelease {
+	case ev.Key == term.MouseRelease:
 		c.sendEventToActiveWindow(ev)
 		if c.lastX != ev.X && c.lastY != ev.Y {
 			return
@@ -574,10 +573,8 @@ func (c *Composer) processMouse(ev Event) {
 
 		ev.Type = EventClick
 		c.sendEventToActiveWindow(ev)
-		return
-	} else {
+	default:
 		c.sendEventToActiveWindow(ev)
-		return
 	}
 }
 
