@@ -117,12 +117,12 @@ func CreateConfirmationDialog(title, question string, buttons []string, defaultB
 	}
 
 	CreateFrame(frm1, 1, 1, BorderNone, 1)
-
-	if defaultButton == DialogButton2 && len(buttons) > 1 {
+	switch {
+	case defaultButton == DialogButton2 && len(buttons) > 1:
 		ActivateControl(dlg.View, btn2)
-	} else if defaultButton == DialogButton3 && len(buttons) > 2 {
+	case defaultButton == DialogButton3 && len(buttons) > 2:
 		ActivateControl(dlg.View, btn3)
-	} else {
+	default:
 		ActivateControl(dlg.View, btn1)
 	}
 
@@ -189,7 +189,8 @@ func CreateSelectDialog(title string, items []string, selectedItem int, typ Sele
 	dlg.View.SetModal(true)
 	dlg.View.SetPack(Vertical)
 
-	if typ == SelectDialogList {
+	switch {
+	case typ == SelectDialogList:
 		fList := CreateFrame(dlg.View, 1, 1, BorderNone, 1)
 		fList.SetPaddings(1, 1)
 		fList.SetGaps(0, 0)
@@ -200,7 +201,7 @@ func CreateSelectDialog(title string, items []string, selectedItem int, typ Sele
 		if selectedItem >= 0 && selectedItem < len(items) {
 			dlg.list.SelectItem(selectedItem)
 		}
-	} else if typ == SelectDialogEdit {
+	case typ == SelectDialogEdit:
 		CreateFrame(dlg.View, 1, 1, BorderNone, Fixed)
 		lb := CreateLabel(dlg.View, 10, 3, items[0], 1)
 		lb.SetMultiline(true)
@@ -225,7 +226,7 @@ func CreateSelectDialog(title string, items []string, selectedItem int, typ Sele
 			// returning false so that other keypresses work as usual
 			return false
 		})
-	} else {
+	default:
 		fRadio := CreateFrame(dlg.View, 1, 1, BorderNone, Fixed)
 		fRadio.SetPaddings(1, 1)
 		fRadio.SetGaps(0, 0)
