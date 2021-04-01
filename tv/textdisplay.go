@@ -7,7 +7,7 @@ import (
 
 type TextDisplay struct {
 	BaseControl
-	colorized bool
+	// colorized bool
 	topLine   int
 	lineCount int
 
