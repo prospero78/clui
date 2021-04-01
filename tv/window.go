@@ -76,14 +76,15 @@ func (wnd *Window) drawFrame() {
 	defer PopAttributes()
 
 	var bs BorderStyle
-	if wnd.border == BorderAuto {
+	switch {
+	case wnd.border == BorderAuto:
 		if wnd.inactive {
 			bs = BorderThin
 		} else {
 			bs = BorderThick
 		}
-	} else if wnd.border == BorderNone {
-	} else {
+	case wnd.border == BorderNone:
+	default:
 		bs = wnd.border
 	}
 
@@ -186,19 +187,20 @@ func (c *Window) HitTest(x, y int) HitResult {
 
 	hResult := HitOutside
 
-	if x == c.x && y == c.y {
+	switch {
+	case x == c.x && y == c.y:
 		hResult = HitTopLeft
-	} else if x == c.x+c.width-1 && y == c.y {
+	case x == c.x+c.width-1 && y == c.y:
 		hResult = HitTopRight
-	} else if x == c.x && y == c.y+c.height-1 {
+	case x == c.x && y == c.y+c.height-1:
 		hResult = HitBottomLeft
-	} else if x == c.x+c.width-1 && y == c.y+c.height-1 {
+	case x == c.x+c.width-1 && y == c.y+c.height-1:
 		hResult = HitBottomRight
-	} else if x == c.x && y > c.y && y < c.y+c.height-1 {
+	case x == c.x && y > c.y && y < c.y+c.height-1:
 		hResult = HitLeft
-	} else if x == c.x+c.width-1 && y > c.y && y < c.y+c.height-1 {
+	case x == c.x+c.width-1 && y > c.y && y < c.y+c.height-1:
 		hResult = HitRight
-	} else if y == c.y && x > c.x && x < c.x+c.width-1 {
+	case y == c.y && x > c.x && x < c.x+c.width-1:
 		lb, rb := c.buttonCount()
 		fromL, fromR := lb, rb
 		if lb > 0 {
@@ -230,7 +232,7 @@ func (c *Window) HitTest(x, y int) HitResult {
 				}
 			}
 		}
-	} else if y == c.y+c.height-1 && x > c.x && x < c.x+c.width-1 {
+	case y == c.y+c.height-1 && x > c.x && x < c.x+c.width-1:
 		hResult = HitBottom
 	}
 
