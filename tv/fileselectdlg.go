@@ -155,14 +155,14 @@ func (d *FileSelectDialog) pathUp() {
 		return
 	}
 	d.currPath = dirUp
-	d.populateFiles()
+	_ = d.populateFiles()
 	d.selectFirst()
 }
 
 // Enters the directory
 func (d *FileSelectDialog) pathDown(dir string) {
 	d.currPath = filepath.Join(d.currPath, dir)
-	d.populateFiles()
+	_ = d.populateFiles()
 	d.selectFirst()
 }
 
@@ -403,7 +403,7 @@ func CreateFileSelectDialog(title, fileMasks, initPath string, selectDir, mustEx
 	})
 
 	dlg.curDir.SetTitle(dlg.currPath)
-	dlg.populateFiles()
+	_ = dlg.populateFiles()
 	dlg.selectFirst()
 
 	ActivateControl(dlg.View, dlg.listBox)
