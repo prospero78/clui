@@ -127,11 +127,12 @@ func (e *EditField) insertRune(ch rune) {
 
 	idx := e.cursorPos
 
-	if idx == 0 {
+	switch {
+	case idx == 0:
 		e.setTitleInternal(string(ch) + e.title)
-	} else if idx >= xs.Len(e.title) {
+	case idx >= xs.Len(e.title):
 		e.setTitleInternal(e.title + string(ch))
-	} else {
+	default:
 		e.setTitleInternal(xs.Slice(e.title, 0, idx) + string(ch) + xs.Slice(e.title, idx, -1))
 	}
 
@@ -152,14 +153,16 @@ func (e *EditField) backspace() {
 	}
 
 	length := xs.Len(e.title)
-	if e.cursorPos >= length {
+
+	switch {
+	case e.cursorPos >= length:
 		e.cursorPos--
 		e.setTitleInternal(xs.Slice(e.title, 0, length-1))
-	} else if e.cursorPos == 1 {
+	case e.cursorPos == 1:
 		e.cursorPos = 0
 		e.setTitleInternal(xs.Slice(e.title, 1, -1))
 		e.offset = 0
-	} else {
+	default:
 		e.cursorPos--
 		e.setTitleInternal(xs.Slice(e.title, 0, e.cursorPos) + xs.Slice(e.title, e.cursorPos+1, -1))
 	}
