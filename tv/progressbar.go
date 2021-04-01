@@ -129,15 +129,17 @@ func (b *ProgressBar) Draw() {
 			shift, str := AlignText(title, w, b.align)
 			titleClr := RealColor(b.titleFg, b.Style(), ColorProgressTitleText)
 			var sOn, sOff string
-			if filled == 0 || shift >= filled {
+			switch {
+			case filled == 0 || shift >= filled:
 				sOff = str
-			} else if w == filled || shift+xs.Len(str) < filled {
+			case w == filled || shift+xs.Len(str) < filled:
 				sOn = str
-			} else {
+			default:
 				r := filled - shift
 				sOn = xs.Slice(str, 0, r)
 				sOff = xs.Slice(str, r, -1)
 			}
+
 			SetTextColor(titleClr)
 			if sOn != "" {
 				SetBackColor(bgOn)
@@ -172,11 +174,12 @@ func (b *ProgressBar) Draw() {
 func (b *ProgressBar) SetValue(pos int) {
 	b.mtx.Lock()
 	defer b.mtx.Unlock()
-	if pos < b.min {
+	switch {
+	case pos < b.min:
 		b.value = b.min
-	} else if pos > b.max {
+	case pos > b.max:
 		b.value = b.max
-	} else {
+	default:
 		b.value = pos
 	}
 }
