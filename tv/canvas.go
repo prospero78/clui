@@ -365,7 +365,7 @@ func DrawRawTextVertical(x, y int, text string) {
 
 	if y < cy {
 		text = xs.Slice(text, cy-y, -1)
-		length = length - (cy - y)
+		length -= cy - y
 		y = cy
 	}
 	text = CutText(text, ch)
@@ -380,13 +380,14 @@ func DrawRawTextVertical(x, y int, text string) {
 // DrawFrame paints the frame without changing area inside it
 func DrawFrame(x, y, w, h int, border BorderStyle) {
 	var chars string
-	if border == BorderThick {
+	switch {
+	case border == BorderThick:
 		chars = SysObject(ObjDoubleBorder)
-	} else if border == BorderThin {
+	case border == BorderThin:
 		chars = SysObject(ObjSingleBorder)
-	} else if border == BorderNone {
+	case border == BorderNone:
 		chars = "      "
-	} else {
+	default:
 		chars = "      "
 	}
 
