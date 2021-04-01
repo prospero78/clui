@@ -115,11 +115,11 @@ func clip(x, y, w, h int) (cx int, cy int, cw int, ch int) {
 	}
 
 	if x < canvas.clipX {
-		w = w - (canvas.clipX - x)
+		w -= (canvas.clipX - x)
 		x = canvas.clipX
 	}
 	if y < canvas.clipY {
-		h = h - (canvas.clipY - y)
+		h -= canvas.clipY - y
 		y = canvas.clipY
 	}
 	if x+w > canvas.clipX+canvas.clipW {
@@ -309,7 +309,7 @@ func DrawRawText(x, y int, text string) {
 
 	if x < cx {
 		text = xs.Slice(text, cx-x, -1)
-		length = length - (cx - x)
+		length -= cx - x
 		x = cx
 	}
 	text = CutText(text, cw)
