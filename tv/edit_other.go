@@ -121,7 +121,7 @@ func (e *EditField) ProcessEvent(event Event) bool {
 			return true
 		case term.KeyCtrlC:
 			if !e.showStars {
-				clipboard.WriteAll(e.Title())
+				_ = clipboard.WriteAll(e.Title())
 			}
 			return true
 		case term.KeyCtrlV:
