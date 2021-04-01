@@ -14,9 +14,9 @@ is required
 */
 type Frame struct {
 	BaseControl
-	border         BorderStyle
-	children       []Control
-	pack           PackType
+	border BorderStyle
+	// children       []Control
+	// pack           PackType
 	scrollable     bool
 	lastScrollProp int
 }
