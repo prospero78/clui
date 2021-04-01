@@ -2,6 +2,7 @@ package tv
 
 import (
 	term "github.com/nsf/termbox-go"
+	"github.com/prospero78/goTV/tv/types"
 )
 
 const (
@@ -77,7 +78,8 @@ type Event struct {
 	// X and Y are multi-purpose fields: mouse coordinated for click event,
 	// X is used to indicate on/off for events like Activate
 	// Y is used for vertical-based events like ListBox item selection - id of the item
-	X, Y int
+	X types.ACoordX
+	Y int
 	// Err is error got from termbox library
 	Err error
 	// Key is a pressed key

@@ -6,6 +6,8 @@ import (
 
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+
+	"github.com/prospero78/goTV/tv/types"
 )
 
 /*
@@ -96,7 +98,7 @@ func (b *Button) Draw() {
 		case ShadowFull:
 			SetBackColor(shadow)
 			FillRect(x+1, y+h-1, w-1, 1, ' ')
-			FillRect(x+w-1, y+1, 1, h-1, ' ')
+			FillRect(x+types.ACoordX(w-1), y+1, 1, h-1, ' ')
 		case ShadowHalf:
 			parts := []rune(SysObject(ObjButton))
 			var bottomCh, rightCh rune
@@ -107,16 +109,16 @@ func (b *Button) Draw() {
 			}
 			SetTextColor(shadow)
 			FillRect(x+1, y+h-1, w-1, 1, bottomCh)
-			FillRect(x+w-1, y+1, 1, h-2, rightCh)
+			FillRect(x+types.ACoordX(w-1), y+1, 1, h-2, rightCh)
 		}
 		SetTextColor(fg)
 		SetBackColor(bg)
 		FillRect(x, y, w-1, h-1, ' ')
-		DrawText(x+shift, y+dy, text)
+		DrawText(x+types.ACoordX(shift), y+dy, text)
 	} else {
 		SetBackColor(bg)
 		FillRect(x+1, y+1, w-1, h-1, ' ')
-		DrawText(x+1+shift, y+1+dy, b.title)
+		DrawText(x+types.ACoordX(1+shift), y+1+dy, b.title)
 	}
 }
 
@@ -167,7 +169,7 @@ func (b *Button) ProcessEvent(event Event) bool {
 			return true
 		} else if event.Key == term.MouseRelease && b.isPressed() != 0 {
 			ReleaseEvents()
-			if event.X >= b.x && event.Y >= b.y && event.X < b.x+b.width && event.Y < b.y+b.height {
+			if event.X >= b.x && event.Y >= b.y && event.X < b.x+types.ACoordX(b.width) && event.Y < b.y+b.height {
 				if b.onClick != nil {
 					b.onClick(event)
 				}

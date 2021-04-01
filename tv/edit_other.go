@@ -6,6 +6,8 @@ import (
 	"github.com/atotto/clipboard"
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+
+	"github.com/prospero78/goTV/tv/types"
 )
 
 /*
@@ -20,7 +22,7 @@ EditField calls onChage in case of its text is changed. Event field Msg contains
 type EditField struct {
 	BaseControl
 	// cursor position in edit text
-	cursorPos int
+	cursorPos types.ACoordX
 	// the number of the first displayed text character - it is used in case of text is longer than edit width
 	offset    int
 	readonly  bool
@@ -50,7 +52,7 @@ func CreateEditField(parent Control, width int, text string, scale int) *EditFie
 	}
 
 	e.SetSize(width, 1)
-	e.cursorPos = xs.Len(text)
+	e.cursorPos = types.ACoordX(xs.Len(text))
 	e.offset = 0
 	e.parent = parent
 	e.readonly = false

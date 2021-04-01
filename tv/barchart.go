@@ -6,6 +6,8 @@ import (
 
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+
+	"github.com/prospero78/goTV/tv/types"
 )
 
 // BarData is info about one bar in the chart. Every
@@ -190,7 +192,7 @@ func (b *BarChart) drawBars() {
 		if b.onDrawCell == nil {
 			SetTextColor(fColor)
 			SetBackColor(bColor)
-			FillRect(b.x+pos, b.y+h-barH, barW, barH, ch)
+			FillRect(b.x+types.ACoordX(pos), b.y+h-barH, barW, barH, ch)
 		} else {
 			cellDef := BarDataCell{Item: d.Title, ID: idx,
 				Value: 0, BarMax: d.Value, TotalMax: max,
@@ -202,7 +204,7 @@ func (b *BarChart) drawBars() {
 				SetTextColor(req.Fg)
 				SetBackColor(req.Bg)
 				for dx := 0; dx < barW; dx++ {
-					PutChar(b.x+pos+dx, b.y+h-1-dy, req.Ch)
+					PutChar(b.x+types.ACoordX(pos+dx), b.y+h-1-dy, req.Ch)
 				}
 			}
 		}
@@ -212,7 +214,7 @@ func (b *BarChart) drawBars() {
 			SetBackColor(bg)
 			if b.showMarks {
 				c := parts[7]
-				PutChar(b.x+pos+barW/2, b.y+h, c)
+				PutChar(b.x+types.ACoordX(pos+barW/2), b.y+h, c)
 			}
 			var s string
 			shift := 0
@@ -221,7 +223,7 @@ func (b *BarChart) drawBars() {
 			} else {
 				shift, s = AlignText(d.Title, barW, AlignCenter)
 			}
-			DrawRawText(b.x+pos+shift, b.y+h+1, s)
+			DrawRawText(b.x+types.ACoordX(pos+shift), b.y+h+1, s)
 		}
 
 		pos += barW + int(b.BarGap())
@@ -251,11 +253,11 @@ func (b *BarChart) drawLegend() {
 		}
 		SetTextColor(d.Fg)
 		SetBackColor(d.Bg)
-		PutChar(b.x+pos+width, b.y+idx, c)
+		PutChar(b.x+types.ACoordX(pos+width), b.y+idx, c)
 		s := CutText(fmt.Sprintf(" - %v", d.Title), int(b.LegendWidth()))
 		SetTextColor(fg)
 		SetBackColor(bg)
-		DrawRawText(b.x+pos+width+1, b.y+idx, s)
+		DrawRawText(b.x+types.ACoordX(pos+width+1), b.y+idx, s)
 	}
 }
 
@@ -308,16 +310,16 @@ func (b *BarChart) drawRulers() {
 
 	if pos > 0 {
 		for dy := 0; dy < h; dy++ {
-			PutChar(b.x+pos, b.y+dy, cV)
+			PutChar(b.x+types.ACoordX(pos), b.y+dy, cV)
 		}
 	}
 	if b.showTitles {
 		for dx := 0; dx < vWidth; dx++ {
-			PutChar(b.x+pos+dx, b.y+h, cH)
+			PutChar(b.x+types.ACoordX(pos+dx), b.y+h, cH)
 		}
 	}
 	if pos > 0 && b.showTitles {
-		PutChar(b.x+pos, b.y+h, cC)
+		PutChar(b.x+types.ACoordX(pos), b.y+h, cC)
 	}
 }
 

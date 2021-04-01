@@ -6,6 +6,8 @@ import (
 
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+
+	"github.com/prospero78/goTV/tv/types"
 )
 
 type attr struct {
@@ -14,7 +16,8 @@ type attr struct {
 }
 
 type rect struct {
-	x, y, w, h int
+	x       types.ACoordX
+	y, w, h int
 }
 
 /*
@@ -25,7 +28,7 @@ type Canvas struct {
 	height    int
 	textColor term.Attribute
 	backColor term.Attribute
-	clipX     int
+	clipX     types.ACoordX
 	clipY     int
 	clipW     int
 	clipH     int
@@ -102,28 +105,28 @@ func Reset() {
 
 // InClipRect returns true if x and y position is inside current clipping
 // rectangle
-func InClipRect(x, y int) bool {
+func InClipRect(x types.ACoordX, y int) bool {
 	return x >= canvas.clipX && y >= canvas.clipY &&
-		x < canvas.clipX+canvas.clipW &&
+		x < canvas.clipX+types.ACoordX(canvas.clipW) &&
 		y < canvas.clipY+canvas.clipH
 }
 
-func clip(x, y, w, h int) (cx int, cy int, cw int, ch int) {
-	if x+w < canvas.clipX || x > canvas.clipX+canvas.clipW ||
+func clip(x types.ACoordX, y, w, h int) (cx types.ACoordX, cy int, cw int, ch int) {
+	if x+types.ACoordX(w) < canvas.clipX || x > canvas.clipX+types.ACoordX(canvas.clipW) ||
 		y+h < canvas.clipY || y > canvas.clipY+canvas.clipH {
 		return 0, 0, 0, 0
 	}
 
 	if x < canvas.clipX {
-		w -= (canvas.clipX - x)
+		w -= int(canvas.clipX - x)
 		x = canvas.clipX
 	}
 	if y < canvas.clipY {
 		h -= canvas.clipY - y
 		y = canvas.clipY
 	}
-	if x+w > canvas.clipX+canvas.clipW {
-		w = canvas.clipW - (x - canvas.clipX)
+	if x+types.ACoordX(w) > canvas.clipX+types.ACoordX(canvas.clipW) {
+		w = canvas.clipW - int(x-canvas.clipX)
 	}
 	if y+h > canvas.clipY+canvas.clipH {
 		h = canvas.clipH - (y - canvas.clipY)
@@ -159,24 +162,24 @@ func ScreenSize() (width int, height int) {
 }
 
 // SetCursorPos sets text caret position. Used by controls like EditField
-func SetCursorPos(x int, y int) {
-	term.SetCursor(x, y)
+func SetCursorPos(x types.ACoordX, y int) {
+	term.SetCursor(int(x), y)
 }
 
 // PutChar sets value for the Canvas cell: rune and its colors. Returns result of
 // operation: e.g, if the symbol position is outside Canvas the operation fails
 // and the function returns false
-func PutChar(x, y int, r rune) bool {
+func PutChar(x types.ACoordX, y int, r rune) bool {
 	if InClipRect(x, y) {
-		term.SetCell(x, y, r, canvas.textColor, canvas.backColor)
+		term.SetCell(int(x), y, r, canvas.textColor, canvas.backColor)
 		return true
 	}
 
 	return false
 }
 
-func putCharUnsafe(x, y int, r rune) {
-	term.SetCell(x, y, r, canvas.textColor, canvas.backColor)
+func putCharUnsafe(x types.ACoordX, y int, r rune) {
+	term.SetCell(int(x), y, r, canvas.textColor, canvas.backColor)
 }
 
 // Symbol returns the character and its attributes by its coordinates
@@ -208,15 +211,15 @@ func BackColor() term.Attribute {
 
 // SetClipRect defines a new clipping rect. Maybe useful with PopClip and
 // PushClip functions
-func SetClipRect(x, y, w, h int) {
+func SetClipRect(x types.ACoordX, y, w, h int) {
 	if x < 0 {
 		x = 0
 	}
 	if y < 0 {
 		y = 0
 	}
-	if x+w > canvas.width {
-		w = canvas.width - x
+	if int(x)+w > canvas.width {
+		w = canvas.width - int(x)
 	}
 	if y+h > canvas.height {
 		h = canvas.height - h
@@ -229,26 +232,26 @@ func SetClipRect(x, y, w, h int) {
 }
 
 // ClipRect returns the current clipping rectangle
-func ClipRect() (x int, y int, w int, h int) {
+func ClipRect() (x types.ACoordX, y int, w int, h int) {
 	return canvas.clipX, canvas.clipY, canvas.clipW, canvas.clipH
 }
 
 // DrawHorizontalLine draws the part of the horizontal line that is inside
 // current clipping rectangle
-func DrawHorizontalLine(x, y, w int, r rune) {
+func DrawHorizontalLine(x types.ACoordX, y, w int, r rune) {
 	x, y, w, _ = clip(x, y, w, 1)
 	if w == 0 {
 		return
 	}
 
-	for i := x; i < x+w; i++ {
+	for i := x; i < x+types.ACoordX(w); i++ {
 		putCharUnsafe(i, y, r)
 	}
 }
 
 // DrawVerticalLine draws the part of the vertical line that is inside current
 // clipping rectangle
-func DrawVerticalLine(x, y, h int, r rune) {
+func DrawVerticalLine(x types.ACoordX, y, h int, r rune) {
 	x, y, _, h = clip(x, y, 1, h)
 	if h == 0 {
 		return
@@ -262,7 +265,7 @@ func DrawVerticalLine(x, y, h int, r rune) {
 // DrawText draws the part of text that is inside the current clipping
 // rectangle. DrawText always paints colorized string. If you want to draw
 // raw string then use DrawRawText function
-func DrawText(x, y int, text string) {
+func DrawText(x types.ACoordX, y int, text string) {
 	PushAttributes()
 	defer PopAttributes()
 
@@ -296,27 +299,27 @@ func DrawText(x, y int, text string) {
 // rectangle. DrawRawText always paints string as is - no color changes.
 // If you want to draw string with color changing commands included then
 // use DrawText function
-func DrawRawText(x, y int, text string) {
+func DrawRawText(x types.ACoordX, y int, text string) {
 	cx, cy, cw, ch := ClipRect()
-	if x >= cx+cw || y < cy || y >= cy+ch {
+	if x >= cx+types.ACoordX(cw) || y < cy || y >= cy+ch {
 		return
 	}
 
 	length := xs.Len(text)
-	if x+length < cx {
+	if x+types.ACoordX(length) < cx {
 		return
 	}
 
 	if x < cx {
-		text = xs.Slice(text, cx-x, -1)
-		length -= cx - x
+		text = xs.Slice(text, int(cx-x), -1)
+		length -= int(cx - x)
 		x = cx
 	}
 	text = CutText(text, cw)
 
 	dx := 0
 	for _, ch := range text {
-		putCharUnsafe(x+dx, y, ch)
+		putCharUnsafe(x+types.ACoordX(dx), y, ch)
 		dx++
 	}
 }
@@ -324,7 +327,7 @@ func DrawRawText(x, y int, text string) {
 // DrawTextVertical draws the part of text that is inside the current clipping
 // rectangle. DrawTextVertical always paints colorized string. If you want to draw
 // raw string then use DrawRawTextVertical function
-func DrawTextVertical(x, y int, text string) {
+func DrawTextVertical(x types.ACoordX, y int, text string) {
 	PushAttributes()
 	defer PopAttributes()
 
@@ -352,9 +355,9 @@ func DrawTextVertical(x, y int, text string) {
 // rectangle. DrawRawTextVertical always paints string as is - no color changes.
 // If you want to draw string with color changing commands included then
 // use DrawTextVertical function
-func DrawRawTextVertical(x, y int, text string) {
+func DrawRawTextVertical(x types.ACoordX, y int, text string) {
 	cx, cy, cw, ch := ClipRect()
-	if y >= cy+ch || x < cx || x >= cx+cw {
+	if y >= cy+ch || x < cx || x >= cx+types.ACoordX(cw) {
 		return
 	}
 
@@ -378,7 +381,7 @@ func DrawRawTextVertical(x, y int, text string) {
 }
 
 // DrawFrame paints the frame without changing area inside it
-func DrawFrame(x, y, w, h int, border BorderStyle) {
+func DrawFrame(x types.ACoordX, y, w, h int, border BorderStyle) {
 	var chars string
 	switch {
 	case border == BorderThick:
@@ -397,17 +400,18 @@ func DrawFrame(x, y, w, h int, border BorderStyle) {
 	if InClipRect(x, y) {
 		putCharUnsafe(x, y, UL)
 	}
-	if InClipRect(x+w-1, y+h-1) {
-		putCharUnsafe(x+w-1, y+h-1, DR)
+	if InClipRect(x+types.ACoordX(w)-1, y+h-1) {
+		putCharUnsafe(x+types.ACoordX(w)-1, y+h-1, DR)
 	}
 	if InClipRect(x, y+h-1) {
 		putCharUnsafe(x, y+h-1, DL)
 	}
-	if InClipRect(x+w-1, y) {
-		putCharUnsafe(x+w-1, y, UR)
+	if InClipRect(x+types.ACoordX(w)-1, y) {
+		putCharUnsafe(x+types.ACoordX(w)-1, y, UR)
 	}
 
-	var xx, yy, ww, hh int
+	var xx types.ACoordX
+	var yy, ww, hh int
 	xx, yy, ww, _ = clip(x+1, y, w-2, 1)
 	if ww > 0 {
 		DrawHorizontalLine(xx, yy, ww, H)
@@ -420,7 +424,7 @@ func DrawFrame(x, y, w, h int, border BorderStyle) {
 	if hh > 0 {
 		DrawVerticalLine(xx, yy, hh, V)
 	}
-	xx, yy, _, hh = clip(x+w-1, y+1, 1, h-2)
+	xx, yy, _, hh = clip(x+types.ACoordX(w)-1, y+1, 1, h-2)
 	if hh > 0 {
 		DrawVerticalLine(xx, yy, hh, V)
 	}
@@ -429,7 +433,7 @@ func DrawFrame(x, y, w, h int, border BorderStyle) {
 // DrawScrollBar displays a scrollbar. pos is the position of the thumb.
 // The function detects direction of the scrollbar automatically: if w is greater
 // than h then it draws horizontal scrollbar and vertical otherwise
-func DrawScrollBar(x, y, w, h, pos int) {
+func DrawScrollBar(x types.ACoordX, y, w, h, pos int) {
 	xx, yy, ww, hh := clip(x, y, w, h)
 	if ww < 1 || hh < 1 {
 		return
@@ -449,10 +453,11 @@ func DrawScrollBar(x, y, w, h, pos int) {
 	chLeft, chRight := parts[4], parts[5]
 
 	chStart, chEnd := chUp, chDown
-	var dx, dy int
+	var dx types.ACoordX
+	var dy int
 	if w > h {
 		chStart, chEnd = chLeft, chRight
-		dx = w - 1
+		dx = types.ACoordX(w) - 1
 		dy = 0
 	} else {
 		dx = 0
@@ -473,7 +478,7 @@ func DrawScrollBar(x, y, w, h, pos int) {
 		yy = y + 1
 		hh--
 	}
-	if xx+ww == x+w && w > h {
+	if xx+types.ACoordX(ww) == x+types.ACoordX(w) && w > h {
 		ww--
 	}
 	if yy+hh == y+h && w < h {
@@ -488,8 +493,8 @@ func DrawScrollBar(x, y, w, h, pos int) {
 
 	if pos >= 0 {
 		if w > h {
-			if pos < w-2 && InClipRect(x+1+pos, y) {
-				putCharUnsafe(x+1+pos, y, chThumb)
+			if pos < w-2 && InClipRect(x+types.ACoordX(1+pos), y) {
+				putCharUnsafe(x+types.ACoordX(1+pos), y, chThumb)
 			}
 		} else {
 			if pos < h-2 && InClipRect(x, y+1+pos) {
@@ -500,14 +505,14 @@ func DrawScrollBar(x, y, w, h, pos int) {
 }
 
 // FillRect paints the area with r character using the current colors
-func FillRect(x, y, w, h int, r rune) {
+func FillRect(x types.ACoordX, y, w, h int, r rune) {
 	x, y, w, h = clip(x, y, w, h)
 	if w < 1 || y < -1 {
 		return
 	}
 
 	for yy := y; yy < y+h; yy++ {
-		for xx := x; xx < x+w; xx++ {
+		for xx := x; xx < x+types.ACoordX(w); xx++ {
 			putCharUnsafe(xx, yy, r)
 		}
 	}

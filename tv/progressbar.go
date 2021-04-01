@@ -6,6 +6,8 @@ import (
 
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+
+	"github.com/prospero78/goTV/tv/types"
 )
 
 /*
@@ -122,7 +124,7 @@ func (b *ProgressBar) Draw() {
 			DrawRawText(x, yy, sFilled)
 			SetTextColor(fgOff)
 			SetBackColor(bgOff)
-			DrawRawText(x+filled, yy, sEmpty)
+			DrawRawText(x+types.ACoordX(filled), yy, sEmpty)
 		}
 
 		if title != "" {
@@ -143,11 +145,11 @@ func (b *ProgressBar) Draw() {
 			SetTextColor(titleClr)
 			if sOn != "" {
 				SetBackColor(bgOn)
-				DrawRawText(x+shift, y, sOn)
+				DrawRawText(x+types.ACoordX(shift), y, sOn)
 			}
 			if sOff != "" {
 				SetBackColor(bgOff)
-				DrawRawText(x+shift+xs.Len(sOn), y, sOff)
+				DrawRawText(x+types.ACoordX(shift+xs.Len(sOn)), y, sOff)
 			}
 		}
 	} else {

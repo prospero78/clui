@@ -4,6 +4,8 @@ import (
 	"math"
 
 	xs "github.com/huandu/xstrings"
+
+	"github.com/prospero78/goTV/tv/types"
 )
 
 /*
@@ -129,7 +131,7 @@ func (f *Frame) Draw() {
 			f.lastScrollProp = prop
 		}
 
-		DrawScrollBar(x+w, y, 1, h, f.lastScrollProp)
+		DrawScrollBar(x+types.ACoordX(w), y, 1, h, f.lastScrollProp)
 	}
 
 	fg, bg := RealColor(f.fg, f.Style(), ColorViewText), RealColor(f.bg, f.Style(), ColorViewBack)
@@ -162,7 +164,7 @@ func (f *Frame) Draw() {
 
 // ScrollTo in case of a scrollable frame this api will scroll the content
 // without adjusting the clipper
-func (f *Frame) ScrollTo(x int, y int) {
+func (f *Frame) ScrollTo(x types.ACoordX, y int) {
 	if !f.scrollable {
 		return
 	}
@@ -202,8 +204,8 @@ func (f *Frame) ProcessEvent(ev Event) bool {
 		yy = y + delta
 	}
 
-	if (tx+tw)-(px/2) > cx+cw {
-		delta := (tx + tw) - (cx + cw)
+	if (tx+types.ACoordX(tw))-(px/2) > cx+types.ACoordX(cw) {
+		delta := (tx + types.ACoordX(tw)) - (cx + types.ACoordX(cw))
 		xx = (x - delta)
 	} else if tx < cx {
 		delta := cx - tx

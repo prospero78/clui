@@ -4,6 +4,8 @@ import (
 	"fmt"
 
 	term "github.com/nsf/termbox-go"
+
+	"github.com/prospero78/goTV/tv/types"
 )
 
 /*
@@ -180,7 +182,7 @@ func (l *TableView) drawHeader() {
 	FillRect(x, y, w, 1, ' ')
 	parts := []rune(SysObject(ObjTableView))
 
-	for i := 0; i < w; i++ {
+	for i := types.ACoordX(0); int(i) < w; i++ {
 		PutChar(x+i, y+1, parts[0])
 	}
 	w-- // scrollbar
@@ -196,11 +198,11 @@ func (l *TableView) drawHeader() {
 		cW := l.counterWidth()
 		shift, str := AlignText("#", cW, AlignRight)
 		SetTextColor(fg)
-		DrawRawText(x+pos+shift, y, str)
+		DrawRawText(x+types.ACoordX(pos+shift), y, str)
 		if l.showVLines {
 			SetTextColor(fgLine)
-			PutChar(x+pos+cW, y, parts[1])
-			PutChar(x+pos+cW, y+1, parts[2])
+			PutChar(x+types.ACoordX(pos+cW), y, parts[1])
+			PutChar(x+types.ACoordX(pos+cW), y+1, parts[2])
 			pos++
 		}
 		pos = cW + dx
@@ -224,18 +226,18 @@ func (l *TableView) drawHeader() {
 				ch = parts[4]
 			}
 			SetTextColor(fg)
-			PutChar(x+pos+w-1, y, ch)
+			PutChar(x+types.ACoordX(pos+w-1), y, ch)
 		}
 
 		shift, str := AlignColorizedText(l.columns[idx].Title, w+dw, l.columns[idx].Alignment)
 		SetTextColor(fg)
-		DrawText(x+pos+shift, y, str)
+		DrawText(x+types.ACoordX(pos+shift), y, str)
 		pos += w
 
 		if l.showVLines && idx < len(l.columns)-1 {
 			SetTextColor(fgLine)
-			PutChar(x+pos, y, parts[1])
-			PutChar(x+pos, y+1, parts[2])
+			PutChar(x+types.ACoordX(pos), y, parts[1])
+			PutChar(x+types.ACoordX(pos), y+1, parts[2])
 			pos++
 		}
 
@@ -260,11 +262,11 @@ func (l *TableView) counterWidth() int {
 func (l *TableView) drawScroll() {
 
 	pos := ThumbPosition(l.selectedRow, l.rowCount, l.height-1)
-	DrawScrollBar(l.x+l.width-1, l.y, 1, l.height-1, pos)
+	DrawScrollBar(l.x+types.ACoordX(l.width-1), l.y, 1, l.height-1, pos)
 
 	pos = ThumbPosition(l.selectedCol, len(l.columns), l.width-1)
 	DrawScrollBar(l.x, l.y+l.height-1, l.width-1, 1, pos)
-	PutChar(l.x+l.width-1, l.y+l.height-1, ' ')
+	PutChar(l.x+types.ACoordX(l.width-1), l.y+l.height-1, ' ')
 }
 
 func (l *TableView) drawCells() {
@@ -293,10 +295,10 @@ func (l *TableView) drawCells() {
 			shift, str := AlignText(s, start, AlignRight)
 			SetTextColor(fg)
 			SetBackColor(bg)
-			DrawText(l.x+shift, l.y+dy+idx-1, str)
+			DrawText(l.x+types.ACoordX(shift), l.y+dy+idx-1, str)
 			if l.showVLines {
 				SetTextColor(fgLine)
-				PutChar(l.x+start, l.y+dy+idx-1, parts[1])
+				PutChar(l.x+types.ACoordX(start), l.y+dy+idx-1, parts[1])
 			}
 		}
 		if l.showVLines {
@@ -335,15 +337,15 @@ func (l *TableView) drawCells() {
 			}
 			SetTextColor(info.Fg)
 			SetBackColor(info.Bg)
-			FillRect(l.x+dx, l.y+dy, length, 1, ' ')
+			FillRect(l.x+types.ACoordX(dx), l.y+dy, length, 1, ' ')
 			shift, text := AlignColorizedText(info.Text, length, info.Alignment)
-			DrawText(l.x+dx+shift, l.y+dy, text)
+			DrawText(l.x+types.ACoordX(dx+shift), l.y+dy, text)
 
 			dx += c.Width
 			if l.showVLines && dx < l.width-1 && colNo < len(l.columns)-1 {
 				SetTextColor(fg)
 				SetBackColor(bg)
-				PutChar(l.x+dx, l.y+dy, parts[1])
+				PutChar(l.x+types.ACoordX(dx), l.y+dy, parts[1])
 				dx++
 			}
 
@@ -608,20 +610,20 @@ func (l *TableView) EnsureRowVisible() {
 	}
 }
 
-func (l *TableView) mouseToCol(dx int) int {
+func (l *TableView) mouseToCol(dx types.ACoordX) int {
 	shift := l.counterWidth()
 	if l.showVLines {
 		shift++
 	}
 
-	if dx < shift {
+	if int(dx) < shift {
 		return -1
 	}
 
 	idx := l.topCol
 	selectedCol := l.selectedCol
 	for {
-		if shift+l.columns[idx].Width > dx {
+		if shift+l.columns[idx].Width > int(dx) {
 			selectedCol = idx
 			break
 		}
@@ -641,17 +643,17 @@ func (l *TableView) mouseToCol(dx int) int {
 	return selectedCol
 }
 
-func (l *TableView) horizontalScrollClick(dx int) {
+func (l *TableView) horizontalScrollClick(dx types.ACoordX) {
 	switch {
 	case dx == 0:
 		l.moveLeft(1)
-	case dx == l.width-2:
+	case int(dx) == l.width-2:
 		l.moveRight(1)
-	case dx > 0 && dx < l.width-2:
+	case dx > 0 && int(dx) < l.width-2:
 		pos := ThumbPosition(l.selectedCol, len(l.columns), l.width-1)
-		if pos < dx {
+		if pos < int(dx) {
 			l.moveRight(1)
-		} else if pos > dx {
+		} else if pos > int(dx) {
 			l.moveLeft(1)
 		}
 	}
@@ -681,11 +683,11 @@ func (l *TableView) processMouseClick(ev Event) bool {
 	dx := ev.X - l.x
 	dy := ev.Y - l.y
 
-	if l.topRow+dy-2 >= l.rowCount && dy != l.height-1 && dx != l.width-1 {
+	if l.topRow+dy-2 >= l.rowCount && dy != l.height-1 && int(dx) != l.width-1 {
 		return false
 	}
 
-	if dy == l.height-1 && dx == l.width-1 {
+	if dy == l.height-1 && int(dx) == l.width-1 {
 		l.selectedRow = l.rowCount - 1
 		l.selectedCol = len(l.columns) - 1
 		return true
@@ -696,7 +698,7 @@ func (l *TableView) processMouseClick(ev Event) bool {
 		return true
 	}
 
-	if dx == l.width-1 {
+	if int(dx) == l.width-1 {
 		l.verticalScrollClick(dy)
 		return true
 	}
@@ -724,7 +726,7 @@ func (l *TableView) processMouseClick(ev Event) bool {
 	return true
 }
 
-func (l *TableView) headerClicked(dx int) {
+func (l *TableView) headerClicked(dx types.ACoordX) {
 	colID := l.mouseToCol(dx)
 	if colID == -1 {
 		if l.onAction != nil {

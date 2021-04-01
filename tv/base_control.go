@@ -5,6 +5,8 @@ import (
 	"sync/atomic"
 
 	term "github.com/nsf/termbox-go"
+
+	"github.com/prospero78/goTV/tv/types"
 )
 
 // BaseControl is a base for all visible controls.
@@ -13,22 +15,24 @@ import (
 type BaseControl struct {
 	refID         int64
 	title         string
-	x, y          int
+	x             types.ACoordX
+	y             int
 	width, height int
 	minW, minH    int
 	scale         int
+	padX          types.ACoordX
+	padY          int
+	gapX, gapY    int
 	fg, bg        term.Attribute
 	fgActive      term.Attribute
 	bgActive      term.Attribute
-	tabSkip       bool
-	disabled      bool
-	hidden        bool
 	align         Align
 	parent        Control
 	inactive      bool
 	modal         bool
-	padX, padY    int
-	gapX, gapY    int
+	tabSkip       bool
+	disabled      bool
+	hidden        bool
 	pack          PackType
 	children      []Control
 	mtx           sync.RWMutex
@@ -96,11 +100,11 @@ func (c *BaseControl) SetSize(width, height int) {
 	}
 }
 
-func (c *BaseControl) Pos() (x int, y int) {
+func (c *BaseControl) Pos() (x types.ACoordX, y int) {
 	return c.x, c.y
 }
 
-func (c *BaseControl) SetPos(x, y int) {
+func (c *BaseControl) SetPos(x types.ACoordX, y int) {
 	if c.clipped && c.clipper != nil {
 		cx, cy, _, _ := c.Clipper()
 		px, py := c.Paddings()
@@ -231,11 +235,11 @@ func (c *BaseControl) SetModal(modal bool) {
 	c.modal = modal
 }
 
-func (c *BaseControl) Paddings() (px int, py int) {
+func (c *BaseControl) Paddings() (px types.ACoordX, py int) {
 	return c.padX, c.padY
 }
 
-func (c *BaseControl) SetPaddings(px, py int) {
+func (c *BaseControl) SetPaddings(px types.ACoordX, py int) {
 	if px >= 0 {
 		c.padX = px
 	}
@@ -316,7 +320,7 @@ func (c *BaseControl) ResizeChildren() {
 		return
 	}
 
-	fullWidth := c.width - 2*c.padX
+	fullWidth := c.width - int(2*c.padX)
 	fullHeight := c.height - 2*c.padY
 	if c.pack == Horizontal {
 		fullWidth -= (children - 1) * c.gapX
@@ -477,7 +481,7 @@ func (c *BaseControl) MinimalSize() (w int, h int) {
 	if c.pack == Vertical {
 		totalY += (children - 1) * c.gapY
 	} else {
-		totalX += (children - 1) * c.gapX
+		totalX += types.ACoordX((children - 1) * c.gapX)
 	}
 
 	for _, ctrl := range c.children {
@@ -491,25 +495,25 @@ func (c *BaseControl) MinimalSize() (w int, h int) {
 		ww, hh := ctrl.MinimalSize()
 		if c.pack == Vertical {
 			totalY += hh
-			if ww+2*c.padX > totalX {
-				totalX = ww + 2*c.padX
+			if types.ACoordX(ww)+2*c.padX > totalX {
+				totalX = types.ACoordX(ww) + 2*c.padX
 			}
 		} else {
-			totalX += ww
+			totalX += types.ACoordX(ww)
 			if hh+2*c.padY > totalY {
 				totalY = hh + 2*c.padY
 			}
 		}
 	}
 
-	if totalX < c.minW {
-		totalX = c.minW
+	if totalX < types.ACoordX(c.minW) {
+		totalX = types.ACoordX(c.minW)
 	}
 	if totalY < c.minH {
 		totalY = c.minH
 	}
 
-	return totalX, totalY
+	return int(totalX), totalY
 }
 
 func (c *BaseControl) Draw() {
@@ -540,7 +544,7 @@ func (c *BaseControl) DrawChildren() {
 	}
 }
 
-func (c *BaseControl) Clipper() (int, int, int, int) {
+func (c *BaseControl) Clipper() (types.ACoordX, int, int, int) {
 	clipped := ClippedParent(c)
 
 	if clipped == nil || (c.clipped && c.clipper != nil) {
@@ -555,19 +559,19 @@ func (c *BaseControl) setClipper() {
 	c.clipper = &rect{x: x, y: y, w: w, h: h}
 }
 
-func (c *BaseControl) HitTest(x, y int) HitResult {
-	if x > c.x && x < c.x+c.width-1 &&
+func (c *BaseControl) HitTest(x types.ACoordX, y int) HitResult {
+	if x > c.x && x < c.x+types.ACoordX(c.width-1) &&
 		y > c.y && y < c.y+c.height-1 {
 		return HitInside
 	}
 
-	if (x == c.x || x == c.x+c.width-1) &&
+	if (x == c.x || x == c.x+types.ACoordX(c.width-1)) &&
 		y >= c.y && y < c.y+c.height {
 		return HitBorder
 	}
 
 	if (y == c.y || y == c.y+c.height-1) &&
-		x >= c.x && x < c.x+c.width {
+		x >= c.x && x < c.x+types.ACoordX(c.width) {
 		return HitBorder
 	}
 
@@ -595,7 +599,7 @@ func (c *BaseControl) PlaceChildren() {
 		if c.pack == Vertical {
 			yy += c.gapY + hh
 		} else {
-			xx += c.gapX + ww
+			xx += types.ACoordX(c.gapX + ww)
 		}
 
 		ctrl.PlaceChildren()

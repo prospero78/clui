@@ -2,6 +2,8 @@ package tv
 
 import (
 	xs "github.com/huandu/xstrings"
+
+	"github.com/prospero78/goTV/tv/types"
 )
 
 /*
@@ -91,7 +93,7 @@ func (l *Label) Draw() {
 		elem := parser.NextElement()
 		xx, yy := l.x, l.y
 		for elem.Type != ElemEndOfText {
-			if xx >= l.x+l.width || yy >= l.y+l.height {
+			if xx >= l.x+types.ACoordX(l.width) || yy >= l.y+l.height {
 				break
 			}
 
@@ -105,7 +107,7 @@ func (l *Label) Draw() {
 
 				if l.direction == Horizontal {
 					xx += 1
-					if xx >= l.x+l.width {
+					if xx >= l.x+types.ACoordX(l.width) {
 						xx = l.x
 						yy += 1
 					}
@@ -126,7 +128,7 @@ func (l *Label) Draw() {
 			if str != l.title && l.align != l.textDisplay {
 				shift, str = AlignColorizedText(l.title, l.width, l.textDisplay)
 			}
-			DrawText(l.x+shift, l.y, str)
+			DrawText(l.x+types.ACoordX(shift), l.y, str)
 		} else {
 			shift, str := AlignColorizedText(l.title, l.height, l.align)
 			if str != l.title && l.align != l.textDisplay {

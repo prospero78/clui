@@ -4,6 +4,8 @@ import (
 	"strings"
 
 	term "github.com/nsf/termbox-go"
+
+	"github.com/prospero78/goTV/tv/types"
 )
 
 /*
@@ -74,7 +76,7 @@ func (l *ListBox) drawScroll() {
 	pos := ThumbPosition(l.currSelection, len(l.items), l.height)
 	l.buttonPos = pos
 
-	DrawScrollBar(l.x+l.width-1, l.y, 1, l.height, pos)
+	DrawScrollBar(l.x+types.ACoordX(l.width-1), l.y, 1, l.height, pos)
 }
 
 func (l *ListBox) drawItems() {
@@ -254,7 +256,7 @@ func (l *ListBox) processMouseClick(ev Event) bool {
 	dx := ev.X - l.x
 	dy := ev.Y - l.y
 
-	if dx == l.width-1 {
+	if dx == types.ACoordX(l.width-1) {
 		if dy < 0 || dy >= l.height || len(l.items) < 2 {
 			return true
 		}
@@ -273,7 +275,7 @@ func (l *ListBox) processMouseClick(ev Event) bool {
 		return true
 	}
 
-	if dx < 0 || dx >= l.width || dy < 0 || dy >= l.height {
+	if dx < 0 || int(dx) >= l.width || dy < 0 || dy >= l.height {
 		return true
 	}
 

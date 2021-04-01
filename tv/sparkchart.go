@@ -4,6 +4,8 @@ import (
 	"fmt"
 	// xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+
+	"github.com/prospero78/goTV/tv/types"
 )
 
 /*
@@ -115,7 +117,7 @@ func (b *SparkChart) drawBars() {
 	defer PopAttributes()
 
 	h := b.height
-	pos := b.x + start
+	pos := b.x + types.ACoordX(start)
 
 	mxFg, mxBg := RealColor(b.maxFg, b.Style(), ColorSparkChartMaxText), RealColor(b.maxBg, b.Style(), ColorSparkChartMaxBack)
 	brFg, brBg := RealColor(b.fg, b.Style(), ColorSparkChartBarText), RealColor(b.bg, b.Style(), ColorSparkChartBarBack)

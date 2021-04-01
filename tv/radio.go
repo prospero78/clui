@@ -3,6 +3,8 @@ package tv
 import (
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+
+	"github.com/prospero78/goTV/tv/types"
 )
 
 /*
@@ -93,7 +95,7 @@ func (c *Radio) Draw() {
 	}
 
 	shift, text := AlignColorizedText(c.title, w-4, c.align)
-	DrawText(x+4+shift, y, text)
+	DrawText(x+types.ACoordX(4+shift), y, text)
 }
 
 // ProcessEvent processes all events come from the control parent. If a control

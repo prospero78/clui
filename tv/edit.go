@@ -5,6 +5,8 @@ import (
 
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+
+	"github.com/prospero78/goTV/tv/types"
 )
 
 // OnChange sets the callback that is called when EditField content is changed
@@ -38,7 +40,7 @@ func (e *EditField) setTitleInternal(title string) {
 	}
 
 	if title == "" {
-		e.cursorPos = xs.Len(title)
+		e.cursorPos = types.ACoordX(xs.Len(title))
 	}
 }
 
@@ -70,31 +72,31 @@ func (e *EditField) Draw() {
 			textOut = e.title
 		}
 	} else {
-		fromIdx := 0
-		toIdx := 0
+		fromIdx := types.ACoordX(0)
+		toIdx := types.ACoordX(0)
 		if e.offset == 0 {
-			toIdx = e.width - 1
+			toIdx = types.ACoordX(e.width - 1)
 			if e.showStars {
-				textOut = strings.Repeat(chStar, toIdx) + chRight
+				textOut = strings.Repeat(chStar, int(toIdx)) + chRight
 			} else {
-				textOut = xs.Slice(e.title, 0, toIdx) + chRight
+				textOut = xs.Slice(e.title, 0, int(toIdx)) + chRight
 			}
 			curOff = -e.offset
 		} else {
 			curOff = 1 - e.offset
-			fromIdx = e.offset
+			fromIdx = types.ACoordX(e.offset)
 			if e.width-1 <= xs.Len(e.title)-e.offset {
-				toIdx = e.offset + e.width - 2
+				toIdx = types.ACoordX(e.offset + e.width - 2)
 				if e.showStars {
-					textOut = chLeft + strings.Repeat(chStar, toIdx-fromIdx) + chRight
+					textOut = chLeft + strings.Repeat(chStar, int(toIdx-fromIdx)) + chRight
 				} else {
-					textOut = chLeft + xs.Slice(e.title, fromIdx, toIdx) + chRight
+					textOut = chLeft + xs.Slice(e.title, int(fromIdx), int(toIdx)) + chRight
 				}
 			} else {
 				if e.showStars {
-					textOut = chLeft + strings.Repeat(chStar, xs.Len(e.title)-fromIdx)
+					textOut = chLeft + strings.Repeat(chStar, xs.Len(e.title)-int(fromIdx))
 				} else {
-					textOut = chLeft + xs.Slice(e.title, fromIdx, -1)
+					textOut = chLeft + xs.Slice(e.title, int(fromIdx), -1)
 				}
 			}
 		}
@@ -112,7 +114,7 @@ func (e *EditField) Draw() {
 	FillRect(x, y, w, 1, ' ')
 	DrawRawText(x, y, textOut)
 	if e.Active() {
-		SetCursorPos(e.cursorPos+e.x+curOff, e.y)
+		SetCursorPos(e.cursorPos+e.x+types.ACoordX(curOff), e.y)
 	}
 }
 
@@ -130,15 +132,15 @@ func (e *EditField) insertRune(ch rune) {
 	switch {
 	case idx == 0:
 		e.setTitleInternal(string(ch) + e.title)
-	case idx >= xs.Len(e.title):
+	case int(idx) >= xs.Len(e.title):
 		e.setTitleInternal(e.title + string(ch))
 	default:
-		e.setTitleInternal(xs.Slice(e.title, 0, idx) + string(ch) + xs.Slice(e.title, idx, -1))
+		e.setTitleInternal(xs.Slice(e.title, 0, int(idx)) + string(ch) + xs.Slice(e.title, int(idx), -1))
 	}
 
 	e.cursorPos++
 
-	if e.cursorPos >= e.width {
+	if int(e.cursorPos) >= e.width {
 		if e.offset == 0 {
 			e.offset = 2
 		} else {
@@ -155,7 +157,7 @@ func (e *EditField) backspace() {
 	length := xs.Len(e.title)
 
 	switch {
-	case e.cursorPos >= length:
+	case int(e.cursorPos) >= length:
 		e.cursorPos--
 		e.setTitleInternal(xs.Slice(e.title, 0, length-1))
 	case e.cursorPos == 1:
@@ -164,7 +166,7 @@ func (e *EditField) backspace() {
 		e.offset = 0
 	default:
 		e.cursorPos--
-		e.setTitleInternal(xs.Slice(e.title, 0, e.cursorPos) + xs.Slice(e.title, e.cursorPos+1, -1))
+		e.setTitleInternal(xs.Slice(e.title, 0, int(e.cursorPos)) + xs.Slice(e.title, int(e.cursorPos+1), -1))
 	}
 
 	if length-1 < e.width {
@@ -175,14 +177,14 @@ func (e *EditField) backspace() {
 func (e *EditField) del() {
 	length := xs.Len(e.title)
 
-	if e.title == "" || e.cursorPos == length || e.readonly {
+	if e.title == "" || int(e.cursorPos) == length || e.readonly {
 		return
 	}
 
-	if e.cursorPos == length-1 {
+	if int(e.cursorPos) == length-1 {
 		e.setTitleInternal(xs.Slice(e.title, 0, length-1))
 	} else {
-		e.setTitleInternal(xs.Slice(e.title, 0, e.cursorPos) + xs.Slice(e.title, e.cursorPos+1, -1))
+		e.setTitleInternal(xs.Slice(e.title, 0, int(e.cursorPos)) + xs.Slice(e.title, int(e.cursorPos+1), -1))
 	}
 
 	if length-1 < e.width {
@@ -195,7 +197,7 @@ func (e *EditField) charLeft() {
 		return
 	}
 
-	if e.cursorPos == e.offset {
+	if int(e.cursorPos) == e.offset {
 		e.offset--
 	}
 
@@ -204,12 +206,12 @@ func (e *EditField) charLeft() {
 
 func (e *EditField) charRight() {
 	length := xs.Len(e.title)
-	if e.cursorPos == length || e.title == "" {
+	if int(e.cursorPos) == length || e.title == "" {
 		return
 	}
 
 	e.cursorPos++
-	if e.cursorPos != length && e.cursorPos >= e.offset+e.width-2 {
+	if int(e.cursorPos) != length && int(e.cursorPos) >= e.offset+e.width-2 {
 		e.offset++
 	}
 }
@@ -221,7 +223,7 @@ func (e *EditField) home() {
 
 func (e *EditField) end() {
 	length := xs.Len(e.title)
-	e.cursorPos = length
+	e.cursorPos = types.ACoordX(length)
 
 	if length < e.width {
 		return

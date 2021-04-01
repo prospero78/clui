@@ -7,6 +7,8 @@ import (
 
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+
+	"github.com/prospero78/goTV/tv/types"
 )
 
 /*
@@ -84,7 +86,7 @@ func (l *TextView) outputHeight() int {
 func (l *TextView) drawScrolls() {
 	height := l.outputHeight()
 	pos := ThumbPosition(l.topLine, l.virtualHeight-l.outputHeight(), height)
-	DrawScrollBar(l.x+l.width-1, l.y, 1, height, pos)
+	DrawScrollBar(l.x+types.ACoordX(l.width-1), l.y, 1, height, pos)
 
 	if !l.wordWrap {
 		pos = ThumbPosition(l.leftShift, l.virtualWidth-l.width+1, l.width-1)
@@ -266,20 +268,20 @@ func (l *TextView) processMouseClick(ev Event) bool {
 	yy := l.outputHeight()
 
 	// cursor is not on any scrollbar
-	if dx != l.width-1 && dy != l.height-1 {
+	if int(dx) != l.width-1 && dy != l.height-1 {
 		return false
 	}
 	// wordwrap mode does not have horizontal scroll
-	if l.wordWrap && dx != l.width-1 {
+	if l.wordWrap && int(dx) != l.width-1 {
 		return false
 	}
 	// corner in not wordwrap mode
-	if !l.wordWrap && dx == l.width-1 && dy == l.height-1 {
+	if !l.wordWrap && int(dx) == l.width-1 && dy == l.height-1 {
 		return false
 	}
 
 	// vertical scroll bar
-	if dx == l.width-1 {
+	if int(dx) == l.width-1 {
 		switch {
 		case dy == 0:
 			l.moveUp(1)
@@ -299,10 +301,10 @@ func (l *TextView) processMouseClick(ev Event) bool {
 	switch {
 	case dx == 0:
 		l.moveLeft()
-	case dx == l.width-2:
+	case int(dx) == l.width-2:
 		l.moveRight()
 	default:
-		newPos := ItemByThumbPosition(dx, l.virtualWidth-l.width+2, l.width-1)
+		newPos := ItemByThumbPosition(int(dx), l.virtualWidth-l.width+2, l.width-1)
 		if newPos >= 0 {
 			l.leftShift = newPos
 		}
