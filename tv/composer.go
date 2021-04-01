@@ -447,9 +447,9 @@ func (c *Composer) processWindowDrag(ev Event) {
 			RefreshScreen()
 		}
 	case DragResizeBottomLeft:
-		newX = newX + dx
-		newW = newW - dx
-		newH = newH + dy
+		newX += dx
+		newW -= dx
+		newH += dy
 		if newX >= 0 && newY >= 0 && newX+newW < cw && newY+newH < ch {
 			c.lastX = ev.X
 			c.lastY = ev.Y
@@ -463,8 +463,8 @@ func (c *Composer) processWindowDrag(ev Event) {
 			RefreshScreen()
 		}
 	case DragResizeBottomRight:
-		newW = newW + dx
-		newH = newH + dy
+		newW += dx
+		newH += dy
 		if newX >= 0 && newY >= 0 && newX+newW < cw && newY+newH < ch {
 			c.lastX = ev.X
 			c.lastY = ev.Y
@@ -475,9 +475,9 @@ func (c *Composer) processWindowDrag(ev Event) {
 			RefreshScreen()
 		}
 	case DragResizeTopRight:
-		newY = newY + dy
-		newW = newW + dx
-		newH = newH - dy
+		newY += dy
+		newW += dx
+		newH -= dy
 		if newX >= 0 && newY >= 0 && newX+newW < cw && newY+newH < ch {
 			c.lastX = ev.X
 			c.lastY = ev.Y
