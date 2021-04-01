@@ -304,10 +304,10 @@ func CalcClipper(c Control) (int, int, int, int) {
 	x, y := c.Pos()
 	px, py := c.Paddings()
 
-	x = x + px
-	y = y + py
-	w = w - 2*px
-	h = h - 2*py
+	x += px
+	y += py
+	w -= 2 * px
+	h -= 2 * py
 
 	return x, y, w, h
 }
