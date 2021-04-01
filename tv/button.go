@@ -88,7 +88,7 @@ func (b *Button) Draw() {
 		fg, bg = RealColor(fg, b.Style(), ColorButtonText), RealColor(bg, b.Style(), ColorButtonBack)
 	}
 
-	dy := int((h - 1) / 2)
+	dy := (h - 1) / 2
 	SetTextColor(fg)
 	shift, text := AlignColorizedText(b.title, w-1, b.align)
 	if b.isPressed() == 0 {
