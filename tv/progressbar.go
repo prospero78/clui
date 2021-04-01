@@ -102,10 +102,10 @@ func (b *ProgressBar) Draw() {
 	var title string
 	if b.direction == Horizontal && b.Title() != "" {
 		title = b.Title()
-		title = strings.Replace(title, "{{percent}}", strconv.Itoa(prc), -1)
-		title = strings.Replace(title, "{{value}}", strconv.Itoa(b.value), -1)
-		title = strings.Replace(title, "{{min}}", strconv.Itoa(b.min), -1)
-		title = strings.Replace(title, "{{max}}", strconv.Itoa(b.max), -1)
+		title = strings.ReplaceAll(title, "{{percent}}", strconv.Itoa(prc))
+		title = strings.ReplaceAll(title, "{{value}}", strconv.Itoa(b.value))
+		title = strings.ReplaceAll(title, "{{min}}", strconv.Itoa(b.min))
+		title = strings.ReplaceAll(title, "{{max}}", strconv.Itoa(b.max))
 	}
 
 	x, y := b.Pos()
