@@ -85,13 +85,14 @@ func (p *ColorParser) parseColor() (term.Attribute, TextElementType, bool) {
 		switch step {
 		case StepType:
 			c := p.text[newIdx]
-			if c == 't' || c == 'f' || c == 'c' {
+			switch {
+			case c == 't' || c == 'f' || c == 'c':
 				t = ElemTextColor
-			} else if c == 'b' {
+			case c == 'b':
 				t = ElemBackColor
-			} else {
+			default:
 				ok = false
-				break
+				goto END_FOR
 			}
 			step = StepColon
 			newIdx++
@@ -121,12 +122,11 @@ func (p *ColorParser) parseColor() (term.Attribute, TextElementType, bool) {
 				newIdx++
 			}
 		}
-
 		if done || !ok {
 			break
 		}
 	}
-
+END_FOR:
 	return attr, t, ok
 }
 
