@@ -8,9 +8,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/prospero78/goTV/tv"
-	"github.com/prospero78/goTV/tv/cons"
-	"github.com/prospero78/goTV/tv/widgets/window"
+	ui "github.com/prospero78/goTV/tv"
 )
 
 // number of columns in a table
@@ -84,13 +82,13 @@ func (d *dbCache) value(row, col int) string {
 }
 
 var (
-	view *window.TWindow
+	view *ui.Window
 )
 
-func createView() *tv.TableView {
-	view = tv.AddWindow(0, 0, 10, 7, "TableView Preload Demo")
-	bch := tv.CreateTableView(view, 35, 12, 1)
-	tv.ActivateControl(view, bch)
+func createView() *ui.TableView {
+	view = ui.AddWindow(0, 0, 10, 7, "TableView Preload Demo")
+	bch := ui.CreateTableView(view, 35, 12, 1)
+	ui.ActivateControl(view, bch)
 
 	return bch
 }
@@ -98,21 +96,21 @@ func createView() *tv.TableView {
 func mainLoop() {
 	// Every application must create a single Composer and
 	// call its intialize method
-	tv.InitLibrary()
-	defer tv.DeinitLibrary()
+	ui.InitLibrary()
+	defer ui.DeinitLibrary()
 
 	cache := &dbCache{firstRow: -1}
 	b := createView()
 	b.SetShowLines(true)
 	b.SetShowRowNumber(true)
 	b.SetRowCount(25)
-	cols := []tv.Column{
-		tv.Column{Title: "First Name", Width: 10, Alignment: cons.AlignLeft},
-		tv.Column{Title: "Last Name", Width: 12, Alignment: cons.AlignLeft},
-		tv.Column{Title: "ID", Width: 12, Alignment: cons.AlignRight},
-		tv.Column{Title: "Post", Width: 12, Alignment: cons.AlignLeft},
-		tv.Column{Title: "Department", Width: 15, Alignment: cons.AlignLeft},
-		tv.Column{Title: "Salary", Width: 12, Alignment: cons.AlignRight},
+	cols := []ui.Column{
+		ui.Column{Title: "First Name", Width: 10, Alignment: ui.AlignLeft},
+		ui.Column{Title: "Last Name", Width: 12, Alignment: ui.AlignLeft},
+		ui.Column{Title: "ID", Width: 12, Alignment: ui.AlignRight},
+		ui.Column{Title: "Post", Width: 12, Alignment: ui.AlignLeft},
+		ui.Column{Title: "Department", Width: 15, Alignment: ui.AlignLeft},
+		ui.Column{Title: "Salary", Width: 12, Alignment: ui.AlignRight},
 	}
 	b.SetColumns(cols)
 	b.OnBeforeDraw(func(col, row, colCnt, rowCnt int) {
@@ -120,12 +118,12 @@ func mainLoop() {
 		l, t, w, h := b.VisibleArea()
 		view.SetTitle(fmt.Sprintf("Caching: %d:%d - %dx%d", l, t, w, h))
 	})
-	b.OnDrawCell(func(info *tv.ColumnDrawInfo) {
+	b.OnDrawCell(func(info *ui.ColumnDrawInfo) {
 		info.Text = cache.value(info.Row, info.Col)
 	})
 
 	// start event processing loop - the main core of the library
-	tv.MainLoop()
+	ui.MainLoop()
 }
 
 func main() {

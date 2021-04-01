@@ -6,10 +6,6 @@ import (
 
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
-
-	"github.com/prospero78/goTV/tv/cons"
-	"github.com/prospero78/goTV/tv/widgets/widgetbase"
-	"github.com/prospero78/goTV/tv/types"
 )
 
 /*
@@ -20,8 +16,8 @@ one set: foreground and background colors): for filled part and for
 empty one. By default colors are the same.
 */
 type ProgressBar struct {
-	widgetbase.TWidgetBase
-	direction        cons.Direction
+	BaseControl
+	direction        Direction
 	min, max         int
 	value            int
 	emptyFg, emptyBg term.Attribute
@@ -35,14 +31,14 @@ width and heigth - are minimal size of the control.
 scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 control should keep its original size.
 */
-func CreateProgressBar(parent types.IWidget, width, height int, scale int) *ProgressBar {
+func CreateProgressBar(parent Control, width, height int, scale int) *ProgressBar {
 	b := new(ProgressBar)
-	b.TWidgetBase = widgetbase.New()
+	b.BaseControl = NewBaseControl()
 
-	if height == cons.AutoSize {
+	if height == AutoSize {
 		height = 1
 	}
-	if width == cons.AutoSize {
+	if width == AutoSize {
 		width = 10
 	}
 
@@ -52,9 +48,9 @@ func CreateProgressBar(parent types.IWidget, width, height int, scale int) *Prog
 	b.SetScale(scale)
 	b.min = 0
 	b.max = 10
-	b.direction = cons.Horizontal
+	b.direction = Horizontal
 	b.parent = parent
-	b.align = cons.AlignCenter
+	b.align = AlignCenter
 
 	if parent != nil {
 		parent.AddChild(b)
@@ -77,12 +73,12 @@ func CreateProgressBar(parent types.IWidget, width, height int, scale int) *Prog
 //      pb.SetTitle("{{value}} of {{max}}")
 //      pb.SetTitle("{{percent}}%")
 func (b *ProgressBar) Draw() {
-	if b.isHidden {
+	if b.hidden {
 		return
 	}
 
-	b.block.RLock()
-	defer b.block.RUnlock()
+	b.mtx.RLock()
+	defer b.mtx.RUnlock()
 	if b.max <= b.min {
 		return
 	}
@@ -90,10 +86,10 @@ func (b *ProgressBar) Draw() {
 	PushAttributes()
 	defer PopAttributes()
 
-	fgOff, fgOn := RealColor(b.fg, b.Style(), cons.ColorProgressText), RealColor(b.fgActive, b.Style(), cons.ColorProgressActiveText)
-	bgOff, bgOn := RealColor(b.bg, b.Style(), cons.ColorProgressBack), RealColor(b.bgActive, b.Style(), cons.ColorProgressActiveBack)
+	fgOff, fgOn := RealColor(b.fg, b.Style(), ColorProgressText), RealColor(b.fgActive, b.Style(), ColorProgressActiveText)
+	bgOff, bgOn := RealColor(b.bg, b.Style(), ColorProgressBack), RealColor(b.bgActive, b.Style(), ColorProgressActiveBack)
 
-	parts := []rune(SysObject(cons.ObjProgressBar))
+	parts := []rune(SysObject(ObjProgressBar))
 	cFilled, cEmpty := parts[0], parts[1]
 
 	prc := 0
@@ -104,18 +100,18 @@ func (b *ProgressBar) Draw() {
 	}
 
 	var title string
-	if b.direction == cons.Horizontal && b.Title() != "" {
+	if b.direction == Horizontal && b.Title() != "" {
 		title = b.Title()
-		title = strings.ReplaceAll(title, "{{percent}}", strconv.Itoa(prc))
-		title = strings.ReplaceAll(title, "{{value}}", strconv.Itoa(b.value))
-		title = strings.ReplaceAll(title, "{{min}}", strconv.Itoa(b.min))
-		title = strings.ReplaceAll(title, "{{max}}", strconv.Itoa(b.max))
+		title = strings.Replace(title, "{{percent}}", strconv.Itoa(prc), -1)
+		title = strings.Replace(title, "{{value}}", strconv.Itoa(b.value), -1)
+		title = strings.Replace(title, "{{min}}", strconv.Itoa(b.min), -1)
+		title = strings.Replace(title, "{{max}}", strconv.Itoa(b.max), -1)
 	}
 
 	x, y := b.Pos()
 	w, h := b.Size()
 
-	if b.direction == cons.Horizontal {
+	if b.direction == Horizontal {
 		filled := prc * w / 100
 		sFilled := strings.Repeat(string(cFilled), filled)
 		sEmpty := strings.Repeat(string(cEmpty), w-filled)
@@ -131,14 +127,13 @@ func (b *ProgressBar) Draw() {
 
 		if title != "" {
 			shift, str := AlignText(title, w, b.align)
-			titleClr := RealColor(b.titleFg, b.Style(), cons.ColorProgressTitleText)
+			titleClr := RealColor(b.titleFg, b.Style(), ColorProgressTitleText)
 			var sOn, sOff string
-			switch {
-			case filled == 0 || shift >= filled:
+			if filled == 0 || shift >= filled {
 				sOff = str
-			case w == filled || shift+xs.Len(str) < filled:
+			} else if w == filled || shift+xs.Len(str) < filled {
 				sOn = str
-			default:
+			} else {
 				r := filled - shift
 				sOn = xs.Slice(str, 0, r)
 				sOff = xs.Slice(str, r, -1)
@@ -175,22 +170,21 @@ func (b *ProgressBar) Draw() {
 // SetValue sets new progress value. If value exceeds ProgressBar
 // limits then the limit value is used
 func (b *ProgressBar) SetValue(pos int) {
-	b.block.Lock()
-	defer b.block.Unlock()
-	switch {
-	case pos < b.min:
+	b.mtx.Lock()
+	defer b.mtx.Unlock()
+	if pos < b.min {
 		b.value = b.min
-	case pos > b.max:
+	} else if pos > b.max {
 		b.value = b.max
-	default:
+	} else {
 		b.value = pos
 	}
 }
 
 // Value returns the current ProgressBar value
 func (b *ProgressBar) Value() int {
-	b.block.RLock()
-	defer b.block.RUnlock()
+	b.mtx.RLock()
+	defer b.mtx.RUnlock()
 	return b.value
 }
 
@@ -216,8 +210,8 @@ func (b *ProgressBar) SetLimits(min, max int) {
 // Step increases ProgressBar value by 1 if the value is less
 // than ProgressBar high limit
 func (b *ProgressBar) Step() int {
-	b.block.Lock()
-	defer b.block.Unlock()
+	b.mtx.Lock()
+	defer b.mtx.Unlock()
 	b.value++
 
 	if b.value > b.max {

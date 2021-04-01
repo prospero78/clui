@@ -5,12 +5,10 @@ import (
 
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
-	"github.com/prospero78/goTV/tv/cons"
-	"github.com/prospero78/goTV/tv/widgets/event"
 )
 
 // OnChange sets the callback that is called when EditField content is changed
-func (e *EditField) OnChange(fn func(event.TEvent)) {
+func (e *EditField) OnChange(fn func(Event)) {
 	e.onChange = fn
 }
 
@@ -34,7 +32,7 @@ func (e *EditField) setTitleInternal(title string) {
 		e.title = title
 
 		if e.onChange != nil {
-			ev := event.TEvent{Msg: title}
+			ev := Event{Msg: title}
 			e.onChange(ev)
 		}
 	}
@@ -46,7 +44,7 @@ func (e *EditField) setTitleInternal(title string) {
 
 // Repaint draws the control on its View surface
 func (e *EditField) Draw() {
-	if e.IsHidden() {
+	if e.hidden {
 		return
 	}
 
@@ -56,7 +54,7 @@ func (e *EditField) Draw() {
 	x, y := e.Pos()
 	w, _ := e.Size()
 
-	parts := []rune(SysObject(cons.ObjEdit))
+	parts := []rune(SysObject(ObjEdit))
 	chLeft, chRight := string(parts[0]), string(parts[1])
 	chStar := "*"
 	if len(parts) > 3 {
@@ -102,11 +100,11 @@ func (e *EditField) Draw() {
 		}
 	}
 
-	fg, bg := RealColor(e.fg, e.Style(), cons.ColorEditText), RealColor(e.bg, e.Style(), cons.ColorEditBack)
+	fg, bg := RealColor(e.fg, e.Style(), ColorEditText), RealColor(e.bg, e.Style(), ColorEditBack)
 	if !e.Enabled() {
-		fg, bg = RealColor(e.fg, e.Style(), cons.ColorDisabledText), RealColor(e.fg, e.Style(), cons.ColorDisabledBack)
+		fg, bg = RealColor(e.fg, e.Style(), ColorDisabledText), RealColor(e.fg, e.Style(), ColorDisabledBack)
 	} else if e.Active() {
-		fg, bg = RealColor(e.fg, e.Style(), cons.ColorEditActiveText), RealColor(e.bg, e.Style(), cons.ColorEditActiveBack)
+		fg, bg = RealColor(e.fg, e.Style(), ColorEditActiveText), RealColor(e.bg, e.Style(), ColorEditActiveBack)
 	}
 
 	SetTextColor(fg)
@@ -129,12 +127,11 @@ func (e *EditField) insertRune(ch rune) {
 
 	idx := e.cursorPos
 
-	switch {
-	case idx == 0:
+	if idx == 0 {
 		e.setTitleInternal(string(ch) + e.title)
-	case idx >= xs.Len(e.title):
+	} else if idx >= xs.Len(e.title) {
 		e.setTitleInternal(e.title + string(ch))
-	default:
+	} else {
 		e.setTitleInternal(xs.Slice(e.title, 0, idx) + string(ch) + xs.Slice(e.title, idx, -1))
 	}
 
@@ -155,15 +152,14 @@ func (e *EditField) backspace() {
 	}
 
 	length := xs.Len(e.title)
-	switch {
-	case e.cursorPos >= length:
+	if e.cursorPos >= length {
 		e.cursorPos--
 		e.setTitleInternal(xs.Slice(e.title, 0, length-1))
-	case e.cursorPos == 1:
+	} else if e.cursorPos == 1 {
 		e.cursorPos = 0
 		e.setTitleInternal(xs.Slice(e.title, 1, -1))
 		e.offset = 0
-	default:
+	} else {
 		e.cursorPos--
 		e.setTitleInternal(xs.Slice(e.title, 0, e.cursorPos) + xs.Slice(e.title, e.cursorPos+1, -1))
 	}
@@ -186,7 +182,7 @@ func (e *EditField) del() {
 		e.setTitleInternal(xs.Slice(e.title, 0, e.cursorPos) + xs.Slice(e.title, e.cursorPos+1, -1))
 	}
 
-	if length-1 < e.GetWidth() {
+	if length-1 < e.width {
 		e.offset = 0
 	}
 }
@@ -210,7 +206,7 @@ func (e *EditField) charRight() {
 	}
 
 	e.cursorPos++
-	if e.cursorPos != length && e.cursorPos >= e.offset+e.GetWidth()-2 {
+	if e.cursorPos != length && e.cursorPos >= e.offset+e.width-2 {
 		e.offset++
 	}
 }
@@ -224,11 +220,11 @@ func (e *EditField) end() {
 	length := xs.Len(e.title)
 	e.cursorPos = length
 
-	if length < e.GetWidth() {
+	if length < e.width {
 		return
 	}
 
-	e.offset = length - (e.GetWidth() - 2)
+	e.offset = length - (e.width - 2)
 }
 
 // Clear empties the EditField and emits OnChange event
@@ -257,18 +253,18 @@ func (e *EditField) MaxWidth() int {
 // Method does nothing if new size is less than minimal size
 // EditField height cannot be changed - it equals 1 always
 func (e *EditField) SetSize(width, height int) {
-	if width != cons.KeepValue && (width > 1000 || width < e.minW) {
+	if width != KeepValue && (width > 1000 || width < e.minW) {
 		return
 	}
-	if height != cons.KeepValue && (height > 200 || height < e.minH) {
+	if height != KeepValue && (height > 200 || height < e.minH) {
 		return
 	}
 
-	if width != cons.KeepValue {
-		e.SetWidth(width)
+	if width != KeepValue {
+		e.width = width
 	}
 
-	e.SetHidth(1)
+	e.height = 1
 }
 
 // PasswordMode returns whether password mode is enabled for the control

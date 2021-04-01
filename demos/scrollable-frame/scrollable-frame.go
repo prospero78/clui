@@ -3,30 +3,28 @@ package main
 import (
 	"fmt"
 
-	"github.com/prospero78/goTV/tv"
-	"github.com/prospero78/goTV/tv/cons"
-	"github.com/prospero78/goTV/tv/widgets/event"
+	ui "github.com/prospero78/goTV/tv"
 )
 
 func main() {
-	tv.InitLibrary()
-	defer tv.DeinitLibrary()
+	ui.InitLibrary()
+	defer ui.DeinitLibrary()
 
-	wnd := tv.AddWindow(0, 0, 60, cons.AutoSize, "Scrollable frame")
+	wnd := ui.AddWindow(0, 0, 60, ui.AutoSize, "Scrollable frame")
 	wnd.SetSizable(false)
 
-	frm := tv.CreateFrame(wnd, 50, 12, cons.BorderNone, cons.Fixed)
-	frm.SetPack(cons.Vertical)
+	frm := ui.CreateFrame(wnd, 50, 12, ui.BorderNone, ui.Fixed)
+	frm.SetPack(ui.Vertical)
 	frm.SetScrollable(true)
 
 	for i := 0; i < 10; i++ {
 		label := fmt.Sprintf("Button %d - press to quit", i)
-		btn := tv.CreateButton(frm, 40, cons.AutoSize, label, 1)
+		btn := ui.CreateButton(frm, 40, ui.AutoSize, label, 1)
 
-		btn.OnClick(func(ev event.TEvent) {
-			go tv.Stop()
+		btn.OnClick(func(ev ui.Event) {
+			go ui.Stop()
 		})
 	}
 
-	tv.MainLoop()
+	ui.MainLoop()
 }

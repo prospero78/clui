@@ -3,10 +3,6 @@ package tv
 import (
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
-	"github.com/prospero78/goTV/tv/cons"
-	"github.com/prospero78/goTV/tv/types"
-	"github.com/prospero78/goTV/tv/widgets/event"
-	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 )
 
 /*
@@ -14,7 +10,7 @@ CheckBox control. It can be two-state one(on and off) - it is default mode - or 
 State values are 0=off, 1=on, 2=third state
 */
 type CheckBox struct {
-	widgetbase.TWidgetBase
+	BaseControl
 	state       int
 	allow3state bool
 
@@ -30,12 +26,12 @@ scale - the way of scaling the control when the parent is resized. Use DoNotScal
 control should keep its original size.
 CheckBox state can be changed using mouse or pressing space on keyboard while the control is active
 */
-func CreateCheckBox(parent types.IWidget, width int, title string, scale int) *CheckBox {
+func CreateCheckBox(parent Control, width int, title string, scale int) *CheckBox {
 	c := new(CheckBox)
-	c.TWidgetBase = widgetbase.New()
+	c.BaseControl = NewBaseControl()
 	c.parent = parent
 
-	if width == cons.AutoSize {
+	if width == AutoSize {
 		width = xs.Len(title) + 4
 	}
 
@@ -57,12 +53,12 @@ func CreateCheckBox(parent types.IWidget, width int, title string, scale int) *C
 
 // Repaint draws the control on its View surface
 func (c *CheckBox) Draw() {
-	if c.IsHidden() {
+	if c.hidden {
 		return
 	}
 
-	c.block.RLock()
-	defer c.block.RUnlock()
+	c.mtx.RLock()
+	defer c.mtx.RUnlock()
 
 	PushAttributes()
 	defer PopAttributes()
@@ -70,14 +66,14 @@ func (c *CheckBox) Draw() {
 	x, y := c.Pos()
 	w, h := c.Size()
 
-	fg, bg := RealColor(c.fg, c.Style(), cons.ColorControlText), RealColor(c.bg, c.Style(), cons.ColorControlBack)
+	fg, bg := RealColor(c.fg, c.Style(), ColorControlText), RealColor(c.bg, c.Style(), ColorControlBack)
 	if !c.Enabled() {
-		fg, bg = RealColor(c.fg, c.Style(), cons.ColorControlDisabledText), RealColor(c.bg, c.Style(), cons.ColorControlDisabledBack)
+		fg, bg = RealColor(c.fg, c.Style(), ColorControlDisabledText), RealColor(c.bg, c.Style(), ColorControlDisabledBack)
 	} else if c.Active() {
-		fg, bg = RealColor(c.fg, c.Style(), cons.ColorControlActiveText), RealColor(c.bg, c.Style(), cons.ColorControlActiveBack)
+		fg, bg = RealColor(c.fg, c.Style(), ColorControlActiveText), RealColor(c.bg, c.Style(), ColorControlActiveBack)
 	}
 
-	parts := []rune(SysObject(cons.ObjCheckBox))
+	parts := []rune(SysObject(ObjCheckBox))
 
 	cOpen, cClose, cEmpty, cCheck, cUnknown := parts[0], parts[1], parts[2], parts[3], parts[4]
 	cState := []rune{cEmpty, cCheck, cUnknown}
@@ -101,22 +97,21 @@ func (c *CheckBox) Draw() {
 	DrawText(x+4+shift, y, text)
 }
 
-// ProcessEvent -- processes all events come from the control parent. If a control
+//ProcessEvent processes all events come from the control parent. If a control
 //   processes an event it should return true. If the method returns false it means
 //   that the control do not want or cannot process the event and the caller sends
 //   the event to the control parent
-func (c *CheckBox) ProcessEvent(event event.TEvent) bool {
-	if (!c.Active() && event.Type == types.AEventType(cons.EventKey)) || !c.Enabled() {
+func (c *CheckBox) ProcessEvent(event Event) bool {
+	if (!c.Active() && event.Type == EventKey) || !c.Enabled() {
 		return false
 	}
 
-	if (event.Type == types.AEventType(cons.EventKey) && event.Key == term.KeySpace) || (event.Type == cons.EventClick) {
-		switch {
-		case c.state == 0:
+	if (event.Type == EventKey && event.Key == term.KeySpace) || (event.Type == EventClick) {
+		if c.state == 0 {
 			c.SetState(1)
-		case c.state == 2:
+		} else if c.state == 2 {
 			c.SetState(0)
-		default:
+		} else {
 			if c.allow3state {
 				c.SetState(2)
 			} else {
@@ -133,8 +128,8 @@ func (c *CheckBox) ProcessEvent(event event.TEvent) bool {
 // Value must be 0 or 1 if Allow3State is off,
 // and 0, 1, or 2 if Allow3State is on
 func (c *CheckBox) SetState(val int) {
-	c.block.Lock()
-	defer c.block.Unlock()
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
 
 	if val == c.state {
 		return
@@ -159,8 +154,8 @@ func (c *CheckBox) SetState(val int) {
 
 // State returns current state of CheckBox
 func (c *CheckBox) State() int {
-	c.block.RLock()
-	defer c.block.RUnlock()
+	c.mtx.RLock()
+	defer c.mtx.RUnlock()
 
 	return c.state
 }
@@ -186,14 +181,14 @@ func (c *CheckBox) Allow3State() bool {
 // Method does nothing if new size is less than minimal size
 // CheckBox height cannot be changed - it equals 1 always
 func (c *CheckBox) SetSize(width, height int) {
-	if width != cons.KeepValue && (width > 1000 || width < c.minW) {
+	if width != KeepValue && (width > 1000 || width < c.minW) {
 		return
 	}
-	if height != cons.KeepValue && (height > 200 || height < c.minH) {
+	if height != KeepValue && (height > 200 || height < c.minH) {
 		return
 	}
 
-	if width != cons.KeepValue {
+	if width != KeepValue {
 		c.width = width
 	}
 
@@ -204,8 +199,8 @@ func (c *CheckBox) SetSize(width, height int) {
 // of the CheckBox is changed. Argument of callback is the current
 // CheckBox state: 0 - off, 1 - on, 2 - third state
 func (c *CheckBox) OnChange(fn func(int)) {
-	c.block.Lock()
-	defer c.block.Unlock()
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
 
 	c.onChange = fn
 }

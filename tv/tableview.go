@@ -4,10 +4,6 @@ import (
 	"fmt"
 
 	term "github.com/nsf/termbox-go"
-	"github.com/prospero78/goTV/tv/cons"
-	"github.com/prospero78/goTV/tv/types"
-	"github.com/prospero78/goTV/tv/widgets/event"
-	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 )
 
 /*
@@ -51,7 +47,7 @@ Events:
         number of visible columns, number of visible rows.
 */
 type TableView struct {
-	widgetbase.TWidgetBase
+	BaseControl
 	// own TableView members
 	topRow        int
 	topCol        int
@@ -82,9 +78,9 @@ type TableView struct {
 type Column struct {
 	Title     string
 	Width     int
-	Alignment cons.Align
+	Alignment Align
 	Fg, Bg    term.Attribute
-	Sort      cons.SortOrder
+	Sort      SortOrder
 }
 
 // ColumnDrawInfo is a structure used in OnDrawCell event.
@@ -104,7 +100,7 @@ type ColumnDrawInfo struct {
 	// cell displayed text
 	Text string
 	// text alignment
-	Alignment types.AAlign
+	Alignment Align
 	// is the row that contains the cell selected(active)
 	RowSelected bool
 	// is the column that contains the cell selected(active)
@@ -125,7 +121,7 @@ type TableEvent struct {
 	// Currently selected row (it is not used for TableActionSort)
 	Row int
 	// Sort order (it is used only in TableActionSort event)
-	Sort cons.SortOrder
+	Sort SortOrder
 }
 
 /*
@@ -136,14 +132,14 @@ width and height - are minimal size of the control.
 scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 control should keep its original size.
 */
-func CreateTableView(parent types.IWidget, width, height int, scale int) *TableView {
+func CreateTableView(parent Control, width, height int, scale int) *TableView {
 	l := new(TableView)
-	l.TWidgetBase = widgetbase.New()
+	l.BaseControl = NewBaseControl()
 
-	if height == cons.AutoSize {
+	if height == AutoSize {
 		height = 3
 	}
-	if width == cons.AutoSize {
+	if width == AutoSize {
 		width = 10
 	}
 
@@ -175,14 +171,14 @@ func (l *TableView) drawHeader() {
 	PushAttributes()
 	defer PopAttributes()
 
-	fg, bg := RealColor(l.fg, l.Style(), cons.ColorTableHeaderText), RealColor(l.bg, l.Style(), cons.ColorTableHeaderBack)
-	fgLine := RealColor(l.fg, l.Style(), cons.ColorTableLineText)
+	fg, bg := RealColor(l.fg, l.Style(), ColorTableHeaderText), RealColor(l.bg, l.Style(), ColorTableHeaderBack)
+	fgLine := RealColor(l.fg, l.Style(), ColorTableLineText)
 	x, y := l.Pos()
 	w, _ := l.Size()
 	SetTextColor(fg)
 	SetBackColor(bg)
 	FillRect(x, y, w, 1, ' ')
-	parts := []rune(SysObject(cons.ObjTableView))
+	parts := []rune(SysObject(ObjTableView))
 
 	for i := 0; i < w; i++ {
 		PutChar(x+i, y+1, parts[0])
@@ -198,7 +194,7 @@ func (l *TableView) drawHeader() {
 	SetBackColor(bg)
 	if l.showRowNo {
 		cW := l.counterWidth()
-		shift, str := AlignText("#", cW, cons.AlignRight)
+		shift, str := AlignText("#", cW, AlignRight)
 		SetTextColor(fg)
 		DrawRawText(x+pos+shift, y, str)
 		if l.showVLines {
@@ -221,10 +217,10 @@ func (l *TableView) drawHeader() {
 		}
 
 		dw := 0
-		if l.columns[idx].Sort != cons.SortNone {
+		if l.columns[idx].Sort != SortNone {
 			dw = -1
 			ch := parts[3]
-			if l.columns[idx].Sort == cons.SortDesc {
+			if l.columns[idx].Sort == SortDesc {
 				ch = parts[4]
 			}
 			SetTextColor(fg)
@@ -280,11 +276,11 @@ func (l *TableView) drawCells() {
 	dy := 2
 	maxDy := l.height - 2
 
-	fg, bg := RealColor(l.fg, l.Style(), cons.ColorTableText), RealColor(l.bg, l.Style(), cons.ColorTableBack)
-	fgRow, bgRow := RealColor(l.fg, l.Style(), cons.ColorTableSelectedText), RealColor(l.bg, l.Style(), cons.ColorTableSelectedBack)
-	fgCell, bgCell := RealColor(l.fg, l.Style(), cons.ColorTableActiveCellText), RealColor(l.bg, l.Style(), cons.ColorTableActiveCellBack)
-	fgLine := RealColor(l.fg, l.Style(), cons.ColorTableLineText)
-	parts := []rune(SysObject(cons.ObjTableView))
+	fg, bg := RealColor(l.fg, l.Style(), ColorTableText), RealColor(l.bg, l.Style(), ColorTableBack)
+	fgRow, bgRow := RealColor(l.fg, l.Style(), ColorTableSelectedText), RealColor(l.bg, l.Style(), ColorTableSelectedBack)
+	fgCell, bgCell := RealColor(l.fg, l.Style(), ColorTableActiveCellText), RealColor(l.bg, l.Style(), ColorTableActiveCellBack)
+	fgLine := RealColor(l.fg, l.Style(), ColorTableLineText)
+	parts := []rune(SysObject(ObjTableView))
 
 	start := 0
 	if l.showRowNo {
@@ -294,7 +290,7 @@ func (l *TableView) drawCells() {
 				break
 			}
 			s := fmt.Sprintf("%v", idx+l.topRow)
-			shift, str := AlignText(s, start, cons.AlignRight)
+			shift, str := AlignText(s, start, AlignRight)
 			SetTextColor(fg)
 			SetBackColor(bg)
 			DrawText(l.x+shift, l.y+dy+idx-1, str)
@@ -314,17 +310,16 @@ func (l *TableView) drawCells() {
 		for colNo < len(l.columns) && dx < l.width-1 {
 			c := l.columns[colNo]
 			info := ColumnDrawInfo{Row: rowNo, Col: colNo, Width: c.Width, Alignment: c.Alignment}
-			switch {
-			case l.selectedRow == rowNo && l.selectedCol == colNo:
+			if l.selectedRow == rowNo && l.selectedCol == colNo {
 				info.RowSelected = true
 				info.CellSelected = true
 				info.Bg = bgCell
 				info.Fg = fgCell
-			case l.selectedRow == rowNo && l.fullRowSelect:
+			} else if l.selectedRow == rowNo && l.fullRowSelect {
 				info.RowSelected = true
 				info.Bg = bgRow
 				info.Fg = fgRow
-			default:
+			} else {
 				info.Fg = fg
 				info.Bg = bg
 			}
@@ -361,12 +356,12 @@ func (l *TableView) drawCells() {
 
 // Draw repaints the control on its View surface
 func (l *TableView) Draw() {
-	if l.isHidden {
+	if l.hidden {
 		return
 	}
 
-	l.block.RLock()
-	defer l.block.RUnlock()
+	l.mtx.RLock()
+	defer l.mtx.RUnlock()
 	PushAttributes()
 	defer PopAttributes()
 
@@ -559,17 +554,16 @@ func (l *TableView) EnsureColVisible() {
 
 	toShow := l.selectedCol
 	for width > 0 {
-		switch {
-		case l.columns[toShow].Width > width:
+		if l.columns[toShow].Width > width {
 			if toShow == l.selectedCol {
 				break
 			} else {
 				toShow++
 				break
 			}
-		case l.columns[toShow].Width == width:
+		} else if l.columns[toShow].Width == width {
 			break
-		default:
+		} else {
 			width -= l.columns[toShow].Width
 			if width < 0 {
 				break
@@ -646,13 +640,12 @@ func (l *TableView) mouseToCol(dx int) int {
 }
 
 func (l *TableView) horizontalScrollClick(dx int) {
-	switch {
-	case dx == 0:
+	if dx == 0 {
 		l.moveLeft(1)
 		return
-	case dx == l.width-2:
+	} else if dx == l.width-2 {
 		l.moveRight(1)
-	case dx > 0 && dx < l.width-2:
+	} else if dx > 0 && dx < l.width-2 {
 		pos := ThumbPosition(l.selectedCol, len(l.columns), l.width-1)
 		if pos < dx {
 			l.moveRight(1)
@@ -663,13 +656,12 @@ func (l *TableView) horizontalScrollClick(dx int) {
 }
 
 func (l *TableView) verticalScrollClick(dy int) {
-	switch {
-	case dy == 0:
+	if dy == 0 {
 		l.moveUp(1)
 		return
-	case dy == l.height-2:
+	} else if dy == l.height-2 {
 		l.moveDown(1)
-	case dy > 0 && dy < l.height-2:
+	} else if dy > 0 && dy < l.height-2 {
 		pos := ThumbPosition(l.selectedRow, l.rowCount, l.height-1)
 		if pos > dy {
 			l.moveUp(l.height - 3)
@@ -679,7 +671,7 @@ func (l *TableView) verticalScrollClick(dy int) {
 	}
 }
 
-func (l *TableView) processMouseClick(ev event.TEvent) bool {
+func (l *TableView) processMouseClick(ev Event) bool {
 	if ev.Key != term.MouseLeft {
 		return false
 	}
@@ -741,16 +733,15 @@ func (l *TableView) headerClicked(dx int) {
 		sort := l.columns[colID].Sort
 
 		for idx := range l.columns {
-			l.columns[idx].Sort = cons.SortNone
+			l.columns[idx].Sort = SortNone
 		}
 
-		switch {
-		case sort == cons.SortAsc:
-			sort = cons.SortDesc
-		case sort == cons.SortNone:
-			sort = cons.SortAsc
-		default:
-			sort = cons.SortNone
+		if sort == SortAsc {
+			sort = SortDesc
+		} else if sort == SortNone {
+			sort = SortAsc
+		} else {
+			sort = SortNone
 		}
 		l.columns[colID].Sort = sort
 
@@ -767,13 +758,13 @@ processes an event it should return true. If the method returns false it means
 that the control do not want or cannot process the event and the caller sends
 the event to the control parent
 */
-func (l *TableView) ProcessEvent(event event.TEvent) bool {
+func (l *TableView) ProcessEvent(event Event) bool {
 	if !l.Active() || !l.Enabled() {
 		return false
 	}
 
 	switch event.Type {
-	case cons.EventKey:
+	case EventKey:
 		if l.onKeyPress != nil {
 			res := l.onKeyPress(event.Key)
 			if res {
@@ -839,18 +830,16 @@ func (l *TableView) ProcessEvent(event event.TEvent) bool {
 				sort := l.columns[colID].Sort
 
 				for idx := range l.columns {
-					l.columns[idx].Sort = cons.SortNone
+					l.columns[idx].Sort = SortNone
 				}
 
-				switch {
-				case sort == cons.SortAsc:
-					sort = cons.SortDesc
-				case sort == cons.SortNone:
-					sort = cons.SortAsc
-				default:
-					sort = cons.SortNone
+				if sort == SortAsc {
+					sort = SortDesc
+				} else if sort == SortNone {
+					sort = SortAsc
+				} else {
+					sort = SortNone
 				}
-
 				l.columns[colID].Sort = sort
 
 				ev := TableEvent{Action: TableActionSort, Col: colID, Row: -1, Sort: sort}
@@ -859,7 +848,7 @@ func (l *TableView) ProcessEvent(event event.TEvent) bool {
 		default:
 			return false
 		}
-	case cons.EventMouse:
+	case EventMouse:
 		return l.processMouseClick(event)
 	}
 
@@ -957,9 +946,9 @@ func (l *TableView) OnKeyPress(fn func(term.Key) bool) {
 // OnDrawCell is called every time the table is going to display
 // a cell
 func (l *TableView) OnDrawCell(fn func(*ColumnDrawInfo)) {
-	l.block.Lock()
+	l.mtx.Lock()
 	l.onDrawCell = fn
-	l.block.Unlock()
+	l.mtx.Unlock()
 }
 
 // OnAction is called when the table wants a user application to
@@ -986,12 +975,11 @@ func (l *TableView) SelectedCol() int {
 // The table scrolls automatically to display the column
 func (l *TableView) SetSelectedRow(row int) {
 	oldSelection := l.selectedRow
-	switch {
-	case row >= l.rowCount:
+	if row >= l.rowCount {
 		l.selectedRow = l.rowCount - 1
-	case row < -1:
+	} else if row < -1 {
 		l.selectedRow = -1
-	default:
+	} else {
 		l.selectedRow = row
 	}
 
@@ -1007,12 +995,11 @@ func (l *TableView) SetSelectedRow(row int) {
 // The table scrolls automatically to display the column
 func (l *TableView) SetSelectedCol(col int) {
 	oldSelection := l.selectedCol
-	switch {
-	case col >= len(l.columns):
+	if col >= len(l.columns) {
 		l.selectedCol = len(l.columns) - 1
-	case col < -1:
+	} else if col < -1 {
 		l.selectedCol = -1
-	default:
+	} else {
 		l.selectedCol = col
 	}
 
@@ -1027,9 +1014,9 @@ func (l *TableView) SetSelectedCol(col int) {
 // Callback receives 4 arguments: first visible column, first visible row,
 // the number of visible columns, the number of visible rows
 func (l *TableView) OnBeforeDraw(fn func(int, int, int, int)) {
-	l.block.Lock()
+	l.mtx.Lock()
 	l.onBeforeDraw = fn
-	l.block.Unlock()
+	l.mtx.Unlock()
 }
 
 // VisibleArea returns which rows and columns are currently visible. It can be

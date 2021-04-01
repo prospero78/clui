@@ -4,10 +4,6 @@ import (
 	"math"
 
 	xs "github.com/huandu/xstrings"
-	"github.com/prospero78/goTV/tv/cons"
-	"github.com/prospero78/goTV/tv/types"
-	"github.com/prospero78/goTV/tv/widgets/event"
-	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 )
 
 /*
@@ -17,10 +13,10 @@ All area inside a frame is transparent. Frame can be used as spacer element
 is required
 */
 type Frame struct {
-	widgetbase.TWidgetBase
-	border         cons.BorderStyle
-	children       []types.IWidget
-	pack           cons.PackType
+	BaseControl
+	border         BorderStyle
+	children       []Control
+	pack           PackType
 	scrollable     bool
 	lastScrollProp int
 }
@@ -34,31 +30,30 @@ bs - type of border: no border, single or double.
 scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 control should keep its original size.
 */
-func CreateFrame(parent types.IWidget, width, height int, bs cons.BorderStyle, scale int) *Frame {
+func CreateFrame(parent Control, width, height int, bs BorderStyle, scale int) *Frame {
 	f := new(Frame)
-	f.TWidgetBase = widgetbase.New()
+	f.BaseControl = NewBaseControl()
 
-	if width == cons.AutoSize {
+	if width == AutoSize {
 		width = 5
 	}
-	if height == cons.AutoSize {
+	if height == AutoSize {
 		height = 3
 	}
 
-	if bs == cons.BorderAuto {
-		bs = cons.BorderNone
+	if bs == BorderAuto {
+		bs = BorderNone
 	}
 
 	f.SetSize(width, height)
 	f.SetConstraints(width, height)
 	f.border = bs
-	f.SetParent(parent)
+	f.parent = parent
 	f.SetTabStop(false)
-	f.SetScale(scale)
+	f.scale = scale
 
-	f.SetGaps(0, 0)
-	if bs == cons.BorderNone {
-		f.SetPaddings()
+	f.gapX, f.gapY = 0, 0
+	if bs == BorderNone {
 		f.padX, f.padY = 0, 0
 	} else {
 		f.padX, f.padY = 1, 1
@@ -77,11 +72,11 @@ func (f *Frame) SetScrollable(scrollable bool) {
 	if scrollable {
 		px, py := f.Paddings()
 
-		if f.Pack() == cons.Vertical {
+		if f.Pack() == Vertical {
 			px += 1
 		}
 
-		if f.Pack() == cons.Horizontal {
+		if f.Pack() == Horizontal {
 			py += 1
 		}
 
@@ -97,7 +92,7 @@ func (f *Frame) Scrollable() bool {
 
 // Repaint draws the control on its View surface
 func (f *Frame) Draw() {
-	if f.isHidden {
+	if f.hidden {
 		return
 	}
 
@@ -137,10 +132,10 @@ func (f *Frame) Draw() {
 		DrawScrollBar(x+w, y, 1, h, f.lastScrollProp)
 	}
 
-	fg, bg := RealColor(f.fg, f.Style(), cons.ColorViewText), RealColor(f.bg, f.Style(), cons.ColorViewBack)
+	fg, bg := RealColor(f.fg, f.Style(), ColorViewText), RealColor(f.bg, f.Style(), ColorViewBack)
 
-	if f.border == cons.BorderNone {
-		if bg != cons.ColorDefault {
+	if f.border == BorderNone {
+		if bg != ColorDefault {
 			SetBackColor(bg)
 			FillRect(x, y, w, h, ' ')
 		}
@@ -172,15 +167,15 @@ func (f *Frame) ScrollTo(x int, y int) {
 		return
 	}
 
-	f.SetX(x)
-	f.SetY(y)
+	f.x = x
+	f.y = y
 
 	f.ResizeChildren()
 	f.PlaceChildren()
 }
 
-func (f *Frame) ProcessEvent(ev event.TEvent) bool {
-	if ev.Type != cons.EventActivateChild || (!f.scrollable || ev.Target == nil) {
+func (f *Frame) ProcessEvent(ev Event) bool {
+	if ev.Type != EventActivateChild || (!f.scrollable || ev.Target == nil) {
 		return false
 	}
 
@@ -215,8 +210,8 @@ func (f *Frame) ProcessEvent(ev event.TEvent) bool {
 		xx = x + delta
 	}
 
-	f.SetX(xx)
-	f.SetY(yy)
+	f.x = xx
+	f.y = yy
 
 	f.ResizeChildren()
 	f.PlaceChildren()

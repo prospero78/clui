@@ -42,7 +42,7 @@ type EditField struct {
 // text - text to edit.
 // scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 //  control should keep its original size.
-func CreateEditField(parent types.IWidget, width int, text string, scale int) *EditField {
+func CreateEditField(parent Control, width int, text string, scale int) *EditField {
 	e := new(EditField)
 	e.BaseControl = NewBaseControl()
 	e.onChange = nil

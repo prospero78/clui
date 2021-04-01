@@ -2,12 +2,10 @@ package tv
 
 import (
 	"testing"
-
-	"github.com/prospero78/goTV/tv/cons"
 )
 
 func TestParserEmpty(t *testing.T) {
-	prs := NewColorParser("", cons.ColorBlack, cons.ColorWhite)
+	prs := NewColorParser("", ColorBlack, ColorWhite)
 
 	elem := prs.NextElement()
 
@@ -19,20 +17,20 @@ func TestParserEmpty(t *testing.T) {
 
 func TestParserColors(t *testing.T) {
 	prs := NewColorParser("a<b:green>c<t:red>d<b:>e<t:>fg\nf",
-		cons.ColorBlack, cons.ColorWhite)
+		ColorBlack, ColorWhite)
 	elems := []TextElement{
-		{ElemPrintable, 'a', cons.ColorBlack, cons.ColorWhite},
-		{ElemBackColor, ' ', cons.ColorBlack, cons.ColorGreen},
-		{ElemPrintable, 'c', cons.ColorBlack, cons.ColorGreen},
-		{ElemTextColor, 'c', cons.ColorRed, cons.ColorGreen},
-		{ElemPrintable, 'd', cons.ColorRed, cons.ColorGreen},
-		{ElemBackColor, 'd', cons.ColorRed, cons.ColorWhite},
-		{ElemPrintable, 'e', cons.ColorRed, cons.ColorWhite},
-		{ElemTextColor, 'e', cons.ColorBlack, cons.ColorWhite},
-		{ElemPrintable, 'f', cons.ColorBlack, cons.ColorWhite},
-		{ElemPrintable, 'g', cons.ColorBlack, cons.ColorWhite},
-		{ElemLineBreak, 'g', cons.ColorBlack, cons.ColorWhite},
-		{ElemPrintable, 'f', cons.ColorBlack, cons.ColorWhite},
+		{ElemPrintable, 'a', ColorBlack, ColorWhite},
+		{ElemBackColor, ' ', ColorBlack, ColorGreen},
+		{ElemPrintable, 'c', ColorBlack, ColorGreen},
+		{ElemTextColor, 'c', ColorRed, ColorGreen},
+		{ElemPrintable, 'd', ColorRed, ColorGreen},
+		{ElemBackColor, 'd', ColorRed, ColorWhite},
+		{ElemPrintable, 'e', ColorRed, ColorWhite},
+		{ElemTextColor, 'e', ColorBlack, ColorWhite},
+		{ElemPrintable, 'f', ColorBlack, ColorWhite},
+		{ElemPrintable, 'g', ColorBlack, ColorWhite},
+		{ElemLineBreak, 'g', ColorBlack, ColorWhite},
+		{ElemPrintable, 'f', ColorBlack, ColorWhite},
 	}
 
 	idx := 0

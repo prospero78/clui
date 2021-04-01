@@ -2,10 +2,6 @@ package tv
 
 import (
 	term "github.com/nsf/termbox-go"
-
-	"github.com/prospero78/goTV/tv/cons"
-	"github.com/prospero78/goTV/tv/types"
-	"github.com/prospero78/goTV/tv/widgets/event"
 )
 
 // ThumbPosition returns a scrollbar thumb position depending
@@ -61,7 +57,7 @@ func ItemByThumbPosition(position, itemCount, length int) int {
 // ChildAt returns the children of parent control that is at absolute
 // coordinates x, y. Returns nil if x, y are outside parent control and
 // returns parent if no child is at x, y
-func ChildAt(parent types.IWidget, x, y int) types.IWidget {
+func ChildAt(parent Control, x, y int) Control {
 	px, py := parent.Pos()
 	pw, ph := parent.Size()
 	if px > x || py > y || px+pw <= x || py+ph <= y {
@@ -72,10 +68,10 @@ func ChildAt(parent types.IWidget, x, y int) types.IWidget {
 		return parent
 	}
 
-	var ctrl types.IWidget
+	var ctrl Control
 	ctrl = parent
 	for _, child := range parent.Children() {
-		if child.IsHidden() {
+		if !child.Visible() {
 			continue
 		}
 
@@ -90,11 +86,11 @@ func ChildAt(parent types.IWidget, x, y int) types.IWidget {
 }
 
 // DeactivateControls makes all children of parent inactive
-func DeactivateControls(parent types.IWidget) {
+func DeactivateControls(parent Control) {
 	for _, ctrl := range parent.Children() {
 		if ctrl.Active() {
 			ctrl.SetActive(false)
-			ctrl.ProcessEvent(event.TEvent{Type: cons.EventActivate, X: 0})
+			ctrl.ProcessEvent(Event{Type: EventActivate, X: 0})
 		}
 
 		DeactivateControls(ctrl)
@@ -103,14 +99,14 @@ func DeactivateControls(parent types.IWidget) {
 
 // ActivateControl makes control active and disables all other children of
 // the parent. Returns true if control was found and activated
-func ActivateControl(parent, control types.IWidget) bool {
+func ActivateControl(parent, control Control) bool {
 	DeactivateControls(parent)
 	res := false
 	ctrl := FindChild(parent, control)
 	if ctrl != nil {
 		res = true
 		if !ctrl.Active() {
-			ctrl.ProcessEvent(event.TEvent{Type: cons.EventActivate, X: 1})
+			ctrl.ProcessEvent(Event{Type: EventActivate, X: 1})
 			ctrl.SetActive(true)
 		}
 	}
@@ -119,8 +115,8 @@ func ActivateControl(parent, control types.IWidget) bool {
 }
 
 // FindChild returns control if it is a child of the parent and nil otherwise
-func FindChild(parent, control types.IWidget) types.IWidget {
-	var res types.IWidget
+func FindChild(parent, control Control) Control {
+	var res Control
 
 	if parent == control {
 		return parent
@@ -142,11 +138,11 @@ func FindChild(parent, control types.IWidget) types.IWidget {
 }
 
 // IsMouseClickEvent returns if a user action can be treated as mouse click.
-func IsMouseClickEvent(ev event.TEvent) bool {
-	if ev.Type == cons.EventClick {
+func IsMouseClickEvent(ev Event) bool {
+	if ev.Type == EventClick {
 		return true
 	}
-	if ev.Type == cons.EventMouse && ev.Key == term.MouseLeft {
+	if ev.Type == EventMouse && ev.Key == term.MouseLeft {
 		return true
 	}
 
@@ -155,7 +151,7 @@ func IsMouseClickEvent(ev event.TEvent) bool {
 
 // FindFirstControl returns the first child for that fn returns true.
 // The function is used to find active or tab-stop control
-func FindFirstControl(parent types.IWidget, fn func(types.IWidget) bool) types.IWidget {
+func FindFirstControl(parent Control, fn func(Control) bool) Control {
 	linear := getLinearControlList(parent, fn)
 	if len(linear) == 0 {
 		return nil
@@ -167,7 +163,7 @@ func FindFirstControl(parent types.IWidget, fn func(types.IWidget) bool) types.I
 // FindLastControl returns the first child for that fn returns true.
 // The function is used by TAB processing method if a user goes backwards
 // with TAB key - not supported now
-func FindLastControl(parent types.IWidget, fn func(types.IWidget) bool) types.IWidget {
+func FindLastControl(parent Control, fn func(Control) bool) Control {
 	linear := getLinearControlList(parent, fn)
 
 	if len(linear) == 0 {
@@ -179,15 +175,15 @@ func FindLastControl(parent types.IWidget, fn func(types.IWidget) bool) types.IW
 
 // ActiveControl returns the active child of the parent or nil if no child is
 // active
-func ActiveControl(parent types.IWidget) types.IWidget {
-	fnActive := func(c types.IWidget) bool {
+func ActiveControl(parent Control) Control {
+	fnActive := func(c Control) bool {
 		return c.Active()
 	}
 	return FindFirstControl(parent, fnActive)
 }
 
 // FindFirstActiveControl returns the first active control of a parent
-func FindFirstActiveControl(parent types.IWidget) types.IWidget {
+func FindFirstActiveControl(parent Control) Control {
 	for _, curr := range getLinearControlList(parent, nil) {
 		if curr.Active() {
 			return curr
@@ -196,8 +192,8 @@ func FindFirstActiveControl(parent types.IWidget) types.IWidget {
 	return nil
 }
 
-func getLinearControlList(parent types.IWidget, fn func(types.IWidget) bool) []types.IWidget {
-	result := []types.IWidget{}
+func getLinearControlList(parent Control, fn func(Control) bool) []Control {
+	result := []Control{}
 
 	for _, curr := range parent.Children() {
 		if fn != nil && fn(curr) {
@@ -219,23 +215,23 @@ func getLinearControlList(parent types.IWidget, fn func(types.IWidget) bool) []t
 
 // NextControl returns the next or previous child (depends on next parameter)
 // that has tab-stop feature on. Used by library when processing TAB key
-func NextControl(parent types.IWidget, curr types.IWidget, next bool) types.IWidget {
-	fnTab := func(c types.IWidget) bool {
-		isVisible := func() types.AVisible {
+func NextControl(parent Control, curr Control, next bool) Control {
+	fnTab := func(c Control) bool {
+		isVisible := func() bool {
 			ctrl := c.Parent()
 
 			for ctrl != nil {
-				if ctrl.IsHidden() {
+				if !ctrl.Visible() {
 					return false
 				}
 
 				ctrl = ctrl.Parent()
 			}
 
-			return c.IsVisible()
+			return c.Visible()
 		}
 
-		return c.TabStop() && bool(isVisible()) && c.Enabled()
+		return c.TabStop() && isVisible() && c.Enabled()
 	}
 
 	linear := getLinearControlList(parent, fnTab)
@@ -276,8 +272,8 @@ func NextControl(parent types.IWidget, curr types.IWidget, next bool) types.IWid
 // makes it active, and then sends the event to it.
 // If it is not mouse click event then it looks for the first active child and
 // sends the event to it if it is not nil
-func SendEventToChild(parent types.IWidget, ev event.TEvent) bool {
-	var child types.IWidget
+func SendEventToChild(parent Control, ev Event) bool {
+	var child Control
 	if IsMouseClickEvent(ev) {
 		child = ChildAt(parent, ev.X, ev.Y)
 		if child != nil && !child.Active() {
@@ -303,22 +299,22 @@ func SendEventToChild(parent types.IWidget, ev event.TEvent) bool {
 
 // CalcClipper calculates the clipper size based on the control's size, position
 // and paddings
-func CalcClipper(c types.IWidget) (int, int, int, int) {
+func CalcClipper(c Control) (int, int, int, int) {
 	w, h := c.Size()
 	x, y := c.Pos()
 	px, py := c.Paddings()
 
-	x += px
-	y += py
-	w -= 2 * px
-	h -= 2 * py
+	x = x + px
+	y = y + py
+	w = w - 2*px
+	h = h - 2*py
 
 	return x, y, w, h
 }
 
 // ClippedParent finds the first c parent with clipped flag
-func ClippedParent(c types.IWidget) types.IWidget {
-	var clipped types.IWidget
+func ClippedParent(c Control) Control {
+	var clipped Control
 
 	ctrl := c.Parent()
 	clipped = c
@@ -336,7 +332,7 @@ func ClippedParent(c types.IWidget) types.IWidget {
 }
 
 // ControlInRect returns true if c is within a given rect
-func ControlInRect(c types.IWidget, x int, y int, w int, h int) bool {
+func ControlInRect(c Control, x int, y int, w int, h int) bool {
 	xx, yy := c.Pos()
 	ww, hh := c.Size()
 

@@ -7,11 +7,6 @@ import (
 
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
-
-	"github.com/prospero78/goTV/tv/cons"
-	"github.com/prospero78/goTV/tv/types"
-	"github.com/prospero78/goTV/tv/widgets/event"
-	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 )
 
 /*
@@ -26,7 +21,7 @@ and horizontal. The latter one is available only if WordWrap
 mode is off).
 */
 type TextView struct {
-	widgetbase.TWidgetBase
+	BaseControl
 	// own listbox members
 	lines   []string
 	lengths []int
@@ -50,14 +45,14 @@ width and height - are minimal size of the control.
 scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 control should keep its original size.
 */
-func CreateTextView(parent types.IWidget, width, height int, scale int) *TextView {
+func CreateTextView(parent Control, width, height int, scale int) *TextView {
 	l := new(TextView)
-	l.TWidgetBase = widgetbase.New()
+	l.BaseControl = NewBaseControl()
 
-	if height == cons.AutoSize {
+	if height == AutoSize {
 		height = 3
 	}
-	if width == cons.AutoSize {
+	if width == AutoSize {
 		width = 5
 	}
 
@@ -78,8 +73,8 @@ func CreateTextView(parent types.IWidget, width, height int, scale int) *TextVie
 	return l
 }
 
-func (l *TextView) outputHeight() types.AHeight {
-	h := l.GetHeight().Get()
+func (l *TextView) outputHeight() int {
+	h := l.height
 	if !l.wordWrap {
 		h--
 	}
@@ -104,9 +99,9 @@ func (l *TextView) drawText() {
 	maxWidth := l.width - 1
 	maxHeight := l.outputHeight()
 
-	bg, fg := RealColor(l.bg, l.Style(), cons.ColorEditBack), RealColor(l.fg, l.Style(), cons.ColorEditText)
+	bg, fg := RealColor(l.bg, l.Style(), ColorEditBack), RealColor(l.fg, l.Style(), ColorEditText)
 	if l.Active() {
-		bg, fg = RealColor(l.bg, l.Style(), cons.ColorEditActiveBack), RealColor(l.fg, l.Style(), cons.ColorEditActiveText)
+		bg, fg = RealColor(l.bg, l.Style(), ColorEditActiveBack), RealColor(l.fg, l.Style(), ColorEditActiveText)
 	}
 
 	SetTextColor(fg)
@@ -124,7 +119,8 @@ func (l *TextView) drawText() {
 			remained := l.lengths[lineID]
 			start := 0
 			for remained > 0 {
-				s := SliceColorized(l.lines[lineID], start, start+maxWidth)
+				var s string
+				s = SliceColorized(l.lines[lineID], start, start+maxWidth)
 
 				if linePos >= l.topLine {
 					DrawText(l.x, l.y+y, s)
@@ -175,7 +171,7 @@ func (l *TextView) drawText() {
 
 // Repaint draws the control on its View surface
 func (l *TextView) Draw() {
-	if l.isHidden {
+	if l.hidden {
 		return
 	}
 
@@ -185,9 +181,9 @@ func (l *TextView) Draw() {
 	x, y := l.Pos()
 	w, h := l.Size()
 
-	bg, fg := RealColor(l.bg, l.Style(), cons.ColorEditBack), RealColor(l.fg, l.Style(), cons.ColorEditText)
+	bg, fg := RealColor(l.bg, l.Style(), ColorEditBack), RealColor(l.fg, l.Style(), ColorEditText)
 	if l.Active() {
-		bg, fg = RealColor(l.bg, l.Style(), cons.ColorEditActiveBack), RealColor(l.fg, l.Style(), cons.ColorEditActiveText)
+		bg, fg = RealColor(l.bg, l.Style(), ColorEditActiveBack), RealColor(l.fg, l.Style(), ColorEditActiveText)
 	}
 
 	SetTextColor(fg)
@@ -261,7 +257,7 @@ func (l *TextView) moveRight() {
 	l.leftShift++
 }
 
-func (l *TextView) processMouseClick(ev event.TEvent) bool {
+func (l *TextView) processMouseClick(ev Event) bool {
 	if ev.Key != term.MouseLeft {
 		return false
 	}
@@ -285,12 +281,11 @@ func (l *TextView) processMouseClick(ev event.TEvent) bool {
 
 	// vertical scroll bar
 	if dx == l.width-1 {
-		switch {
-		case dy == 0:
+		if dy == 0 {
 			l.moveUp(1)
-		case dy == yy-1:
+		} else if dy == yy-1 {
 			l.moveDown(1)
-		default:
+		} else {
 			newPos := ItemByThumbPosition(dy, l.virtualHeight-yy+1, yy)
 			if newPos >= 0 {
 				l.topLine = newPos
@@ -301,12 +296,11 @@ func (l *TextView) processMouseClick(ev event.TEvent) bool {
 	}
 
 	// horizontal scrollbar
-	switch {
-	case dx == 0:
+	if dx == 0 {
 		l.moveLeft()
-	case dx == l.width-2:
+	} else if dx == l.width-2 {
 		l.moveRight()
-	default:
+	} else {
 		newPos := ItemByThumbPosition(dx, l.virtualWidth-l.width+2, l.width-1)
 		if newPos >= 0 {
 			l.leftShift = newPos
@@ -322,13 +316,13 @@ processes an event it should return true. If the method returns false it means
 that the control do not want or cannot process the event and the caller sends
 the event to the control parent
 */
-func (l *TextView) ProcessEvent(event event.TEvent) bool {
+func (l *TextView) ProcessEvent(event Event) bool {
 	if !l.Active() || !l.Enabled() {
 		return false
 	}
 
 	switch event.Type {
-	case cons.EventKey:
+	case EventKey:
 		switch event.Key {
 		case term.KeyHome:
 			l.home()
@@ -355,7 +349,7 @@ func (l *TextView) ProcessEvent(event event.TEvent) bool {
 		default:
 			return false
 		}
-	case cons.EventMouse:
+	case EventMouse:
 		return l.processMouseClick(event)
 	}
 

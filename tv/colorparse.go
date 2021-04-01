@@ -2,7 +2,6 @@ package tv
 
 import (
 	term "github.com/nsf/termbox-go"
-	"github.com/prospero78/goTV/tv/cons"
 )
 
 // TextElementType type of the parsed element of the string
@@ -86,14 +85,13 @@ func (p *ColorParser) parseColor() (term.Attribute, TextElementType, bool) {
 		switch step {
 		case StepType:
 			c := p.text[newIdx]
-			switch {
-			case c == 't' || c == 'f' || c == 'c':
+			if c == 't' || c == 'f' || c == 'c' {
 				t = ElemTextColor
-			case c == 'b':
+			} else if c == 'b' {
 				t = ElemBackColor
-			default:
+			} else {
 				ok = false
-				goto break0
+				break
 			}
 			step = StepColon
 			newIdx++
@@ -101,7 +99,7 @@ func (p *ColorParser) parseColor() (term.Attribute, TextElementType, bool) {
 			c := p.text[newIdx]
 			if c != ':' {
 				ok = false
-				goto break0
+				break
 			}
 			newIdx++
 			step = StepValue
@@ -110,12 +108,12 @@ func (p *ColorParser) parseColor() (term.Attribute, TextElementType, bool) {
 			if c == '>' {
 				p.index = newIdx + 1
 				if cText == "" {
-					attr = cons.ColorDefault
+					attr = ColorDefault
 				} else {
 					attr = StringToColor(cText)
 				}
-				done = true // FIXME: нигде не используется
-				goto break0
+				done = true
+				break
 			} else {
 				if c != ' ' || cText != "" {
 					cText += string(c)
@@ -123,11 +121,12 @@ func (p *ColorParser) parseColor() (term.Attribute, TextElementType, bool) {
 				newIdx++
 			}
 		}
+
 		if done || !ok {
-			goto break0
+			break
 		}
 	}
-break0:
+
 	return attr, t, ok
 }
 
@@ -154,13 +153,13 @@ func (p *ColorParser) NextElement() TextElement {
 	}
 
 	if atype == ElemBackColor {
-		if attr == cons.ColorDefault {
+		if attr == ColorDefault {
 			p.currBack = p.defBack
 		} else {
 			p.currBack = attr
 		}
 	} else if atype == ElemTextColor {
-		if attr == cons.ColorDefault {
+		if attr == ColorDefault {
 			p.currText = p.defText
 		} else {
 			p.currText = attr

@@ -4,10 +4,6 @@ import (
 	"fmt"
 	// xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
-
-	"github.com/prospero78/goTV/tv/cons"
-	"github.com/prospero78/goTV/tv/types"
-	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 )
 
 /*
@@ -30,7 +26,7 @@ AutoScale to false and Top value to 100.
 Note: negative and zero values are displayed as empty bar
 */
 type SparkChart struct {
-	widgetbase.TWidgetBase
+	BaseControl
 	data         []float64
 	valueWidth   int
 	hiliteMax    bool
@@ -47,14 +43,14 @@ w and h - are minimal size of the control.
 scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 control should keep its original size.
 */
-func CreateSparkChart(parent types.IWidget, w, h int, scale int) *SparkChart {
+func CreateSparkChart(parent Control, w, h int, scale int) *SparkChart {
 	c := new(SparkChart)
-	c.TWidgetBase = widgetbase.New()
+	c.BaseControl = NewBaseControl()
 
-	if w == cons.AutoSize {
+	if w == AutoSize {
 		w = 10
 	}
-	if h == cons.AutoSize {
+	if h == AutoSize {
 		h = 5
 	}
 
@@ -62,7 +58,7 @@ func CreateSparkChart(parent types.IWidget, w, h int, scale int) *SparkChart {
 
 	c.SetSize(w, h)
 	c.SetConstraints(w, h)
-	c.isTabSkip = true
+	c.tabSkip = true
 	c.hiliteMax = true
 	c.autosize = true
 	c.data = make([]float64, 0)
@@ -77,17 +73,17 @@ func CreateSparkChart(parent types.IWidget, w, h int, scale int) *SparkChart {
 
 // Draw repaints the control on its View surface
 func (b *SparkChart) Draw() {
-	if b.isHidden {
+	if b.hidden {
 		return
 	}
 
-	b.block.RLock()
-	defer b.block.RUnlock()
+	b.mtx.RLock()
+	defer b.mtx.RUnlock()
 
 	PushAttributes()
 	defer PopAttributes()
 
-	fg, bg := RealColor(b.fg, b.Style(), cons.ColorSparkChartText), RealColor(b.bg, b.Style(), cons.ColorSparkChartBack)
+	fg, bg := RealColor(b.fg, b.Style(), ColorSparkChartText), RealColor(b.bg, b.Style(), ColorSparkChartBack)
 	SetTextColor(fg)
 	SetBackColor(bg)
 	FillRect(b.x, b.y, b.width, b.height, ' ')
@@ -121,9 +117,9 @@ func (b *SparkChart) drawBars() {
 	h := b.height
 	pos := b.x + start
 
-	mxFg, mxBg := RealColor(b.maxFg, b.Style(), cons.ColorSparkChartMaxText), RealColor(b.maxBg, b.Style(), cons.ColorSparkChartMaxBack)
-	brFg, brBg := RealColor(b.fg, b.Style(), cons.ColorSparkChartBarText), RealColor(b.bg, b.Style(), cons.ColorSparkChartBarBack)
-	parts := []rune(SysObject(cons.ObjSparkChart))
+	mxFg, mxBg := RealColor(b.maxFg, b.Style(), ColorSparkChartMaxText), RealColor(b.maxBg, b.Style(), ColorSparkChartMaxBack)
+	brFg, brBg := RealColor(b.fg, b.Style(), ColorSparkChartBarText), RealColor(b.bg, b.Style(), ColorSparkChartBarBack)
+	parts := []rune(SysObject(ObjSparkChart))
 
 	var dt []float64
 	if len(b.data) > width {
@@ -188,7 +184,7 @@ func (b *SparkChart) calculateBarArea() (int, int) {
 	pos := 0
 
 	if b.valueWidth < w/2 {
-		w -= b.valueWidth
+		w = w - b.valueWidth
 		pos = b.valueWidth
 	}
 
@@ -224,8 +220,8 @@ func (b *SparkChart) calculateMultiplier() (float64, float64) {
 
 // AddData appends a new bar to a chart
 func (b *SparkChart) AddData(val float64) {
-	b.block.Lock()
-	defer b.block.Unlock()
+	b.mtx.Lock()
+	defer b.mtx.Unlock()
 
 	b.data = append(b.data, val)
 
@@ -237,16 +233,16 @@ func (b *SparkChart) AddData(val float64) {
 
 // ClearData removes all bar from chart
 func (b *SparkChart) ClearData() {
-	b.block.Lock()
-	defer b.block.Unlock()
+	b.mtx.Lock()
+	defer b.mtx.Unlock()
 
 	b.data = make([]float64, 0)
 }
 
 // SetData assigns a new bar list to a chart
 func (b *SparkChart) SetData(data []float64) {
-	b.block.Lock()
-	defer b.block.Unlock()
+	b.mtx.Lock()
+	defer b.mtx.Unlock()
 
 	b.data = make([]float64, len(data))
 	copy(b.data, data)
@@ -266,8 +262,8 @@ func (b *SparkChart) ValueWidth() int {
 
 // SetValueWidth changes width of the value panel on the left
 func (b *SparkChart) SetValueWidth(width int) {
-	b.block.Lock()
-	defer b.block.Unlock()
+	b.mtx.Lock()
+	defer b.mtx.Unlock()
 
 	b.valueWidth = width
 }
@@ -281,8 +277,8 @@ func (b *SparkChart) Top() float64 {
 // SetTop sets the theoretical highest value of data flow
 // to scale the chart
 func (b *SparkChart) SetTop(top float64) {
-	b.block.Lock()
-	defer b.block.Unlock()
+	b.mtx.Lock()
+	defer b.mtx.Unlock()
 
 	b.topValue = top
 }
@@ -295,8 +291,8 @@ func (b *SparkChart) AutoScale() bool {
 
 // SetAutoScale changes the way of scaling the data flow
 func (b *SparkChart) SetAutoScale(auto bool) {
-	b.block.Lock()
-	defer b.block.Unlock()
+	b.mtx.Lock()
+	defer b.mtx.Unlock()
 
 	b.autosize = auto
 }
@@ -310,8 +306,8 @@ func (b *SparkChart) HilitePeaks() bool {
 // SetHilitePeaks enables or disables hiliting maximum
 // values with different colors
 func (b *SparkChart) SetHilitePeaks(hilite bool) {
-	b.block.Lock()
-	defer b.block.Unlock()
+	b.mtx.Lock()
+	defer b.mtx.Unlock()
 
 	b.hiliteMax = hilite
 }

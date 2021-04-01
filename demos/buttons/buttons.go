@@ -1,68 +1,67 @@
 package main
 
 import (
-	"github.com/prospero78/goTV/tv"
-	"github.com/prospero78/goTV/tv/cons"
+	ui "github.com/prospero78/goTV/tv"
 )
 
 func createView() {
-	view := tv.AddWindow(0, 0, 10, 7, "Button` Demo")
-	view.SetTitleButtons(cons.ButtonMaximize | cons.ButtonClose)
+	view := ui.AddWindow(0, 0, 10, 7, "Button` Demo")
+	view.SetTitleButtons(ui.ButtonMaximize | ui.ButtonClose)
 
-	frmViews := tv.CreateFrame(view, 8, 5, cons.BorderNone, cons.Fixed)
-	frmViews.SetPack(cons.Horizontal)
-	frmFull := tv.CreateFrame(frmViews, 8, 5, cons.BorderThin, cons.Fixed)
-	frmFull.SetPack(cons.Vertical)
+	frmViews := ui.CreateFrame(view, 8, 5, ui.BorderNone, ui.Fixed)
+	frmViews.SetPack(ui.Horizontal)
+	frmFull := ui.CreateFrame(frmViews, 8, 5, ui.BorderThin, ui.Fixed)
+	frmFull.SetPack(ui.Vertical)
 	frmFull.SetTitle("Full")
-	frmHalf := tv.CreateFrame(frmViews, 8, 5, cons.BorderThin, cons.Fixed)
-	frmHalf.SetPack(cons.Vertical)
+	frmHalf := ui.CreateFrame(frmViews, 8, 5, ui.BorderThin, ui.Fixed)
+	frmHalf.SetPack(ui.Vertical)
 	frmHalf.SetTitle("Half")
-	frmNone := tv.CreateFrame(frmViews, 8, 5, cons.BorderThin, cons.Fixed)
-	frmNone.SetPack(cons.Vertical)
+	frmNone := ui.CreateFrame(frmViews, 8, 5, ui.BorderThin, ui.Fixed)
+	frmNone.SetPack(ui.Vertical)
 	frmNone.SetTitle("None")
 
-	btnF1 := tv.CreateButton(frmFull, cons.AutoSize, 4, "First", cons.Fixed)
-	btnF2 := tv.CreateButton(frmFull, cons.AutoSize, 4, "Second", cons.Fixed)
-	btnF3 := tv.CreateButton(frmFull, cons.AutoSize, 4, "Quit", cons.Fixed)
-	btnF1.SetShadowType(cons.ShadowFull)
-	btnF2.SetShadowType(cons.ShadowFull)
-	btnF3.SetShadowType(cons.ShadowFull)
-	btnH1 := tv.CreateButton(frmHalf, cons.AutoSize, 4, "First", cons.Fixed)
-	btnH2 := tv.CreateButton(frmHalf, cons.AutoSize, 4, "Second", cons.Fixed)
-	btnH3 := tv.CreateButton(frmHalf, cons.AutoSize, 4, "Quit", cons.Fixed)
-	btnH1.SetShadowType(cons.ShadowHalf)
-	btnH2.SetShadowType(cons.ShadowHalf)
-	btnH3.SetShadowType(cons.ShadowHalf)
-	btnN1 := tv.CreateButton(frmNone, cons.AutoSize, 4, "First", cons.Fixed)
-	btnN2 := tv.CreateButton(frmNone, cons.AutoSize, 4, "Second", cons.Fixed)
-	btnN3 := tv.CreateButton(frmNone, cons.AutoSize, 4, "Quit", cons.Fixed)
-	btnN1.SetShadowType(cons.ShadowNone)
-	btnN2.SetShadowType(cons.ShadowNone)
-	btnN3.SetShadowType(cons.ShadowNone)
+	btnF1 := ui.CreateButton(frmFull, ui.AutoSize, 4, "First", ui.Fixed)
+	btnF2 := ui.CreateButton(frmFull, ui.AutoSize, 4, "Second", ui.Fixed)
+	btnF3 := ui.CreateButton(frmFull, ui.AutoSize, 4, "Quit", ui.Fixed)
+	btnF1.SetShadowType(ui.ShadowFull)
+	btnF2.SetShadowType(ui.ShadowFull)
+	btnF3.SetShadowType(ui.ShadowFull)
+	btnH1 := ui.CreateButton(frmHalf, ui.AutoSize, 4, "First", ui.Fixed)
+	btnH2 := ui.CreateButton(frmHalf, ui.AutoSize, 4, "Second", ui.Fixed)
+	btnH3 := ui.CreateButton(frmHalf, ui.AutoSize, 4, "Quit", ui.Fixed)
+	btnH1.SetShadowType(ui.ShadowHalf)
+	btnH2.SetShadowType(ui.ShadowHalf)
+	btnH3.SetShadowType(ui.ShadowHalf)
+	btnN1 := ui.CreateButton(frmNone, ui.AutoSize, 4, "First", ui.Fixed)
+	btnN2 := ui.CreateButton(frmNone, ui.AutoSize, 4, "Second", ui.Fixed)
+	btnN3 := ui.CreateButton(frmNone, ui.AutoSize, 4, "Quit", ui.Fixed)
+	btnN1.SetShadowType(ui.ShadowNone)
+	btnN2.SetShadowType(ui.ShadowNone)
+	btnN3.SetShadowType(ui.ShadowNone)
 
-	btnF3.OnClick(func(ev cons.Event) {
-		go tv.Stop()
+	btnF3.OnClick(func(ev ui.Event) {
+		go ui.Stop()
 	})
-	btnH3.OnClick(func(ev cons.Event) {
-		go tv.Stop()
+	btnH3.OnClick(func(ev ui.Event) {
+		go ui.Stop()
 	})
-	btnN3.OnClick(func(ev cons.Event) {
-		go tv.Stop()
+	btnN3.OnClick(func(ev ui.Event) {
+		go ui.Stop()
 	})
 
-	tv.ActivateControl(view, btnF1)
+	ui.ActivateControl(view, btnF1)
 }
 
 func mainLoop() {
 	// Every application must create a single Composer and
 	// call its intialize method
-	tv.InitLibrary()
-	defer tv.DeinitLibrary()
+	ui.InitLibrary()
+	defer ui.DeinitLibrary()
 
 	createView()
 
 	// start event processing loop - the main core of the library
-	tv.MainLoop()
+	ui.MainLoop()
 }
 
 func main() {

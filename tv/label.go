@@ -2,9 +2,6 @@ package tv
 
 import (
 	xs "github.com/huandu/xstrings"
-	"github.com/prospero78/goTV/tv/cons"
-	"github.com/prospero78/goTV/tv/types"
-	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 )
 
 /*
@@ -16,10 +13,10 @@ of alignment feature: if text is longer than Label width the text
 is always left aligned
 */
 type Label struct {
-	widgetbase.TWidgetBase
-	direction   cons.Direction
+	BaseControl
+	direction   Direction
 	multiline   bool
-	textDisplay types.AAlign
+	textDisplay Align
 }
 
 /*
@@ -31,14 +28,14 @@ title - is Label title.
 scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 control should keep its original size.
 */
-func CreateLabel(parent types.IWidget, w, h int, title string, scale int) *Label {
+func CreateLabel(parent Control, w, h int, title string, scale int) *Label {
 	c := new(Label)
-	c.TWidgetBase = widgetbase.New()
+	c.BaseControl = NewBaseControl()
 
-	if w == cons.AutoSize {
+	if w == AutoSize {
 		w = xs.Len(title)
 	}
-	if h == cons.AutoSize {
+	if h == AutoSize {
 		h = 1
 	}
 
@@ -48,8 +45,8 @@ func CreateLabel(parent types.IWidget, w, h int, title string, scale int) *Label
 	c.SetSize(w, h)
 	c.SetConstraints(w, h)
 	c.SetScale(scale)
-	c.isTabSkip = true
-	c.textDisplay = cons.AlignLeft
+	c.tabSkip = true
+	c.textDisplay = AlignLeft
 
 	if parent != nil {
 		parent.AddChild(c)
@@ -59,31 +56,31 @@ func CreateLabel(parent types.IWidget, w, h int, title string, scale int) *Label
 }
 
 // Direction returns direction of text output: vertical or horizontal
-func (l *Label) Direction() cons.Direction {
+func (l *Label) Direction() Direction {
 	return l.direction
 }
 
 // SetDirection sets the text output direction
-func (l *Label) SetDirection(dir cons.Direction) {
+func (l *Label) SetDirection(dir Direction) {
 	l.direction = dir
 }
 
 func (l *Label) Draw() {
-	if l.IsHidden() {
+	if l.hidden {
 		return
 	}
 
 	PushAttributes()
 	defer PopAttributes()
 
-	fg, bg := RealColor(l.fg, l.Style(), cons.ColorText), RealColor(l.bg, l.Style(), cons.ColorBack)
+	fg, bg := RealColor(l.fg, l.Style(), ColorText), RealColor(l.bg, l.Style(), ColorBack)
 	if !l.Enabled() {
-		fg = RealColor(l.fg, l.Style(), cons.ColorDisabledText)
+		fg = RealColor(l.fg, l.Style(), ColorDisabledText)
 	}
 
 	SetTextColor(fg)
 	SetBackColor(bg)
-	FillRect(l.GetX(), l.GetY(), l.GetWidth(), l.GetHidth(), ' ')
+	FillRect(l.x, l.y, l.width, l.height, ' ')
 
 	if l.title == "" {
 		return
@@ -92,9 +89,9 @@ func (l *Label) Draw() {
 	if l.multiline {
 		parser := NewColorParser(l.title, fg, bg)
 		elem := parser.NextElement()
-		xx, yy := l.GetX(), l.y
+		xx, yy := l.x, l.y
 		for elem.Type != ElemEndOfText {
-			if xx >= l.GetX()+l.width || yy >= l.y+l.height {
+			if xx >= l.x+l.width || yy >= l.y+l.height {
 				break
 			}
 
@@ -106,7 +103,7 @@ func (l *Label) Draw() {
 				SetBackColor(elem.Bg)
 				putCharUnsafe(xx, yy, elem.Ch)
 
-				if l.direction == cons.Horizontal {
+				if l.direction == Horizontal {
 					xx += 1
 					if xx >= l.x+l.width {
 						xx = l.x
@@ -124,7 +121,7 @@ func (l *Label) Draw() {
 			elem = parser.NextElement()
 		}
 	} else {
-		if l.direction == cons.Horizontal {
+		if l.direction == Horizontal {
 			shift, str := AlignColorizedText(l.title, l.width, l.align)
 			if str != l.title && l.align != l.textDisplay {
 				shift, str = AlignColorizedText(l.title, l.width, l.textDisplay)
@@ -158,7 +155,7 @@ func (l *Label) SetMultiline(multi bool) {
 // - AlignLeft - the head of the title is shown
 // - AlignRight - the tail of the title is shown
 // The property is used only by single line Label
-func (l *Label) TextDisplay() cons.Align {
+func (l *Label) TextDisplay() Align {
 	return l.textDisplay
 }
 
@@ -166,8 +163,8 @@ func (l *Label) TextDisplay() cons.Align {
 // is longer than the lable. Only AlignLeft and AlignRigth are valid values
 // for the property. Any other value does is skipped and does not affect
 // displaying the title
-func (l *Label) SetTextDisplay(align cons.Align) {
-	if align != cons.AlignLeft && align != cons.AlignRight {
+func (l *Label) SetTextDisplay(align Align) {
+	if align != AlignLeft && align != AlignRight {
 		return
 	}
 

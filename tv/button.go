@@ -6,11 +6,6 @@ import (
 
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
-
-	"github.com/prospero78/goTV/tv/cons"
-	"github.com/prospero78/goTV/tv/types"
-	"github.com/prospero78/goTV/tv/widgets/event"
-	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 )
 
 /*
@@ -19,11 +14,11 @@ emits OnClick event. Event has only one valid field Sender.
 Button can be clicked with mouse or using space on keyboard while the Button is active.
 */
 type Button struct {
-	widgetbase.TWidgetBase
+	BaseControl
 	shadowColor term.Attribute
 	pressed     int32
-	shadowType  cons.ButtonShadow
-	onClick     func(event.TEvent)
+	shadowType  ButtonShadow
+	onClick     func(Event)
 }
 
 /*
@@ -35,17 +30,17 @@ title - button title.
 scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 control should keep its original size.
 */
-func CreateButton(parent types.IWidget, width, height int, title string, scale int) *Button {
+func CreateButton(parent Control, width, height int, title string, scale int) *Button {
 	b := new(Button)
-	b.TWidgetBase = widgetbase.New()
+	b.BaseControl = NewBaseControl()
 
 	b.parent = parent
-	b.align = cons.AlignCenter
+	b.align = AlignCenter
 
-	if height == cons.AutoSize {
+	if height == AutoSize {
 		height = 4
 	}
-	if width == cons.AutoSize {
+	if width == AutoSize {
 		width = xs.Len(title) + 2 + 1
 	}
 
@@ -70,40 +65,39 @@ func CreateButton(parent types.IWidget, width, height int, title string, scale i
 
 // Repaint draws the control on its View surface
 func (b *Button) Draw() {
-	if b.IsHidden() {
+	if b.hidden {
 		return
 	}
 
-	b.block.RLock()
-	defer b.block.RUnlock()
+	b.mtx.RLock()
+	defer b.mtx.RUnlock()
 	PushAttributes()
 	defer PopAttributes()
 
-	x, y := b.GetPos()
+	x, y := b.Pos()
 	w, h := b.Size()
 
 	fg, bg := b.fg, b.bg
-	shadow := RealColor(b.shadowColor, b.Style(), cons.ColorButtonShadow)
-	switch {
-	case b.IsDisabled():
-		fg, bg = RealColor(fg, b.Style(), cons.ColorButtonDisabledText), RealColor(bg, b.Style(), cons.ColorButtonDisabledBack)
-	case b.Active():
-		fg, bg = RealColor(b.fgActive, b.Style(), cons.ColorButtonActiveText), RealColor(b.bgActive, b.Style(), cons.ColorButtonActiveBack)
-	default:
-		fg, bg = RealColor(fg, b.Style(), cons.ColorButtonText), RealColor(bg, b.Style(), cons.ColorButtonBack)
+	shadow := RealColor(b.shadowColor, b.Style(), ColorButtonShadow)
+	if b.disabled {
+		fg, bg = RealColor(fg, b.Style(), ColorButtonDisabledText), RealColor(bg, b.Style(), ColorButtonDisabledBack)
+	} else if b.Active() {
+		fg, bg = RealColor(b.fgActive, b.Style(), ColorButtonActiveText), RealColor(b.bgActive, b.Style(), ColorButtonActiveBack)
+	} else {
+		fg, bg = RealColor(fg, b.Style(), ColorButtonText), RealColor(bg, b.Style(), ColorButtonBack)
 	}
 
-	dy := (h - 1) / 2
+	dy := int((h - 1) / 2)
 	SetTextColor(fg)
 	shift, text := AlignColorizedText(b.title, w-1, b.align)
 	if b.isPressed() == 0 {
 		switch b.shadowType {
-		case cons.ShadowFull:
+		case ShadowFull:
 			SetBackColor(shadow)
 			FillRect(x+1, y+h-1, w-1, 1, ' ')
 			FillRect(x+w-1, y+1, 1, h-1, ' ')
-		case cons.ShadowHalf:
-			parts := []rune(SysObject(cons.ObjButton))
+		case ShadowHalf:
+			parts := []rune(SysObject(ObjButton))
 			var bottomCh, rightCh rune
 			if len(parts) < 2 {
 				bottomCh, rightCh = '▀', '█'
@@ -139,15 +133,15 @@ processes an event it should return true. If the method returns false it means
 that the control do not want or cannot process the event and the caller sends
 the event to the control parent
 */
-func (b *Button) ProcessEvent(_event event.TEvent) bool {
+func (b *Button) ProcessEvent(event Event) bool {
 	if !b.Enabled() {
 		return false
 	}
 
-	if _event.Type == cons.EventKey {
-		if _event.Key == term.KeySpace && b.isPressed() == 0 {
+	if event.Type == EventKey {
+		if event.Key == term.KeySpace && b.isPressed() == 0 {
 			b.setPressed(1)
-			ev := event.TEvent{Type: cons.EventRedraw}
+			ev := Event{Type: EventRedraw}
 
 			go func() {
 				PutEvent(ev)
@@ -157,24 +151,24 @@ func (b *Button) ProcessEvent(_event event.TEvent) bool {
 			}()
 
 			if b.onClick != nil {
-				b.onClick(_event)
+				b.onClick(event)
 			}
 			return true
-		} else if _event.Key == term.KeyEsc && b.isPressed() != 0 {
+		} else if event.Key == term.KeyEsc && b.isPressed() != 0 {
 			b.setPressed(0)
 			ReleaseEvents()
 			return true
 		}
-	} else if _event.Type == cons.EventMouse {
-		if _event.Key == term.MouseLeft {
+	} else if event.Type == EventMouse {
+		if event.Key == term.MouseLeft {
 			b.setPressed(1)
 			GrabEvents(b)
 			return true
-		} else if _event.Key == term.MouseRelease && b.isPressed() != 0 {
+		} else if event.Key == term.MouseRelease && b.isPressed() != 0 {
 			ReleaseEvents()
-			if _event.X >= b.GetX() && _event.Y >= b.GetY() && _event.X < b.GetX()+b.GetWidth() && _event.Y < b.GetY()+b.GetHidth() {
+			if event.X >= b.x && event.Y >= b.y && event.X < b.x+b.width && event.Y < b.y+b.height {
 				if b.onClick != nil {
-					b.onClick(_event)
+					b.onClick(event)
 				}
 			}
 			b.setPressed(0)
@@ -187,18 +181,18 @@ func (b *Button) ProcessEvent(_event event.TEvent) bool {
 
 // OnClick sets the callback that is called when one clicks button
 // with mouse or pressing space on keyboard while the button is active
-func (b *Button) OnClick(fn func(event.TEvent)) {
+func (b *Button) OnClick(fn func(Event)) {
 	b.onClick = fn
 }
 
 // ShadowType returns type of a show the button drops
-func (b *Button) ShadowType() cons.ButtonShadow {
+func (b *Button) ShadowType() ButtonShadow {
 	return b.shadowType
 }
 
 // SetShadowType changes the shadow the button drops
-func (b *Button) SetShadowType(sh cons.ButtonShadow) {
-	b.block.Lock()
+func (b *Button) SetShadowType(sh ButtonShadow) {
+	b.mtx.Lock()
 	b.shadowType = sh
-	b.block.Unlock()
+	b.mtx.Unlock()
 }

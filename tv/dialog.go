@@ -2,10 +2,6 @@ package tv
 
 import (
 	term "github.com/nsf/termbox-go"
-
-	"github.com/prospero78/goTV/tv/cons"
-	"github.com/prospero78/goTV/tv/widgets/event"
-	"github.com/prospero78/goTV/tv/widgets/window"
 )
 
 // ConfirmationDialog is a simple dialog to get a user
@@ -15,7 +11,7 @@ import (
 // The dialog is modal, so a user cannot interact other
 // Views until the user closes the dialog
 type ConfirmationDialog struct {
-	View    *window.TWindow
+	View    *Window
 	result  int
 	onClose func()
 }
@@ -26,14 +22,14 @@ type ConfirmationDialog struct {
 // The dialog is modal, so a user cannot interact other
 // Views until the user closes the dialog
 type SelectDialog struct {
-	View      *window.TWindow
+	View      *Window
 	result    int
 	value     int
 	edtResult string
 	rg        *RadioGroup
 	list      *ListBox
 	edit      *EditField
-	typ       cons.SelectDialogType
+	typ       SelectDialogType
 	onClose   func()
 }
 
@@ -69,23 +65,23 @@ func CreateConfirmationDialog(title, question string, buttons []string, defaultB
 	defer WindowManager().EndUpdate()
 	dlg.View.SetConstraints(30, 3)
 	dlg.View.SetModal(true)
-	dlg.View.SetPack(cons.Vertical)
-	CreateFrame(dlg.View, 1, 1, cons.BorderNone, cons.Fixed)
+	dlg.View.SetPack(Vertical)
+	CreateFrame(dlg.View, 1, 1, BorderNone, Fixed)
 
-	fbtn := CreateFrame(dlg.View, 1, 1, cons.BorderNone, 1)
-	CreateFrame(fbtn, 1, 1, cons.BorderNone, cons.Fixed)
+	fbtn := CreateFrame(dlg.View, 1, 1, BorderNone, 1)
+	CreateFrame(fbtn, 1, 1, BorderNone, Fixed)
 	lb := CreateLabel(fbtn, 10, 3, question, 1)
 	lb.SetMultiline(true)
-	CreateFrame(fbtn, 1, 1, cons.BorderNone, cons.Fixed)
+	CreateFrame(fbtn, 1, 1, BorderNone, Fixed)
 
-	CreateFrame(dlg.View, 1, 1, cons.BorderNone, cons.Fixed)
-	frm1 := CreateFrame(dlg.View, 16, 4, cons.BorderNone, cons.Fixed)
-	CreateFrame(frm1, 1, 1, cons.BorderNone, 1)
+	CreateFrame(dlg.View, 1, 1, BorderNone, Fixed)
+	frm1 := CreateFrame(dlg.View, 16, 4, BorderNone, Fixed)
+	CreateFrame(frm1, 1, 1, BorderNone, 1)
 
 	bText := buttons[0]
-	btn1 := CreateButton(frm1, cons.AutoSize, cons.AutoSize, bText, cons.Fixed)
-	btn1.OnClick(func(ev event.TEvent) {
-		dlg.result = cons.DialogButton1
+	btn1 := CreateButton(frm1, AutoSize, AutoSize, bText, Fixed)
+	btn1.OnClick(func(ev Event) {
+		dlg.result = DialogButton1
 
 		WindowManager().DestroyWindow(dlg.View)
 		WindowManager().BeginUpdate()
@@ -98,10 +94,10 @@ func CreateConfirmationDialog(title, question string, buttons []string, defaultB
 	var btn2, btn3 *Button
 
 	if len(buttons) > 1 {
-		CreateFrame(frm1, 1, 1, cons.BorderNone, 1)
-		btn2 = CreateButton(frm1, cons.AutoSize, cons.AutoSize, buttons[1], cons.Fixed)
-		btn2.OnClick(func(ev event.TEvent) {
-			dlg.result = cons.DialogButton2
+		CreateFrame(frm1, 1, 1, BorderNone, 1)
+		btn2 = CreateButton(frm1, AutoSize, AutoSize, buttons[1], Fixed)
+		btn2.OnClick(func(ev Event) {
+			dlg.result = DialogButton2
 			WindowManager().DestroyWindow(dlg.View)
 			if dlg.onClose != nil {
 				dlg.onClose()
@@ -109,10 +105,10 @@ func CreateConfirmationDialog(title, question string, buttons []string, defaultB
 		})
 	}
 	if len(buttons) > 2 {
-		CreateFrame(frm1, 1, 1, cons.BorderNone, 1)
-		btn3 = CreateButton(frm1, cons.AutoSize, cons.AutoSize, buttons[2], cons.Fixed)
-		btn3.OnClick(func(ev event.TEvent) {
-			dlg.result = cons.DialogButton3
+		CreateFrame(frm1, 1, 1, BorderNone, 1)
+		btn3 = CreateButton(frm1, AutoSize, AutoSize, buttons[2], Fixed)
+		btn3.OnClick(func(ev Event) {
+			dlg.result = DialogButton3
 			WindowManager().DestroyWindow(dlg.View)
 			if dlg.onClose != nil {
 				dlg.onClose()
@@ -120,19 +116,19 @@ func CreateConfirmationDialog(title, question string, buttons []string, defaultB
 		})
 	}
 
-	CreateFrame(frm1, 1, 1, cons.BorderNone, 1)
-	switch {
-	case defaultButton == cons.DialogButton2 && len(buttons) > 1:
+	CreateFrame(frm1, 1, 1, BorderNone, 1)
+
+	if defaultButton == DialogButton2 && len(buttons) > 1 {
 		ActivateControl(dlg.View, btn2)
-	case defaultButton == cons.DialogButton3 && len(buttons) > 2:
+	} else if defaultButton == DialogButton3 && len(buttons) > 2 {
 		ActivateControl(dlg.View, btn3)
-	default:
+	} else {
 		ActivateControl(dlg.View, btn1)
 	}
 
-	dlg.View.OnClose(func(ev event.TEvent) bool {
-		if dlg.result == cons.DialogAlive {
-			dlg.result = cons.DialogClosed
+	dlg.View.OnClose(func(ev Event) bool {
+		if dlg.result == DialogAlive {
+			dlg.result = DialogClosed
 			if ev.X != 1 {
 				WindowManager().DestroyWindow(dlg.View)
 			}
@@ -165,7 +161,7 @@ func (d *ConfirmationDialog) Result() int {
 // ------------------------ Selection Dialog ---------------------
 
 func CreateEditDialog(title, message, initialText string) *SelectDialog {
-	return CreateSelectDialog(title, []string{message, initialText}, 0, cons.SelectDialogEdit)
+	return CreateSelectDialog(title, []string{message, initialText}, 0, SelectDialogEdit)
 }
 
 // NewSelectDialog creates new dialog to select an item from list.
@@ -176,7 +172,7 @@ func CreateEditDialog(title, message, initialText string) *SelectDialog {
 //  the dialog is created
 // typ is a selection type: ListBox or RadioGroup
 // Returns nil in case of creation process fails, e.g, if item list is empty
-func CreateSelectDialog(title string, items []string, selectedItem int, typ cons.SelectDialogType) *SelectDialog {
+func CreateSelectDialog(title string, items []string, selectedItem int, typ SelectDialogType) *SelectDialog {
 	dlg := new(SelectDialog)
 
 	if len(items) == 0 {
@@ -191,10 +187,10 @@ func CreateSelectDialog(title string, items []string, selectedItem int, typ cons
 	WindowManager().BeginUpdate()
 	defer WindowManager().EndUpdate()
 	dlg.View.SetModal(true)
-	dlg.View.SetPack(cons.Vertical)
-	switch {
-	case typ == cons.SelectDialogList:
-		fList := CreateFrame(dlg.View, 1, 1, cons.BorderNone, 1)
+	dlg.View.SetPack(Vertical)
+
+	if typ == SelectDialogList {
+		fList := CreateFrame(dlg.View, 1, 1, BorderNone, 1)
 		fList.SetPaddings(1, 1)
 		fList.SetGaps(0, 0)
 		dlg.list = CreateListBox(fList, 15, 5, 1)
@@ -204,14 +200,14 @@ func CreateSelectDialog(title string, items []string, selectedItem int, typ cons
 		if selectedItem >= 0 && selectedItem < len(items) {
 			dlg.list.SelectItem(selectedItem)
 		}
-	case typ == cons.SelectDialogEdit:
-		CreateFrame(dlg.View, 1, 1, cons.BorderNone, cons.Fixed)
+	} else if typ == SelectDialogEdit {
+		CreateFrame(dlg.View, 1, 1, BorderNone, Fixed)
 		lb := CreateLabel(dlg.View, 10, 3, items[0], 1)
 		lb.SetMultiline(true)
 
 		fWidth, _ := dlg.View.Size()
-		dlg.edit = CreateEditField(dlg.View, fWidth-2, items[1], cons.AutoSize)
-		CreateFrame(dlg.View, 1, 1, cons.BorderNone, cons.Fixed)
+		dlg.edit = CreateEditField(dlg.View, fWidth-2, items[1], AutoSize)
+		CreateFrame(dlg.View, 1, 1, BorderNone, Fixed)
 
 		dlg.edit.OnKeyPress(func(key term.Key, r rune) bool {
 			var input string
@@ -219,7 +215,7 @@ func CreateSelectDialog(title string, items []string, selectedItem int, typ cons
 				input = dlg.edit.Title()
 				dlg.edtResult = input
 				dlg.value = -1
-				dlg.result = cons.DialogButton1
+				dlg.result = DialogButton1
 
 				WindowManager().DestroyWindow(dlg.View)
 				if dlg.onClose != nil {
@@ -229,14 +225,14 @@ func CreateSelectDialog(title string, items []string, selectedItem int, typ cons
 			// returning false so that other keypresses work as usual
 			return false
 		})
-	default:
-		fRadio := CreateFrame(dlg.View, 1, 1, cons.BorderNone, cons.Fixed)
+	} else {
+		fRadio := CreateFrame(dlg.View, 1, 1, BorderNone, Fixed)
 		fRadio.SetPaddings(1, 1)
 		fRadio.SetGaps(0, 0)
-		fRadio.SetPack(cons.Vertical)
+		fRadio.SetPack(Vertical)
 		dlg.rg = CreateRadioGroup()
 		for _, item := range items {
-			r := CreateRadio(fRadio, cons.AutoSize, item, cons.Fixed)
+			r := CreateRadio(fRadio, AutoSize, item, Fixed)
 			dlg.rg.AddItem(r)
 		}
 		if selectedItem >= 0 && selectedItem < len(items) {
@@ -244,18 +240,17 @@ func CreateSelectDialog(title string, items []string, selectedItem int, typ cons
 		}
 	}
 
-	frm1 := CreateFrame(dlg.View, 16, 4, cons.BorderNone, cons.Fixed)
-	CreateFrame(frm1, 1, 1, cons.BorderNone, 1)
-	btn1 := CreateButton(frm1, cons.AutoSize, cons.AutoSize, "OK", cons.Fixed)
-	btn1.OnClick(func(ev event.TEvent) {
-		dlg.result = cons.DialogButton1
-		switch {
-		case dlg.typ == cons.SelectDialogList:
+	frm1 := CreateFrame(dlg.View, 16, 4, BorderNone, Fixed)
+	CreateFrame(frm1, 1, 1, BorderNone, 1)
+	btn1 := CreateButton(frm1, AutoSize, AutoSize, "OK", Fixed)
+	btn1.OnClick(func(ev Event) {
+		dlg.result = DialogButton1
+		if dlg.typ == SelectDialogList {
 			dlg.value = dlg.list.SelectedItem()
-		case dlg.typ == cons.SelectDialogEdit:
+		} else if dlg.typ == SelectDialogEdit {
 			dlg.edtResult = dlg.edit.Title()
 			dlg.value = -1
-		default:
+		} else {
 			dlg.value = dlg.rg.Selected()
 		}
 		WindowManager().DestroyWindow(dlg.View)
@@ -264,10 +259,10 @@ func CreateSelectDialog(title string, items []string, selectedItem int, typ cons
 		}
 	})
 
-	CreateFrame(frm1, 1, 1, cons.BorderNone, 1)
-	btn2 := CreateButton(frm1, cons.AutoSize, cons.AutoSize, "Cancel", cons.Fixed)
-	btn2.OnClick(func(ev event.TEvent) {
-		dlg.result = cons.DialogButton2
+	CreateFrame(frm1, 1, 1, BorderNone, 1)
+	btn2 := CreateButton(frm1, AutoSize, AutoSize, "Cancel", Fixed)
+	btn2.OnClick(func(ev Event) {
+		dlg.result = DialogButton2
 		dlg.edtResult = ""
 		dlg.value = -1
 		WindowManager().DestroyWindow(dlg.View)
@@ -276,16 +271,16 @@ func CreateSelectDialog(title string, items []string, selectedItem int, typ cons
 		}
 	})
 
-	if typ == cons.SelectDialogEdit {
+	if typ == SelectDialogEdit {
 		ActivateControl(dlg.View, dlg.edit)
 	} else {
 		ActivateControl(dlg.View, btn2)
 	}
-	CreateFrame(frm1, 1, 1, cons.BorderNone, 1)
+	CreateFrame(frm1, 1, 1, BorderNone, 1)
 
-	dlg.View.OnClose(func(ev event.TEvent) bool {
-		if dlg.result == cons.DialogAlive {
-			dlg.result = cons.DialogClosed
+	dlg.View.OnClose(func(ev Event) bool {
+		if dlg.result == DialogAlive {
+			dlg.result = DialogClosed
 			if ev.X != 1 {
 				WindowManager().DestroyWindow(dlg.View)
 			}

@@ -6,12 +6,6 @@ import (
 	"github.com/atotto/clipboard"
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
-	"github.com/sirupsen/logrus"
-
-	"github.com/prospero78/goTV/tv/cons"
-	"github.com/prospero78/goTV/tv/types"
-	"github.com/prospero78/goTV/tv/widgets/event"
-	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 )
 
 /*
@@ -24,7 +18,7 @@ maximun then the text is automatically truncated.
 EditField calls onChage in case of its text is changed. Event field Msg contains the new text
 */
 type EditField struct {
-	widgetbase.TWidgetBase
+	BaseControl
 	// cursor position in edit text
 	cursorPos int
 	// the number of the first displayed text character - it is used in case of text is longer than edit width
@@ -33,7 +27,7 @@ type EditField struct {
 	maxWidth  int
 	showStars bool
 
-	onChange   func(event.TEvent)
+	onChange   func(Event)
 	onKeyPress func(term.Key, rune) bool
 }
 
@@ -44,14 +38,14 @@ type EditField struct {
 // text - text to edit.
 // scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 //  control should keep its original size.
-func CreateEditField(parent types.IWidget, width int, text string, scale int) *EditField {
+func CreateEditField(parent Control, width int, text string, scale int) *EditField {
 	e := new(EditField)
-	e.TWidgetBase = widgetbase.New()
+	e.BaseControl = NewBaseControl()
 	e.onChange = nil
 	e.SetTitle(text)
 	e.SetEnabled(true)
 
-	if width == cons.AutoSize {
+	if width == AutoSize {
 		width = xs.Len(text) + 1
 	}
 
@@ -79,24 +73,24 @@ processes an event it should return true. If the method returns false it means
 that the control do not want or cannot process the event and the caller sends
 the event to the control parent
 */
-func (e *EditField) ProcessEvent(_event event.TEvent) bool {
+func (e *EditField) ProcessEvent(event Event) bool {
 	if !e.Active() || !e.Enabled() {
 		return false
 	}
 
-	if _event.Type == cons.EventActivate && _event.X == 0 {
+	if event.Type == EventActivate && event.X == 0 {
 		term.HideCursor()
 	}
 
-	if _event.Type == cons.EventKey && _event.Key != term.KeyTab {
+	if event.Type == EventKey && event.Key != term.KeyTab {
 		if e.onKeyPress != nil {
-			res := e.onKeyPress(_event.Key, _event.Ch)
+			res := e.onKeyPress(event.Key, event.Ch)
 			if res {
 				return true
 			}
 		}
 
-		switch _event.Key {
+		switch event.Key {
 		case term.KeyEnter:
 			return false
 		case term.KeySpace:
@@ -127,9 +121,7 @@ func (e *EditField) ProcessEvent(_event event.TEvent) bool {
 			return true
 		case term.KeyCtrlC:
 			if !e.showStars {
-				if err := clipboard.WriteAll(e.Title()); err != nil {
-					logrus.WithError(err).Fatalf("EditField.ProcessEvent() in write clipboard")
-				}
+				clipboard.WriteAll(e.Title())
 			}
 			return true
 		case term.KeyCtrlV:
@@ -140,8 +132,8 @@ func (e *EditField) ProcessEvent(_event event.TEvent) bool {
 			}
 			return true
 		default:
-			if _event.Ch != 0 {
-				e.insertRune(_event.Ch)
+			if event.Ch != 0 {
+				e.insertRune(event.Ch)
 				return true
 			}
 		}

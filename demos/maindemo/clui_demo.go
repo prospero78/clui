@@ -15,83 +15,82 @@ import (
 	"strconv"
 
 	term "github.com/nsf/termbox-go"
-	"github.com/prospero78/goTV/tv"
-	"github.com/prospero78/goTV/tv/cons"
-	"github.com/prospero78/goTV/tv/widgets/event"
+	ui "github.com/prospero78/goTV/tv"
 )
 
-func updateProgress(value string, pb *tv.ProgressBar) {
+func updateProgress(value string, pb *ui.ProgressBar) {
 	v, _ := strconv.Atoi(value)
 	pb.SetValue(v)
 }
 
-func changeTheme(lb *tv.ListBox, btn *tv.Button, tp int) {
-	items := tv.ThemeNames()
-	dlgType := cons.SelectDialogRadio
+func changeTheme(lb *ui.ListBox, btn *ui.Button, tp int) {
+	items := ui.ThemeNames()
+	dlgType := ui.SelectDialogRadio
 	if tp == 1 {
-		dlgType = cons.SelectDialogList
+		dlgType = ui.SelectDialogList
 	}
 
 	curr := -1
 	for i, tName := range items {
-		if tName == tv.CurrentTheme() {
+		if tName == ui.CurrentTheme() {
 			curr = i
 			break
 		}
 	}
 
-	selDlg := tv.CreateSelectDialog("Choose a theme", items, curr, dlgType)
+	selDlg := ui.CreateSelectDialog("Choose a theme", items, curr, dlgType)
 	selDlg.OnClose(func() {
-		if selDlg.Result() == cons.DialogButton1 {
+		switch selDlg.Result() {
+		case ui.DialogButton1:
 			idx := selDlg.Value()
 			lb.AddItem(fmt.Sprintf("Selected item: %v", selDlg.Value()))
 			lb.SelectItem(lb.ItemCount() - 1)
 			if idx != -1 {
-				tv.SetCurrentTheme(items[idx])
+				ui.SetCurrentTheme(items[idx])
 			}
 		}
 
 		btn.SetEnabled(true)
 		// ask the composer to repaint all windows
-		tv.PutEvent(event.TEvent{Type: cons.EventRedraw})
+		ui.PutEvent(ui.Event{Type: ui.EventRedraw})
 	})
 }
 
 func createView() {
 
-	view := tv.AddWindow(0, 0, 20, 7, "Theme Manager Demo")
+	view := ui.AddWindow(0, 0, 20, 7, "Theme Manager Demo")
 
-	frmLeft := tv.CreateFrame(view, 8, 4, cons.BorderNone, 1)
-	frmLeft.SetPack(cons.Vertical)
-	frmLeft.SetGaps(cons.KeepValue, 1)
+	frmLeft := ui.CreateFrame(view, 8, 4, ui.BorderNone, 1)
+	frmLeft.SetPack(ui.Vertical)
+	frmLeft.SetGaps(ui.KeepValue, 1)
 	frmLeft.SetPaddings(1, 1)
 
-	frmTheme := tv.CreateFrame(frmLeft, 8, 1, cons.BorderNone, cons.Fixed)
-	frmTheme.SetGaps(1, cons.KeepValue)
-	checkBox := tv.CreateCheckBox(frmTheme, cons.AutoSize, "Use ListBox", cons.Fixed)
-	btnTheme := tv.CreateButton(frmTheme, cons.AutoSize, 4, "Select theme", cons.Fixed)
-	tv.CreateFrame(frmLeft, 1, 1, cons.BorderNone, 1)
+	frmTheme := ui.CreateFrame(frmLeft, 8, 1, ui.BorderNone, ui.Fixed)
+	frmTheme.SetGaps(1, ui.KeepValue)
+	checkBox := ui.CreateCheckBox(frmTheme, ui.AutoSize, "Use ListBox", ui.Fixed)
+	btnTheme := ui.CreateButton(frmTheme, ui.AutoSize, 4, "Select theme", ui.Fixed)
+	ui.CreateFrame(frmLeft, 1, 1, ui.BorderNone, 1)
 
-	frmPb := tv.CreateFrame(frmLeft, 8, 1, cons.BorderNone, cons.Fixed)
-	tv.CreateLabel(frmPb, 1, 1, "[", cons.Fixed)
-	pb := tv.CreateProgressBar(frmPb, 20, 1, 1)
+	frmPb := ui.CreateFrame(frmLeft, 8, 1, ui.BorderNone, ui.Fixed)
+	ui.CreateLabel(frmPb, 1, 1, "[", ui.Fixed)
+	pb := ui.CreateProgressBar(frmPb, 20, 1, 1)
 	pb.SetLimits(0, 10)
 	pb.SetTitle("{{value}} of {{max}}")
-	tv.CreateLabel(frmPb, 1, 1, "]", cons.Fixed)
+	ui.CreateLabel(frmPb, 1, 1, "]", ui.Fixed)
 
-	edit := tv.CreateEditField(frmLeft, 5, "0", cons.Fixed)
+	edit := ui.CreateEditField(frmLeft, 5, "0", ui.Fixed)
 
-	frmEdit := tv.CreateFrame(frmLeft, 8, 1, cons.BorderNone, cons.Fixed)
+	frmEdit := ui.CreateFrame(frmLeft, 8, 1, ui.BorderNone, ui.Fixed)
 	frmEdit.SetPaddings(1, 1)
-	frmEdit.SetGaps(1, cons.KeepValue)
-	btnSet := tv.CreateButton(frmEdit, cons.AutoSize, 4, "Set", cons.Fixed)
-	btnStep := tv.CreateButton(frmEdit, cons.AutoSize, 4, "Step", cons.Fixed)
-	tv.CreateFrame(frmEdit, 1, 1, cons.BorderNone, 1)
-	btnQuit := tv.CreateButton(frmEdit, cons.AutoSize, 4, "Quit", cons.Fixed)
+	frmEdit.SetGaps(1, ui.KeepValue)
+	btnSet := ui.CreateButton(frmEdit, ui.AutoSize, 4, "Set", ui.Fixed)
+	btnStep := ui.CreateButton(frmEdit, ui.AutoSize, 4, "Step", ui.Fixed)
+	ui.CreateFrame(frmEdit, 1, 1, ui.BorderNone, 1)
+	btnQuit := ui.CreateButton(frmEdit, ui.AutoSize, 4, "Quit", ui.Fixed)
 
-	logBox := tv.CreateListBox(view, 28, 5, cons.Fixed)
+	logBox := ui.CreateListBox(view, 28, 5, ui.Fixed)
 
-	tv.ActivateControl(view, edit)
+	ui.ActivateControl(view, edit)
 
 	edit.OnKeyPress(func(key term.Key, ch rune) bool {
 		if key == term.KeyCtrlM {
@@ -103,40 +102,40 @@ func createView() {
 		}
 		return false
 	})
-	btnTheme.OnClick(func(ev event.TEvent) {
+	btnTheme.OnClick(func(ev ui.Event) {
 		btnTheme.SetEnabled(false)
 		tp := checkBox.State()
 		changeTheme(logBox, btnTheme, tp)
 	})
-	btnSet.OnClick(func(ev event.TEvent) {
+	btnSet.OnClick(func(ev ui.Event) {
 		v := edit.Title()
 		logBox.AddItem(fmt.Sprintf("New ProgressBar value: %v", v))
 		logBox.SelectItem(logBox.ItemCount() - 1)
 		updateProgress(v, pb)
 	})
-	btnStep.OnClick(func(ev event.TEvent) {
+	btnStep.OnClick(func(ev ui.Event) {
 		go pb.Step()
 		logBox.AddItem("ProgressBar step")
 		logBox.SelectItem(logBox.ItemCount() - 1)
-		tv.PutEvent(event.TEvent{Type: cons.EventRedraw})
+		ui.PutEvent(ui.Event{Type: ui.EventRedraw})
 	})
-	btnQuit.OnClick(func(ev event.TEvent) {
-		go tv.Stop()
+	btnQuit.OnClick(func(ev ui.Event) {
+		go ui.Stop()
 	})
 }
 
 func mainLoop() {
 	// Every application must create a single Composer and
 	// call its intialize method
-	tv.InitLibrary()
-	defer tv.DeinitLibrary()
+	ui.InitLibrary()
+	defer ui.DeinitLibrary()
 
-	tv.SetThemePath("themes")
+	ui.SetThemePath("themes")
 
 	createView()
 
 	// start event processing loop - the main core of the library
-	tv.MainLoop()
+	ui.MainLoop()
 }
 
 func main() {

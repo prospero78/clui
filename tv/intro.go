@@ -1,5 +1,5 @@
 /*
- package tv is an UI library to create simple interactive console applications.
+Package clui is an UI library to create simple interactive console applications.
 Inspired by Borland TurboVision.
 
 The library includes a set of simple but useful controls to create a multi-Windows

@@ -6,8 +6,6 @@ import (
 
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
-	"github.com/prospero78/goTV/tv/cons"
-	"github.com/prospero78/goTV/tv/types"
 )
 
 var (
@@ -44,7 +42,7 @@ func Ellipsize(str string, maxWidth int) string {
 		return xs.Slice(str, 0, maxWidth)
 	}
 
-	left := (maxWidth - 3) / 2
+	left := int((maxWidth - 3) / 2)
 	right := maxWidth - left - 3
 	return xs.Slice(str, 0, left) + "..." + xs.Slice(str, ln-right, -1)
 }
@@ -68,16 +66,16 @@ func CutText(str string, maxWidth int) string {
 // to draw a label aligned but with transparent beginning
 // and ending. If you do not need transparency you can
 // add spaces manually using the returned shift value
-func AlignText(str string, width int, align types.AAlign) (shift int, out string) {
+func AlignText(str string, width int, align Align) (shift int, out string) {
 	length := xs.Len(str)
 
 	if length >= width {
 		return 0, CutText(str, width)
 	}
 
-	if align == cons.AlignRight {
+	if align == AlignRight {
 		return width - length, str
-	} else if align == cons.AlignCenter {
+	} else if align == AlignCenter {
 		return (width - length) / 2, str
 	}
 
@@ -89,7 +87,7 @@ func AlignText(str string, width int, align types.AAlign) (shift int, out string
 // color tags to the line beginning.
 // Note: function is ineffective and a bit slow - do not use
 // it everywhere
-func AlignColorizedText(str string, width int, align types.AAlign) (int, string) {
+func AlignColorizedText(str string, width int, align Align) (int, string) {
 	rawText := UnColorizeText(str)
 	length := xs.Len(rawText)
 
@@ -99,9 +97,9 @@ func AlignColorizedText(str string, width int, align types.AAlign) (int, string)
 	}
 
 	skip := 0
-	if align == cons.AlignRight {
+	if align == AlignRight {
 		skip = length - width
-	} else if align == cons.AlignCenter {
+	} else if align == AlignCenter {
 		skip = (length - width) / 2
 	}
 
@@ -115,8 +113,8 @@ func AlignColorizedText(str string, width int, align types.AAlign) (int, string)
 		if elem.Type == ElemEndOfText {
 			break
 		}
-		switch {
-		case elem.Type == ElemPrintable:
+
+		if elem.Type == ElemPrintable {
 			curr++
 			if curr == skip+1 {
 				if fgChanged {
@@ -129,12 +127,12 @@ func AlignColorizedText(str string, width int, align types.AAlign) (int, string)
 			} else if curr > skip+1 {
 				out += string(elem.Ch)
 			}
-		case elem.Type == ElemTextColor:
+		} else if elem.Type == ElemTextColor {
 			fgChanged = true
 			if curr > skip+1 {
 				out += "<t:" + ColorToString(elem.Fg) + ">"
 			}
-		case elem.Type == ElemBackColor:
+		} else if elem.Type == ElemBackColor {
 			bgChanged = true
 			if curr > skip+1 {
 				out += "<b:" + ColorToString(elem.Bg) + ">"
@@ -218,14 +216,13 @@ func UnColorizeText(str string) string {
 // Examples: "red bold", "green+underline+bold"
 func StringToColor(str string) term.Attribute {
 	var parts []string
-	switch {
-	case strings.ContainsRune(str, '+'):
+	if strings.ContainsRune(str, '+') {
 		parts = strings.Split(str, "+")
-	case strings.ContainsRune(str, '|'):
+	} else if strings.ContainsRune(str, '|') {
 		parts = strings.Split(str, "|")
-	case strings.ContainsRune(str, ' '):
+	} else if strings.ContainsRune(str, ' ') {
 		parts = strings.Split(str, " ")
-	default:
+	} else {
 		parts = append(parts, str)
 	}
 

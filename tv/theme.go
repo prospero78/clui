@@ -10,7 +10,6 @@ import (
 	"unicode/utf8"
 
 	term "github.com/nsf/termbox-go"
-	"github.com/prospero78/goTV/tv/cons"
 )
 
 /*
@@ -130,85 +129,85 @@ func ThemeReset() {
 	defer thememtx.Unlock()
 
 	themeManager.current = defaultTheme
-	themeManager.themes = make(map[string]theme)
+	themeManager.themes = make(map[string]theme, 0)
 
 	defTheme := theme{parent: "", title: "Default Theme", author: "Vladimir V. Markelov", version: "1.0"}
-	defTheme.colors = make(map[string]term.Attribute)
-	defTheme.objects = make(map[string]string)
+	defTheme.colors = make(map[string]term.Attribute, 0)
+	defTheme.objects = make(map[string]string, 0)
 
-	defTheme.objects[cons.ObjSingleBorder] = "─│┌┐└┘"
-	defTheme.objects[cons.ObjDoubleBorder] = "═║╔╗╚╝"
-	defTheme.objects[cons.ObjEdit] = "←→V*"
-	defTheme.objects[cons.ObjScrollBar] = "░■▲▼◄►"
-	defTheme.objects[cons.ObjViewButtons] = "^_■[]"
-	defTheme.objects[cons.ObjCheckBox] = "[] X?"
-	defTheme.objects[cons.ObjRadio] = "() *"
-	defTheme.objects[cons.ObjProgressBar] = "░▒"
-	defTheme.objects[cons.ObjBarChart] = "█─│┌┐└┘┬┴├┤┼"
-	defTheme.objects[cons.ObjSparkChart] = "█"
-	defTheme.objects[cons.ObjTableView] = "─│┼▼▲"
-	defTheme.objects[cons.ObjButton] = "▀█"
+	defTheme.objects[ObjSingleBorder] = "─│┌┐└┘"
+	defTheme.objects[ObjDoubleBorder] = "═║╔╗╚╝"
+	defTheme.objects[ObjEdit] = "←→V*"
+	defTheme.objects[ObjScrollBar] = "░■▲▼◄►"
+	defTheme.objects[ObjViewButtons] = "^_■[]"
+	defTheme.objects[ObjCheckBox] = "[] X?"
+	defTheme.objects[ObjRadio] = "() *"
+	defTheme.objects[ObjProgressBar] = "░▒"
+	defTheme.objects[ObjBarChart] = "█─│┌┐└┘┬┴├┤┼"
+	defTheme.objects[ObjSparkChart] = "█"
+	defTheme.objects[ObjTableView] = "─│┼▼▲"
+	defTheme.objects[ObjButton] = "▀█"
 
-	defTheme.colors[cons.ColorDisabledText] = cons.ColorBlackBold
-	defTheme.colors[cons.ColorDisabledBack] = cons.ColorWhite
-	defTheme.colors[cons.ColorText] = cons.ColorWhite
-	defTheme.colors[cons.ColorBack] = cons.ColorBlack
-	defTheme.colors[cons.ColorViewBack] = cons.ColorBlack
-	defTheme.colors[cons.ColorViewText] = cons.ColorWhite
+	defTheme.colors[ColorDisabledText] = ColorBlackBold
+	defTheme.colors[ColorDisabledBack] = ColorWhite
+	defTheme.colors[ColorText] = ColorWhite
+	defTheme.colors[ColorBack] = ColorBlack
+	defTheme.colors[ColorViewBack] = ColorBlack
+	defTheme.colors[ColorViewText] = ColorWhite
 
-	defTheme.colors[cons.ColorControlText] = cons.ColorWhite
-	defTheme.colors[cons.ColorControlBack] = cons.ColorBlack
-	defTheme.colors[cons.ColorControlActiveText] = cons.ColorWhite
-	defTheme.colors[cons.ColorControlActiveBack] = cons.ColorMagenta
-	defTheme.colors[cons.ColorControlShadow] = cons.ColorBlue
-	defTheme.colors[cons.ColorControlDisabledText] = cons.ColorWhite
-	defTheme.colors[cons.ColorControlDisabledBack] = cons.ColorBlack
+	defTheme.colors[ColorControlText] = ColorWhite
+	defTheme.colors[ColorControlBack] = ColorBlack
+	defTheme.colors[ColorControlActiveText] = ColorWhite
+	defTheme.colors[ColorControlActiveBack] = ColorMagenta
+	defTheme.colors[ColorControlShadow] = ColorBlue
+	defTheme.colors[ColorControlDisabledText] = ColorWhite
+	defTheme.colors[ColorControlDisabledBack] = ColorBlack
 
-	defTheme.colors[cons.ColorButtonText] = cons.ColorWhite
-	defTheme.colors[cons.ColorButtonBack] = cons.ColorGreen
-	defTheme.colors[cons.ColorButtonActiveText] = cons.ColorWhite
-	defTheme.colors[cons.ColorButtonActiveBack] = cons.ColorMagenta
-	defTheme.colors[cons.ColorButtonShadow] = cons.ColorBlue
-	defTheme.colors[cons.ColorButtonDisabledText] = cons.ColorWhite
-	defTheme.colors[cons.ColorButtonDisabledBack] = cons.ColorBlack
+	defTheme.colors[ColorButtonText] = ColorWhite
+	defTheme.colors[ColorButtonBack] = ColorGreen
+	defTheme.colors[ColorButtonActiveText] = ColorWhite
+	defTheme.colors[ColorButtonActiveBack] = ColorMagenta
+	defTheme.colors[ColorButtonShadow] = ColorBlue
+	defTheme.colors[ColorButtonDisabledText] = ColorWhite
+	defTheme.colors[ColorButtonDisabledBack] = ColorBlack
 
-	defTheme.colors[cons.ColorEditText] = cons.ColorBlack
-	defTheme.colors[cons.ColorEditBack] = cons.ColorWhite
-	defTheme.colors[cons.ColorEditActiveText] = cons.ColorBlack
-	defTheme.colors[cons.ColorEditActiveBack] = cons.ColorYellow
-	defTheme.colors[cons.ColorSelectionText] = cons.ColorYellow
-	defTheme.colors[cons.ColorSelectionBack] = cons.ColorBlue
+	defTheme.colors[ColorEditText] = ColorBlack
+	defTheme.colors[ColorEditBack] = ColorWhite
+	defTheme.colors[ColorEditActiveText] = ColorBlack
+	defTheme.colors[ColorEditActiveBack] = ColorYellow
+	defTheme.colors[ColorSelectionText] = ColorYellow
+	defTheme.colors[ColorSelectionBack] = ColorBlue
 
-	defTheme.colors[cons.ColorScrollBack] = cons.ColorBlack
-	defTheme.colors[cons.ColorScrollText] = cons.ColorWhite
-	defTheme.colors[cons.ColorThumbBack] = cons.ColorBlack
-	defTheme.colors[cons.ColorThumbText] = cons.ColorWhite
+	defTheme.colors[ColorScrollBack] = ColorBlack
+	defTheme.colors[ColorScrollText] = ColorWhite
+	defTheme.colors[ColorThumbBack] = ColorBlack
+	defTheme.colors[ColorThumbText] = ColorWhite
 
-	defTheme.colors[cons.ColorProgressText] = cons.ColorBlue
-	defTheme.colors[cons.ColorProgressBack] = cons.ColorBlack
-	defTheme.colors[cons.ColorProgressActiveText] = cons.ColorBlack
-	defTheme.colors[cons.ColorProgressActiveBack] = cons.ColorBlue
-	defTheme.colors[cons.ColorProgressTitleText] = cons.ColorWhite
+	defTheme.colors[ColorProgressText] = ColorBlue
+	defTheme.colors[ColorProgressBack] = ColorBlack
+	defTheme.colors[ColorProgressActiveText] = ColorBlack
+	defTheme.colors[ColorProgressActiveBack] = ColorBlue
+	defTheme.colors[ColorProgressTitleText] = ColorWhite
 
-	defTheme.colors[cons.ColorBarChartBack] = cons.ColorBlack
-	defTheme.colors[cons.ColorBarChartText] = cons.ColorWhite
+	defTheme.colors[ColorBarChartBack] = ColorBlack
+	defTheme.colors[ColorBarChartText] = ColorWhite
 
-	defTheme.colors[cons.ColorSparkChartBack] = cons.ColorBlack
-	defTheme.colors[cons.ColorSparkChartText] = cons.ColorWhite
-	defTheme.colors[cons.ColorSparkChartBarBack] = cons.ColorBlack
-	defTheme.colors[cons.ColorSparkChartBarText] = cons.ColorCyan
-	defTheme.colors[cons.ColorSparkChartMaxBack] = cons.ColorBlack
-	defTheme.colors[cons.ColorSparkChartMaxText] = cons.ColorCyanBold
+	defTheme.colors[ColorSparkChartBack] = ColorBlack
+	defTheme.colors[ColorSparkChartText] = ColorWhite
+	defTheme.colors[ColorSparkChartBarBack] = ColorBlack
+	defTheme.colors[ColorSparkChartBarText] = ColorCyan
+	defTheme.colors[ColorSparkChartMaxBack] = ColorBlack
+	defTheme.colors[ColorSparkChartMaxText] = ColorCyanBold
 
-	defTheme.colors[cons.ColorTableText] = cons.ColorWhite
-	defTheme.colors[cons.ColorTableBack] = cons.ColorBlack
-	defTheme.colors[cons.ColorTableSelectedText] = cons.ColorWhite
-	defTheme.colors[cons.ColorTableSelectedBack] = cons.ColorBlack
-	defTheme.colors[cons.ColorTableActiveCellText] = cons.ColorWhiteBold
-	defTheme.colors[cons.ColorTableActiveCellBack] = cons.ColorBlack
-	defTheme.colors[cons.ColorTableLineText] = cons.ColorWhite
-	defTheme.colors[cons.ColorTableHeaderText] = cons.ColorWhite
-	defTheme.colors[cons.ColorTableHeaderBack] = cons.ColorBlack
+	defTheme.colors[ColorTableText] = ColorWhite
+	defTheme.colors[ColorTableBack] = ColorBlack
+	defTheme.colors[ColorTableSelectedText] = ColorWhite
+	defTheme.colors[ColorTableSelectedBack] = ColorBlack
+	defTheme.colors[ColorTableActiveCellText] = ColorWhiteBold
+	defTheme.colors[ColorTableActiveCellBack] = ColorBlack
+	defTheme.colors[ColorTableLineText] = ColorWhite
+	defTheme.colors[ColorTableHeaderText] = ColorWhite
+	defTheme.colors[ColorTableHeaderBack] = ColorBlack
 
 	themeManager.themes[defaultTheme] = defTheme
 }
@@ -226,7 +225,7 @@ func SysColor(color string) term.Attribute {
 
 	clr, okclr := sch.colors[color]
 	if !okclr {
-		visited := make(map[string]int)
+		visited := make(map[string]int, 0)
 		visited[themeManager.current] = 1
 		if !ok {
 			visited[defaultTheme] = 1
@@ -271,7 +270,7 @@ func SysObject(object string) string {
 
 	obj, okobj := sch.objects[object]
 	if !okobj {
-		visited := make(map[string]int)
+		visited := make(map[string]int, 0)
 		visited[themeManager.current] = 1
 		if !ok {
 			visited[defaultTheme] = 1
@@ -389,8 +388,8 @@ func (s *ThemeManager) loadTheme(name string) {
 	}
 
 	theme := theme{parent: defaultTheme, title: "", author: ""}
-	theme.colors = make(map[string]term.Attribute)
-	theme.objects = make(map[string]string)
+	theme.colors = make(map[string]term.Attribute, 0)
+	theme.objects = make(map[string]string, 0)
 
 	file, err := os.Open(s.themePath + string(os.PathSeparator) + name + themeSuffix)
 	if err != nil {
@@ -423,16 +422,15 @@ func (s *ThemeManager) loadTheme(name string) {
 		}
 
 		low := strings.ToLower(key)
-		switch {
-		case low == "parent":
+		if low == "parent" {
 			theme.parent = value
-		case low == "author":
+		} else if low == "author" {
 			theme.author = value
-		case low == "name" || low == "title":
+		} else if low == "name" || low == "title" {
 			theme.title = value
-		case low == "version":
+		} else if low == "version" {
 			theme.version = value
-		case strings.HasSuffix(key, "Back") || strings.HasSuffix(key, "Text"):
+		} else if strings.HasSuffix(key, "Back") || strings.HasSuffix(key, "Text") {
 			// the first case is a reference to existing color (of this or parent theme)
 			// the second is the real color
 			if strings.HasSuffix(value, "Back") || strings.HasSuffix(value, "Text") {
@@ -464,7 +462,7 @@ func (s *ThemeManager) loadTheme(name string) {
 				}
 				theme.colors[key] = c
 			}
-		default:
+		} else {
 			theme.objects[key] = value
 		}
 	}
@@ -482,7 +480,9 @@ func ReloadTheme(name string) {
 	}
 
 	thememtx.Lock()
-	delete(themeManager.themes, name)
+	if _, ok := themeManager.themes[name]; ok {
+		delete(themeManager.themes, name)
+	}
 	thememtx.Unlock()
 
 	themeManager.loadTheme(name)
@@ -534,11 +534,11 @@ func RealColor(clr term.Attribute, style string, id string) term.Attribute {
 
 	ccolor := fmt.Sprintf("%s%s", prefix, id)
 
-	if clr == cons.ColorDefault {
+	if clr == ColorDefault {
 		clr = SysColor(ccolor)
 	}
 
-	if clr == cons.ColorDefault {
+	if clr == ColorDefault {
 		panic("Failed to load color value for " + ccolor)
 	}
 

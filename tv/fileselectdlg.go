@@ -8,10 +8,6 @@ import (
 	"strings"
 
 	term "github.com/nsf/termbox-go"
-	"github.com/prospero78/goTV/tv/cons"
-	"github.com/prospero78/goTV/tv/widgets/event"
-	"github.com/prospero78/goTV/tv/widgets/window"
-	"github.com/sirupsen/logrus"
 )
 
 // FileSelectDialog is a dialog to select a file or directory.
@@ -23,7 +19,7 @@ import (
 //   * Exists - if the selected object exists or a user entered manually a
 //         name of the object
 type FileSelectDialog struct {
-	View     *window.TWindow
+	View     *Window
 	FilePath string
 	Exists   bool
 	Selected bool
@@ -159,18 +155,14 @@ func (d *FileSelectDialog) pathUp() {
 		return
 	}
 	d.currPath = dirUp
-	if err := d.populateFiles(); err != nil {
-		logrus.WithError(err).Fatalf("FileSelectDialog.pathUp(): in populate files")
-	}
+	d.populateFiles()
 	d.selectFirst()
 }
 
 // Enters the directory
 func (d *FileSelectDialog) pathDown(dir string) {
 	d.currPath = filepath.Join(d.currPath, dir)
-	if err := d.populateFiles(); err != nil {
-		logrus.WithError(err).Fatalf("FileSelectDialog.pathDown(): in populate files")
-	}
+	d.populateFiles()
 	d.selectFirst()
 }
 
@@ -223,34 +215,34 @@ func CreateFileSelectDialog(title, fileMasks, initPath string, selectDir, mustEx
 	defer WindowManager().EndUpdate()
 
 	dlg.View.SetModal(true)
-	dlg.View.SetPack(cons.Vertical)
+	dlg.View.SetPack(Vertical)
 
 	dlg.currPath = initPath
 	dlg.detectPath()
-	dlg.curDir = CreateLabel(dlg.View, cons.AutoSize, cons.AutoSize, "", cons.Fixed)
-	dlg.curDir.SetTextDisplay(cons.AlignRight)
+	dlg.curDir = CreateLabel(dlg.View, AutoSize, AutoSize, "", Fixed)
+	dlg.curDir.SetTextDisplay(AlignRight)
 
-	flist := CreateFrame(dlg.View, 1, 1, cons.BorderNone, 1)
+	flist := CreateFrame(dlg.View, 1, 1, BorderNone, 1)
 	flist.SetPaddings(1, 1)
-	flist.SetPack(cons.Horizontal)
+	flist.SetPack(Horizontal)
 	dlg.listBox = CreateListBox(flist, 16, ch-20, 1)
 
-	fselected := CreateFrame(dlg.View, 1, 1, cons.BorderNone, cons.Fixed)
+	fselected := CreateFrame(dlg.View, 1, 1, BorderNone, Fixed)
 	// text + edit field to enter name manually
-	fselected.SetPack(cons.Vertical)
+	fselected.SetPack(Vertical)
 	fselected.SetPaddings(1, 0)
-	CreateLabel(fselected, cons.AutoSize, cons.AutoSize, "Selected object:", 1)
+	CreateLabel(fselected, AutoSize, AutoSize, "Selected object:", 1)
 	dlg.edFile = CreateEditField(fselected, cw-22, "", 1)
 
 	// buttons at the right
-	blist := CreateFrame(flist, 1, 1, cons.BorderNone, cons.Fixed)
-	blist.SetPack(cons.Vertical)
+	blist := CreateFrame(flist, 1, 1, BorderNone, Fixed)
+	blist.SetPack(Vertical)
 	blist.SetPaddings(1, 1)
-	btnOpen := CreateButton(blist, cons.AutoSize, cons.AutoSize, "Open", cons.Fixed)
-	btnSelect := CreateButton(blist, cons.AutoSize, cons.AutoSize, "Select", cons.Fixed)
-	btnCancel := CreateButton(blist, cons.AutoSize, cons.AutoSize, "Cancel", cons.Fixed)
+	btnOpen := CreateButton(blist, AutoSize, AutoSize, "Open", Fixed)
+	btnSelect := CreateButton(blist, AutoSize, AutoSize, "Select", Fixed)
+	btnCancel := CreateButton(blist, AutoSize, AutoSize, "Cancel", Fixed)
 
-	btnCancel.OnClick(func(ev event.TEvent) {
+	btnCancel.OnClick(func(ev Event) {
 		WindowManager().DestroyWindow(dlg.View)
 		WindowManager().BeginUpdate()
 		dlg.Selected = false
@@ -261,7 +253,7 @@ func CreateFileSelectDialog(title, fileMasks, initPath string, selectDir, mustEx
 		}
 	})
 
-	btnSelect.OnClick(func(ev event.TEvent) {
+	btnSelect.OnClick(func(ev Event) {
 		WindowManager().DestroyWindow(dlg.View)
 		WindowManager().BeginUpdate()
 		dlg.Selected = true
@@ -280,9 +272,9 @@ func CreateFileSelectDialog(title, fileMasks, initPath string, selectDir, mustEx
 		}
 	})
 
-	dlg.View.OnClose(func(ev event.TEvent) bool {
-		if dlg.result == cons.DialogAlive {
-			dlg.result = cons.DialogClosed
+	dlg.View.OnClose(func(ev Event) bool {
+		if dlg.result == DialogAlive {
+			dlg.result = DialogClosed
 			if ev.X != 1 {
 				WindowManager().DestroyWindow(dlg.View)
 			}
@@ -293,7 +285,7 @@ func CreateFileSelectDialog(title, fileMasks, initPath string, selectDir, mustEx
 		return true
 	})
 
-	dlg.listBox.OnSelectItem(func(ev event.TEvent) {
+	dlg.listBox.OnSelectItem(func(ev Event) {
 		item := ev.Msg
 		if item == ".." {
 			btnSelect.SetEnabled(false)
@@ -320,7 +312,7 @@ func CreateFileSelectDialog(title, fileMasks, initPath string, selectDir, mustEx
 		}
 	})
 
-	btnOpen.OnClick(func(ev event.TEvent) {
+	btnOpen.OnClick(func(ev Event) {
 		s := dlg.listBox.SelectedItemText()
 		if s != ".." && (s == "" || !strings.HasSuffix(s, string(os.PathSeparator))) {
 			return
@@ -333,7 +325,7 @@ func CreateFileSelectDialog(title, fileMasks, initPath string, selectDir, mustEx
 		}
 	})
 
-	dlg.edFile.OnChange(func(ev event.TEvent) {
+	dlg.edFile.OnChange(func(ev Event) {
 		s := ""
 		lowCurrText := strings.ToLower(dlg.listBox.SelectedItemText())
 		lowEditText := strings.ToLower(dlg.edFile.Title())
@@ -411,9 +403,7 @@ func CreateFileSelectDialog(title, fileMasks, initPath string, selectDir, mustEx
 	})
 
 	dlg.curDir.SetTitle(dlg.currPath)
-	if err := dlg.populateFiles(); err != nil {
-		logrus.WithError(err).Fatalf("fileselectdlg.go/CreateFileSelectDialog(): in populate files")
-	}
+	dlg.populateFiles()
 	dlg.selectFirst()
 
 	ActivateControl(dlg.View, dlg.listBox)

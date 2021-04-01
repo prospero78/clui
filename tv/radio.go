@@ -3,11 +3,6 @@ package tv
 import (
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
-
-	"github.com/prospero78/goTV/tv/cons"
-	"github.com/prospero78/goTV/tv/types"
-	"github.com/prospero78/goTV/tv/widgets/event"
-	"github.com/prospero78/goTV/tv/widgets/widgetbase"
 )
 
 /*
@@ -15,7 +10,7 @@ Radio button control. Unite a few radios in one radio group to
 make a user select one of available choices.
 */
 type Radio struct {
-	widgetbase.TWidgetBase
+	BaseControl
 	group    *RadioGroup
 	selected bool
 
@@ -31,11 +26,11 @@ title - radio title.
 scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 control should keep its original size.
 */
-func CreateRadio(parent types.IWidget, width int, title string, scale int) *Radio {
+func CreateRadio(parent Control, width int, title string, scale int) *Radio {
 	c := new(Radio)
-	c.TWidgetBase = widgetbase.New()
+	c.BaseControl = NewBaseControl()
 
-	if width == cons.AutoSize {
+	if width == AutoSize {
 		width = xs.Len(title) + 4
 	}
 
@@ -58,7 +53,7 @@ func CreateRadio(parent types.IWidget, width int, title string, scale int) *Radi
 
 // Draw repaints the control on its View surface
 func (c *Radio) Draw() {
-	if c.isHidden {
+	if c.hidden {
 		return
 	}
 
@@ -68,14 +63,14 @@ func (c *Radio) Draw() {
 	x, y := c.Pos()
 	w, h := c.Size()
 
-	fg, bg := RealColor(c.fg, c.Style(), cons.ColorControlText), RealColor(c.bg, c.Style(), cons.ColorControlBack)
+	fg, bg := RealColor(c.fg, c.Style(), ColorControlText), RealColor(c.bg, c.Style(), ColorControlBack)
 	if !c.Enabled() {
-		fg, bg = RealColor(c.fg, c.Style(), cons.ColorControlDisabledText), RealColor(c.bg, c.Style(), cons.ColorControlDisabledBack)
+		fg, bg = RealColor(c.fg, c.Style(), ColorControlDisabledText), RealColor(c.bg, c.Style(), ColorControlDisabledBack)
 	} else if c.Active() {
-		fg, bg = RealColor(c.fg, c.Style(), cons.ColorControlActiveText), RealColor(c.bg, c.Style(), cons.ColorControlActiveBack)
+		fg, bg = RealColor(c.fg, c.Style(), ColorControlActiveText), RealColor(c.bg, c.Style(), ColorControlActiveBack)
 	}
 
-	parts := []rune(SysObject(cons.ObjRadio))
+	parts := []rune(SysObject(ObjRadio))
 	cOpen, cClose, cEmpty, cCheck := parts[0], parts[1], parts[2], parts[3]
 	cState := cEmpty
 	if c.selected {
@@ -108,12 +103,12 @@ func (c *Radio) Draw() {
 // The control processes only space button and mouse clicks to make control selected.
 // Deselecting control is not possible: one has to click another radio of the radio
 // group to deselect this button
-func (c *Radio) ProcessEvent(_event event.TEvent) bool {
-	if (!c.Active() && _event.Type == cons.EventKey) || !c.Enabled() {
+func (c *Radio) ProcessEvent(event Event) bool {
+	if (!c.Active() && event.Type == EventKey) || !c.Enabled() {
 		return false
 	}
 
-	if (_event.Type == cons.EventKey && _event.Key == term.KeySpace) || _event.Type == cons.EventClick {
+	if (event.Type == EventKey && event.Key == term.KeySpace) || event.Type == EventClick {
 		if c.group == nil {
 			c.SetSelected(true)
 		} else {
@@ -148,8 +143,8 @@ func (c *Radio) SetGroup(group *RadioGroup) {
 // OnChange sets the callback that is called whenever the state
 // of the Radio is changed. Argument of callback is the current
 func (c *Radio) OnChange(fn func(bool)) {
-	c.block.Lock()
-	defer c.block.Unlock()
+	c.mtx.Lock()
+	defer c.mtx.Unlock()
 
 	c.onChange = fn
 }
