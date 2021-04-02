@@ -30,7 +30,7 @@ type Canvas struct {
 	textColor term.Attribute
 	backColor term.Attribute
 	clipX     types.ACoordX
-	clipY     int
+	clipY     types.ACoordY
 	clipW     int
 	clipH     int
 	attrStack []attr
@@ -78,7 +78,7 @@ func PopAttributes() {
 func PushClip() {
 	c := rect{
 		x: canvas.clipX,
-		y: types.ACoordY(canvas.clipY),
+		y: canvas.clipY,
 		w: canvas.clipW,
 		h: canvas.clipH}
 	canvas.clipStack = append(canvas.clipStack, c)
@@ -111,14 +111,16 @@ func Reset() {
 // InClipRect returns true if x and y position is inside current clipping
 // rectangle
 func InClipRect(x types.ACoordX, y types.ACoordY) bool {
-	return x >= canvas.clipX && int(y) >= canvas.clipY &&
+	return x >= canvas.clipX && y >= canvas.clipY &&
 		x < canvas.clipX+types.ACoordX(canvas.clipW) &&
-		int(y) < canvas.clipY+canvas.clipH
+		y < canvas.clipY+types.ACoordY(canvas.clipH)
 }
 
 func clip(x types.ACoordX, y types.ACoordY, w, h int) (cx types.ACoordX, cy types.ACoordY, cw int, ch int) {
-	if x+types.ACoordX(w) < canvas.clipX || x > canvas.clipX+types.ACoordX(canvas.clipW) ||
-		y+types.ACoordY(h) < types.ACoordY(canvas.clipY) || int(y) > canvas.clipY+canvas.clipH {
+	if x+types.ACoordX(w) < canvas.clipX ||
+		x > canvas.clipX+types.ACoordX(canvas.clipW) ||
+		y+types.ACoordY(h) < canvas.clipY ||
+		y > canvas.clipY+types.ACoordY(canvas.clipH) {
 		return 0, 0, 0, 0
 	}
 
@@ -126,15 +128,15 @@ func clip(x types.ACoordX, y types.ACoordY, w, h int) (cx types.ACoordX, cy type
 		w -= int(canvas.clipX - x)
 		x = canvas.clipX
 	}
-	if int(y) < canvas.clipY {
-		h -= canvas.clipY - int(y)
-		y = types.ACoordY(canvas.clipY)
+	if y < canvas.clipY {
+		h -= int(canvas.clipY - y)
+		y = canvas.clipY
 	}
 	if x+types.ACoordX(w) > canvas.clipX+types.ACoordX(canvas.clipW) {
 		w = canvas.clipW - int(x-canvas.clipX)
 	}
-	if int(y)+h > canvas.clipY+canvas.clipH {
-		h = canvas.clipH - (int(y) - canvas.clipY)
+	if y+types.ACoordY(h) > canvas.clipY+types.ACoordY(canvas.clipH) {
+		h = canvas.clipH - int(y-canvas.clipY)
 	}
 
 	return x, y, w, h
@@ -231,13 +233,13 @@ func SetClipRect(x types.ACoordX, y types.ACoordY, w, h int) {
 	}
 
 	canvas.clipX = x
-	canvas.clipY = int(y)
+	canvas.clipY = y
 	canvas.clipW = w
 	canvas.clipH = h
 }
 
 // ClipRect returns the current clipping rectangle
-func ClipRect() (x types.ACoordX, y int, w int, h int) {
+func ClipRect() (x types.ACoordX, y types.ACoordY, w int, h int) {
 	return canvas.clipX, canvas.clipY, canvas.clipW, canvas.clipH
 }
 
@@ -306,7 +308,7 @@ func DrawText(x types.ACoordX, y types.ACoordY, text string) {
 // use DrawText function
 func DrawRawText(x types.ACoordX, y types.ACoordY, text string) {
 	cx, cy, cw, ch := ClipRect()
-	if x >= cx+types.ACoordX(cw) || int(y) < cy || int(y) >= cy+ch {
+	if x >= cx+types.ACoordX(cw) || y < cy || y >= cy+types.ACoordY(ch) {
 		return
 	}
 
@@ -362,19 +364,19 @@ func DrawTextVertical(x types.ACoordX, y types.ACoordY, text string) {
 // use DrawTextVertical function
 func DrawRawTextVertical(x types.ACoordX, y types.ACoordY, text string) {
 	cx, cy, cw, ch := ClipRect()
-	if int(y) >= cy+ch || x < cx || x >= cx+types.ACoordX(cw) {
+	if y >= cy+types.ACoordY(ch) || x < cx || x >= cx+types.ACoordX(cw) {
 		return
 	}
 
 	length := xs.Len(text)
-	if int(y)+length < cy {
+	if y+types.ACoordY(length) < cy {
 		return
 	}
 
-	if int(y) < cy {
-		text = xs.Slice(text, cy-int(y), -1)
+	if y < cy {
+		text = xs.Slice(text, int(cy-y), -1)
 		// length -= cy - y
-		y = types.ACoordY(cy)
+		y = cy
 	}
 	text = CutText(text, ch)
 

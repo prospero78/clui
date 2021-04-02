@@ -21,11 +21,9 @@ import (
 type FileSelectDialog struct {
 	View     *Window
 	FilePath string
-	
 
 	fileMasks []string
 	currPath  string
-	
 
 	result  int
 	onClose func()
@@ -34,8 +32,8 @@ type FileSelectDialog struct {
 	edFile  *EditField
 	curDir  *Label
 
-	Exists   bool
-	Selected bool
+	Exists    bool
+	Selected  bool
 	mustExist bool
 	selectDir bool
 }
