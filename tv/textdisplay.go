@@ -82,7 +82,7 @@ func (l *TextDisplay) drawText() {
 
 		if str != "" {
 			str = SliceColorized(str, 0, l.width)
-			DrawText(l.x.Get(), l.y+types.ACoordY(ind), str)
+			DrawText(l.x.Get(), l.y.Get()+types.ACoordY(ind), str)
 		}
 
 		ind++
@@ -163,7 +163,7 @@ func (l *TextDisplay) processMouseClick(ev Event) bool {
 		return false
 	}
 
-	dy := ev.Y - l.y
+	dy := ev.Y - l.y.Get()
 	ww := l.height
 
 	if int(dy) < l.height/2 {

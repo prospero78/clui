@@ -88,7 +88,7 @@ func (b *SparkChart) Draw() {
 	fg, bg := RealColor(b.fg, b.Style(), ColorSparkChartText), RealColor(b.bg, b.Style(), ColorSparkChartBack)
 	SetTextColor(fg)
 	SetBackColor(bg)
-	FillRect(b.x.Get(), b.y, b.width, b.height, ' ')
+	FillRect(b.x.Get(), b.y.Get(), b.width, b.height, ' ')
 
 	if len(b.data) == 0 {
 		return
@@ -144,7 +144,7 @@ func (b *SparkChart) drawBars() {
 		}
 		SetTextColor(f)
 		SetBackColor(g)
-		FillRect(pos, b.y+types.ACoordY(h-barH), 1, barH, parts[0])
+		FillRect(pos, b.y.Get()+types.ACoordY(h-barH), 1, barH, parts[0])
 
 		pos++
 	}
@@ -175,7 +175,7 @@ func (b *SparkChart) drawValues() {
 		v := float64(h-int(dy)) / float64(h) * max
 		s := fmt.Sprintf(format, v)
 		s = CutText(s, b.valueWidth)
-		DrawRawText(b.x.Get(), b.y+dy, s)
+		DrawRawText(b.x.Get(), b.y.Get()+dy, s)
 
 		dy += 2
 	}

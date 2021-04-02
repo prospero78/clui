@@ -77,9 +77,9 @@ func PopAttributes() {
 // PushClip saves the current clipping window
 func PushClip() {
 	c := rect{
-		x: canvas.clipX, 
-		y: types.ACoordY(canvas.clipY), 
-		w: canvas.clipW, 
+		x: canvas.clipX,
+		y: types.ACoordY(canvas.clipY),
+		w: canvas.clipW,
 		h: canvas.clipH}
 	canvas.clipStack = append(canvas.clipStack, c)
 }

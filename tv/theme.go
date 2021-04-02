@@ -225,7 +225,7 @@ func SysColor(color string) term.Attribute {
 
 	clr, okclr := sch.colors[color]
 	if !okclr {
-		visited := make(map[string]int, 0)
+		visited := make(map[string]int)
 		visited[themeManager.current] = 1
 		if !ok {
 			visited[defaultTheme] = 1
@@ -239,7 +239,7 @@ func SysColor(color string) term.Attribute {
 			thememtx.RLock()
 			sch = themeManager.themes[sch.parent]
 			// clr, okclr = sch.colors[color]
-			clr, _ = sch.colors[color]
+			clr = sch.colors[color]
 			thememtx.RUnlock()
 
 			if ok {
@@ -286,7 +286,7 @@ func SysObject(object string) string {
 			thememtx.RLock()
 			sch = themeManager.themes[sch.parent]
 			// obj, okobj = sch.objects[object]
-			obj, _ = sch.objects[object]
+			obj = sch.objects[object]
 			thememtx.RUnlock()
 
 			if ok {
@@ -483,9 +483,7 @@ func ReloadTheme(name string) {
 	}
 
 	thememtx.Lock()
-	if _, ok := themeManager.themes[name]; ok {
-		delete(themeManager.themes, name)
-	}
+	delete(themeManager.themes, name)
 	thememtx.Unlock()
 
 	themeManager.loadTheme(name)

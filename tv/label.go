@@ -82,7 +82,7 @@ func (l *Label) Draw() {
 
 	SetTextColor(fg)
 	SetBackColor(bg)
-	FillRect(l.x.Get(), l.y, l.width, l.height, ' ')
+	FillRect(l.x.Get(), l.y.Get(), l.width, l.height, ' ')
 
 	if l.title == "" {
 		return
@@ -93,28 +93,28 @@ func (l *Label) Draw() {
 		elem := parser.NextElement()
 		xx, yy := l.x, l.y
 		for elem.Type != ElemEndOfText {
-			if xx.Get() >= l.x.Get()+types.ACoordX(l.width) || yy >= l.y+types.ACoordY(l.height) {
+			if xx.Get() >= l.x.Get()+types.ACoordX(l.width) || yy.Get() >= l.y.Get()+types.ACoordY(l.height) {
 				break
 			}
 
 			if elem.Type == ElemLineBreak {
 				xx = l.x
-				yy += 1
+				yy.Set(yy.Get() + 1)
 			} else if elem.Type == ElemPrintable {
 				SetTextColor(elem.Fg)
 				SetBackColor(elem.Bg)
-				putCharUnsafe(xx.Get(), yy, elem.Ch)
+				putCharUnsafe(xx.Get(), yy.Get(), elem.Ch)
 
 				if l.direction == Horizontal {
 					xx.Set(xx.Get() + 1)
 					if xx.Get() >= l.x.Get()+types.ACoordX(l.width) {
 						xx.Set(l.x.Get())
-						yy += 1
+						yy.Set(yy.Get() + 1)
 					}
 				} else {
-					yy += 1
-					if yy >= l.y+types.ACoordY(l.height) {
-						yy = l.y
+					yy.Set(yy.Get() + 1)
+					if yy.Get() >= l.y.Get()+types.ACoordY(l.height) {
+						yy.Set(l.y.Get())
 						xx.Set(xx.Get() + 1)
 					}
 				}
@@ -128,13 +128,13 @@ func (l *Label) Draw() {
 			if str != l.title && l.align != l.textDisplay {
 				shift, str = AlignColorizedText(l.title, l.width, l.textDisplay)
 			}
-			DrawText(l.x.Get()+types.ACoordX(shift), l.y, str)
+			DrawText(l.x.Get()+types.ACoordX(shift), l.y.Get(), str)
 		} else {
 			shift, str := AlignColorizedText(l.title, l.height, l.align)
 			if str != l.title && l.align != l.textDisplay {
 				shift, str = AlignColorizedText(l.title, l.width, l.textDisplay)
 			}
-			DrawTextVertical(l.x.Get(), l.y+types.ACoordY(shift), str)
+			DrawTextVertical(l.x.Get(), l.y.Get()+types.ACoordY(shift), str)
 		}
 	}
 }

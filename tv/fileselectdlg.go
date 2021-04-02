@@ -21,13 +21,11 @@ import (
 type FileSelectDialog struct {
 	View     *Window
 	FilePath string
-	Exists   bool
-	Selected bool
+	
 
 	fileMasks []string
 	currPath  string
-	mustExist bool
-	selectDir bool
+	
 
 	result  int
 	onClose func()
@@ -35,6 +33,11 @@ type FileSelectDialog struct {
 	listBox *ListBox
 	edFile  *EditField
 	curDir  *Label
+
+	Exists   bool
+	Selected bool
+	mustExist bool
+	selectDir bool
 }
 
 // Set the cursor the first item in the file list

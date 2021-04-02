@@ -86,11 +86,11 @@ func (l *TextView) outputHeight() int {
 func (l *TextView) drawScrolls() {
 	height := l.outputHeight()
 	pos := ThumbPosition(l.topLine, l.virtualHeight-l.outputHeight(), height)
-	DrawScrollBar(l.x.Get()+types.ACoordX(l.width-1), l.y, 1, height, pos)
+	DrawScrollBar(l.x.Get()+types.ACoordX(l.width-1), l.y.Get(), 1, height, pos)
 
 	if !l.wordWrap {
 		pos = ThumbPosition(l.leftShift, l.virtualWidth-l.width+1, l.width-1)
-		DrawScrollBar(l.x.Get(), l.y+types.ACoordY(l.height-1), l.width-1, 1, pos)
+		DrawScrollBar(l.x.Get(), l.y.Get()+types.ACoordY(l.height-1), l.width-1, 1, pos)
 	}
 }
 
@@ -124,7 +124,7 @@ func (l *TextView) drawText() {
 				s := SliceColorized(l.lines[lineID], start, start+maxWidth)
 
 				if linePos >= l.topLine {
-					DrawText(l.x.Get(), l.y+types.ACoordY(y), s)
+					DrawText(l.x.Get(), l.y.Get()+types.ACoordY(y), s)
 				}
 
 				remained -= maxWidth
@@ -163,7 +163,7 @@ func (l *TextView) drawText() {
 					str = SliceColorized(str, l.leftShift, maxWidth+l.leftShift)
 				}
 			}
-			DrawText(l.x.Get(), l.y+types.ACoordY(y), str)
+			DrawText(l.x.Get(), l.y.Get()+types.ACoordY(y), str)
 
 			y++
 		}
@@ -264,7 +264,7 @@ func (l *TextView) processMouseClick(ev Event) bool {
 	}
 
 	dx := ev.X - l.x.Get()
-	dy := ev.Y - l.y
+	dy := ev.Y - l.y.Get()
 	yy := l.outputHeight()
 
 	// cursor is not on any scrollbar

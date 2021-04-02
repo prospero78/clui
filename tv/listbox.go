@@ -76,7 +76,7 @@ func (l *ListBox) drawScroll() {
 	pos := ThumbPosition(l.currSelection, len(l.items), l.height)
 	l.buttonPos = pos
 
-	DrawScrollBar(l.x.Get()+types.ACoordX(l.width-1), l.y, 1, l.height, pos)
+	DrawScrollBar(l.x.Get()+types.ACoordX(l.width-1), l.y.Get(), 1, l.height, pos)
 }
 
 func (l *ListBox) drawItems() {
@@ -103,9 +103,9 @@ func (l *ListBox) drawItems() {
 
 		SetTextColor(f)
 		SetBackColor(b)
-		FillRect(l.x.Get(), l.y+dy, l.width-1, 1, ' ')
+		FillRect(l.x.Get(), l.y.Get()+dy, l.width-1, 1, ' ')
 		str := SliceColorized(l.items[curr], 0, maxWidth)
-		DrawText(l.x.Get(), l.y+dy, str)
+		DrawText(l.x.Get(), l.y.Get()+dy, str)
 
 		curr++
 		dy++
@@ -254,7 +254,7 @@ func (l *ListBox) processMouseClick(ev Event) bool {
 	}
 
 	dx := ev.X - l.x.Get()
-	dy := ev.Y - l.y
+	dy := ev.Y - l.y.Get()
 
 	if dx == types.ACoordX(l.width-1) {
 		if dy < 0 || int(dy) >= l.height || len(l.items) < 2 {

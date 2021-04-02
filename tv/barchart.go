@@ -124,7 +124,7 @@ func (b *BarChart) Draw() {
 	SetTextColor(fg)
 	SetBackColor(bg)
 
-	FillRect(b.x.Get(), b.y, b.width, b.height, ' ')
+	FillRect(b.x.Get(), b.y.Get(), b.width, b.height, ' ')
 
 	if len(b.data) == 0 {
 		return
@@ -192,7 +192,7 @@ func (b *BarChart) drawBars() {
 		if b.onDrawCell == nil {
 			SetTextColor(fColor)
 			SetBackColor(bColor)
-			FillRect(b.x.Get()+types.ACoordX(pos), b.y+types.ACoordY(h-barH), barW, barH, ch)
+			FillRect(b.x.Get()+types.ACoordX(pos), b.y.Get()+types.ACoordY(h-barH), barW, barH, ch)
 		} else {
 			cellDef := BarDataCell{Item: d.Title, ID: idx,
 				Value: 0, BarMax: d.Value, TotalMax: max,
@@ -204,7 +204,7 @@ func (b *BarChart) drawBars() {
 				SetTextColor(req.Fg)
 				SetBackColor(req.Bg)
 				for dx := 0; dx < barW; dx++ {
-					PutChar(b.x.Get()+types.ACoordX(pos+dx), b.y+types.ACoordY(h-1-dy), req.Ch)
+					PutChar(b.x.Get()+types.ACoordX(pos+dx), b.y.Get()+types.ACoordY(h-1-dy), req.Ch)
 				}
 			}
 		}
@@ -214,7 +214,7 @@ func (b *BarChart) drawBars() {
 			SetBackColor(bg)
 			if b.showMarks {
 				c := parts[7]
-				PutChar(b.x.Get()+types.ACoordX(pos+barW/2), b.y+types.ACoordY(h), c)
+				PutChar(b.x.Get()+types.ACoordX(pos+barW/2), b.y.Get()+types.ACoordY(h), c)
 			}
 			var s string
 			shift := 0
@@ -223,7 +223,7 @@ func (b *BarChart) drawBars() {
 			} else {
 				shift, s = AlignText(d.Title, barW, AlignCenter)
 			}
-			DrawRawText(b.x.Get()+types.ACoordX(pos+shift), b.y+types.ACoordY(h)+1, s)
+			DrawRawText(b.x.Get()+types.ACoordX(pos+shift), b.y.Get()+types.ACoordY(h)+1, s)
 		}
 
 		pos += barW + int(b.BarGap())
@@ -253,11 +253,11 @@ func (b *BarChart) drawLegend() {
 		}
 		SetTextColor(d.Fg)
 		SetBackColor(d.Bg)
-		PutChar(b.x.Get()+types.ACoordX(pos+width), b.y+types.ACoordY(idx), c)
+		PutChar(b.x.Get()+types.ACoordX(pos+width), b.y.Get()+types.ACoordY(idx), c)
 		s := CutText(fmt.Sprintf(" - %v", d.Title), int(b.LegendWidth()))
 		SetTextColor(fg)
 		SetBackColor(bg)
-		DrawRawText(b.x.Get()+types.ACoordX(pos+width+1), b.y+types.ACoordY(idx), s)
+		DrawRawText(b.x.Get()+types.ACoordX(pos+width+1), b.y.Get()+types.ACoordY(idx), s)
 	}
 }
 
@@ -284,7 +284,7 @@ func (b *BarChart) drawValues() {
 		v := float64(h-dy) / float64(h) * max
 		s := fmt.Sprintf(format, v)
 		s = CutText(s, valVal)
-		DrawRawText(b.x.Get(), b.y+types.ACoordY(dy), s)
+		DrawRawText(b.x.Get(), b.y.Get()+types.ACoordY(dy), s)
 
 		dy += 2
 	}
@@ -310,16 +310,16 @@ func (b *BarChart) drawRulers() {
 
 	if pos > 0 {
 		for dy := 0; dy < h; dy++ {
-			PutChar(b.x.Get()+types.ACoordX(pos), b.y+types.ACoordY(dy), cV)
+			PutChar(b.x.Get()+types.ACoordX(pos), b.y.Get()+types.ACoordY(dy), cV)
 		}
 	}
 	if b.showTitles {
 		for dx := 0; dx < vWidth; dx++ {
-			PutChar(b.x.Get()+types.ACoordX(pos+dx), b.y+types.ACoordY(h), cH)
+			PutChar(b.x.Get()+types.ACoordX(pos+dx), b.y.Get()+types.ACoordY(h), cH)
 		}
 	}
 	if pos > 0 && b.showTitles {
-		PutChar(b.x.Get()+types.ACoordX(pos), b.y+types.ACoordY(h), cC)
+		PutChar(b.x.Get()+types.ACoordX(pos), b.y.Get()+types.ACoordY(h), cC)
 	}
 }
 

@@ -161,7 +161,7 @@ func (b *ProgressBar) Draw() {
 			SetBackColor(bgOff)
 			DrawRawText(x, yy, sEmpty)
 		}
-		for yy := y + types.ACoordY(h - filled); yy < y+types.ACoordY(h); yy++ {
+		for yy := y + types.ACoordY(h-filled); yy < y+types.ACoordY(h); yy++ {
 			SetTextColor(fgOff)
 			SetBackColor(bgOff)
 			DrawRawText(x, yy, sFilled)

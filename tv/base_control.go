@@ -7,6 +7,7 @@ import (
 	term "github.com/nsf/termbox-go"
 
 	"github.com/prospero78/goTV/tv/coordx"
+	"github.com/prospero78/goTV/tv/coordy"
 	"github.com/prospero78/goTV/tv/types"
 )
 
@@ -14,16 +15,16 @@ import (
 // Every new control must inherit it or implement
 // the same set of methods
 type BaseControl struct {
-	refID         int64
-	title         string
+	refID int64
+
 	x             types.ICoordX
-	y             types.ACoordY
+	y             types.ICoordY
 	width, height int
 	minW, minH    int
 	scale         int
+	gapX, gapY    int
 	padX          types.ACoordX
 	padY          types.ACoordY
-	gapX, gapY    int
 	fg, bg        term.Attribute
 	fgActive      term.Attribute
 	bgActive      term.Attribute
@@ -34,13 +35,14 @@ type BaseControl struct {
 	tabSkip       bool
 	disabled      bool
 	hidden        bool
+	clipped       bool
+	clipper       *rect
 	pack          PackType
 	children      []Control
 	mtx           sync.RWMutex
 	onActive      func(active bool)
 	style         string
-	clipped       bool
-	clipper       *rect
+	title         string
 }
 
 var (
@@ -55,6 +57,7 @@ func NewBaseControl() BaseControl {
 	return BaseControl{
 		refID: nextRefId(),
 		x:     coordx.New(),
+		y:     coordy.New(),
 	}
 }
 
@@ -105,7 +108,7 @@ func (c *BaseControl) SetSize(width, height int) {
 }
 
 func (c *BaseControl) Pos() (x types.ACoordX, y types.ACoordY) {
-	return c.x.Get(), c.y
+	return c.x.Get(), c.y.Get()
 }
 
 func (c *BaseControl) SetPos(x types.ACoordX, y types.ACoordY) {
@@ -114,16 +117,16 @@ func (c *BaseControl) SetPos(x types.ACoordX, y types.ACoordY) {
 		px, py := c.Paddings()
 
 		distX := cx - c.x.Get()
-		distY := cy - c.y
+		distY := cy - c.y.Get()
 
 		c.clipper.x = x + px
-		c.clipper.y = y + types.ACoordY(py)
+		c.clipper.y = y + py
 
 		c.x.Set((x - distX) + px)
-		c.y = (y - distY) + types.ACoordY(py)
+		c.y.Set((y - distY) + py)
 	} else {
 		c.x.Set(x)
-		c.y = y
+		c.y.Set(y)
 	}
 }
 
@@ -565,16 +568,16 @@ func (c *BaseControl) setClipper() {
 
 func (c *BaseControl) HitTest(x types.ACoordX, y types.ACoordY) HitResult {
 	if x > c.x.Get() && x < c.x.Get()+types.ACoordX(c.width-1) &&
-		y > c.y && y < c.y+types.ACoordY(c.height-1) {
+		y > c.y.Get() && y < c.y.Get()+types.ACoordY(c.height-1) {
 		return HitInside
 	}
 
 	if (x == c.x.Get() || x == c.x.Get()+types.ACoordX(c.width-1)) &&
-		y >= c.y && y < c.y+types.ACoordY(c.height) {
+		y >= c.y.Get() && y < c.y.Get()+types.ACoordY(c.height) {
 		return HitBorder
 	}
 
-	if (y == c.y || y == c.y+types.ACoordY(c.height-1)) &&
+	if (y == c.y.Get() || y == c.y.Get()+types.ACoordY(c.height-1)) &&
 		x >= c.x.Get() && x < c.x.Get()+types.ACoordX(c.width) {
 		return HitBorder
 	}
@@ -592,7 +595,7 @@ func (c *BaseControl) PlaceChildren() {
 		return
 	}
 
-	xx, yy := c.x.Get()+c.padX, c.y+c.padY
+	xx, yy := c.x.Get()+c.padX, c.y.Get()+c.padY
 	for _, ctrl := range c.children {
 		if !ctrl.Visible() {
 			continue
