@@ -9,18 +9,18 @@ import (
 // Window is an implementation of View managed by Composer.
 type Window struct {
 	BaseControl
-
-	buttons   ViewButton
-	maximized bool
-	// maximization support
 	origWidth  int
 	origHeight int
 	origX      types.ACoordX
 	origY      int
-	hidden     bool
-	immovable  bool
-	fixedSize  bool
-	border     BorderStyle
+	buttons    ViewButton
+	maximized  bool
+	// maximization support
+
+	hidden    bool
+	immovable bool
+	fixedSize bool
+	border    BorderStyle
 
 	onClose        func(Event) bool
 	onScreenResize func(Event)
@@ -89,7 +89,7 @@ func (wnd *Window) drawFrame() {
 		bs = wnd.border
 	}
 
-	DrawFrame(wnd.x, wnd.y, wnd.width, wnd.height, bs)
+	DrawFrame(wnd.x.Get(), wnd.y, wnd.width, wnd.height, bs)
 }
 
 func (wnd *Window) drawTitle() {
@@ -116,7 +116,7 @@ func (wnd *Window) drawTitle() {
 	if xs.Len(rawText) > maxw {
 		fitTitle = SliceColorized(fitTitle, 0, maxw-3) + "..."
 	}
-	DrawText(wnd.x+types.ACoordX(xshift), wnd.y, fitTitle)
+	DrawText(wnd.x.Get()+types.ACoordX(xshift), wnd.y, fitTitle)
 }
 
 func (wnd *Window) drawButtons() {
@@ -133,14 +133,14 @@ func (wnd *Window) drawButtons() {
 
 	// draw close button (rb can be either 1 or 0)
 	if rb != 0 {
-		pos := wnd.x + types.ACoordX(wnd.width-rb-2)
+		pos := wnd.x.Get() + types.ACoordX(wnd.width-rb-2)
 		putCharUnsafe(pos, wnd.y, cOpenB)
 		putCharUnsafe(pos+1, wnd.y, cClose)
 		putCharUnsafe(pos+2, wnd.y, cCloseB)
 	}
 
 	if lb > 0 {
-		pos := wnd.x + 1
+		pos := wnd.x.Get() + 1
 		putCharUnsafe(pos, wnd.y, cOpenB)
 		pos += 1
 		if wnd.buttons&ButtonBottom == ButtonBottom {
@@ -165,7 +165,7 @@ func (wnd *Window) Draw() {
 	fg, bg := RealColor(wnd.fg, wnd.Style(), ColorViewText), RealColor(wnd.bg, wnd.Style(), ColorViewBack)
 	SetBackColor(bg)
 
-	FillRect(wnd.x, wnd.y, wnd.width, wnd.height, ' ')
+	FillRect(wnd.x.Get(), wnd.y, wnd.width, wnd.height, ' ')
 
 	wnd.DrawChildren()
 
@@ -181,7 +181,7 @@ func (wnd *Window) Draw() {
 // method is used to detect if a mouse cursor on a window border or outside,
 // which window icon is under cursor etc
 func (c *Window) HitTest(x types.ACoordX, y int) HitResult {
-	if x > c.x && x < c.x+types.ACoordX(c.width-1) &&
+	if x > c.x.Get() && x < c.x.Get()+types.ACoordX(c.width-1) &&
 		y > c.y && y < c.y+c.height-1 {
 		return HitInside
 	}
@@ -189,19 +189,19 @@ func (c *Window) HitTest(x types.ACoordX, y int) HitResult {
 	hResult := HitOutside
 
 	switch {
-	case x == c.x && y == c.y:
+	case x == c.x.Get() && y == c.y:
 		hResult = HitTopLeft
-	case x == c.x+types.ACoordX(c.width-1) && y == c.y:
+	case x == c.x.Get()+types.ACoordX(c.width-1) && y == c.y:
 		hResult = HitTopRight
-	case x == c.x && y == c.y+c.height-1:
+	case x == c.x.Get() && y == c.y+c.height-1:
 		hResult = HitBottomLeft
-	case x == c.x+types.ACoordX(c.width-1) && y == c.y+c.height-1:
+	case x == c.x.Get()+types.ACoordX(c.width-1) && y == c.y+c.height-1:
 		hResult = HitBottomRight
-	case x == c.x && y > c.y && y < c.y+c.height-1:
+	case x == c.x.Get() && y > c.y && y < c.y+c.height-1:
 		hResult = HitLeft
-	case x == c.x+types.ACoordX(c.width-1) && y > c.y && y < c.y+c.height-1:
+	case x == c.x.Get()+types.ACoordX(c.width-1) && y > c.y && y < c.y+c.height-1:
 		hResult = HitRight
-	case y == c.y && x > c.x && x < c.x+types.ACoordX(c.width-1):
+	case y == c.y && x > c.x.Get() && x < c.x.Get()+types.ACoordX(c.width-1):
 		lb, rb := c.buttonCount()
 		fromL, fromR := lb, rb
 		if lb > 0 {
@@ -210,14 +210,14 @@ func (c *Window) HitTest(x types.ACoordX, y int) HitResult {
 		if rb > 0 {
 			fromR += 2
 		}
-		if x > c.x+types.ACoordX(fromL) && x < c.x+types.ACoordX(c.width-fromR) {
+		if x > c.x.Get()+types.ACoordX(fromL) && x < c.x.Get()+types.ACoordX(c.width-fromR) {
 			hResult = HitTop
 		} else {
 			hResult = HitTop
-			if c.buttons&ButtonClose == ButtonClose && rb != 0 && x == c.x+types.ACoordX(c.width-2) {
+			if c.buttons&ButtonClose == ButtonClose && rb != 0 && x == c.x.Get()+types.ACoordX(c.width-2) {
 				hResult = HitButtonClose
-			} else if lb != 0 && x > c.x+1 && x < c.x+types.ACoordX(2+lb) {
-				dx := x - c.x - 2
+			} else if lb != 0 && x > c.x.Get()+1 && x < c.x.Get()+types.ACoordX(2+lb) {
+				dx := x - c.x.Get() - 2
 				hitRes := []HitResult{HitTop, HitTop}
 				pos := 0
 				if c.buttons&ButtonBottom == ButtonBottom {
@@ -226,14 +226,14 @@ func (c *Window) HitTest(x types.ACoordX, y int) HitResult {
 				}
 				if c.buttons&ButtonMaximize == ButtonMaximize {
 					hitRes[pos] = HitButtonMaximize
-					pos += 1
+					// pos += 1
 				}
 				if int(dx) < len(hitRes) {
 					hResult = hitRes[dx]
 				}
 			}
 		}
-	case y == c.y+c.height-1 && x > c.x && x < c.x+types.ACoordX(c.width-1):
+	case y == c.y+c.height-1 && x > c.x.Get() && x < c.x.Get()+types.ACoordX(c.width-1):
 		hResult = HitBottom
 	}
 

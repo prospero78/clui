@@ -6,6 +6,7 @@ import (
 
 	term "github.com/nsf/termbox-go"
 
+	"github.com/prospero78/goTV/tv/coordx"
 	"github.com/prospero78/goTV/tv/types"
 )
 
@@ -15,7 +16,7 @@ import (
 type BaseControl struct {
 	refID         int64
 	title         string
-	x             types.ACoordX
+	x             types.ICoordX
 	y             int
 	width, height int
 	minW, minH    int
@@ -51,7 +52,10 @@ func nextRefId() int64 {
 }
 
 func NewBaseControl() BaseControl {
-	return BaseControl{refID: nextRefId()}
+	return BaseControl{
+		refID: nextRefId(),
+		x:     coordx.New(),
+	}
 }
 
 func (c *BaseControl) SetClipped(clipped bool) {
@@ -101,7 +105,7 @@ func (c *BaseControl) SetSize(width, height int) {
 }
 
 func (c *BaseControl) Pos() (x types.ACoordX, y int) {
-	return c.x, c.y
+	return c.x.Get(), c.y
 }
 
 func (c *BaseControl) SetPos(x types.ACoordX, y int) {
@@ -109,16 +113,16 @@ func (c *BaseControl) SetPos(x types.ACoordX, y int) {
 		cx, cy, _, _ := c.Clipper()
 		px, py := c.Paddings()
 
-		distX := cx - c.x
+		distX := cx - c.x.Get()
 		distY := cy - c.y
 
 		c.clipper.x = x + px
 		c.clipper.y = y + py
 
-		c.x = (x - distX) + px
+		c.x.Set((x - distX) + px)
 		c.y = (y - distY) + py
 	} else {
-		c.x = x
+		c.x.Set(x)
 		c.y = y
 	}
 }
@@ -560,18 +564,18 @@ func (c *BaseControl) setClipper() {
 }
 
 func (c *BaseControl) HitTest(x types.ACoordX, y int) HitResult {
-	if x > c.x && x < c.x+types.ACoordX(c.width-1) &&
+	if x > c.x.Get() && x < c.x.Get()+types.ACoordX(c.width-1) &&
 		y > c.y && y < c.y+c.height-1 {
 		return HitInside
 	}
 
-	if (x == c.x || x == c.x+types.ACoordX(c.width-1)) &&
+	if (x == c.x.Get() || x == c.x.Get()+types.ACoordX(c.width-1)) &&
 		y >= c.y && y < c.y+c.height {
 		return HitBorder
 	}
 
 	if (y == c.y || y == c.y+c.height-1) &&
-		x >= c.x && x < c.x+types.ACoordX(c.width) {
+		x >= c.x.Get() && x < c.x.Get()+types.ACoordX(c.width) {
 		return HitBorder
 	}
 
@@ -588,7 +592,7 @@ func (c *BaseControl) PlaceChildren() {
 		return
 	}
 
-	xx, yy := c.x+c.padX, c.y+c.padY
+	xx, yy := c.x.Get()+c.padX, c.y+c.padY
 	for _, ctrl := range c.children {
 		if !ctrl.Visible() {
 			continue

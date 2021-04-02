@@ -114,7 +114,7 @@ func (e *EditField) Draw() {
 	FillRect(x, y, w, 1, ' ')
 	DrawRawText(x, y, textOut)
 	if e.Active() {
-		SetCursorPos(e.cursorPos+e.x+types.ACoordX(curOff), e.y)
+		SetCursorPos(e.cursorPos+e.x.Get()+types.ACoordX(curOff), e.y)
 	}
 }
 

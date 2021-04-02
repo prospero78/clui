@@ -238,7 +238,8 @@ func SysColor(color string) term.Attribute {
 			themeManager.loadTheme(sch.parent)
 			thememtx.RLock()
 			sch = themeManager.themes[sch.parent]
-			clr, okclr = sch.colors[color]
+			// clr, okclr = sch.colors[color]
+			clr, _ = sch.colors[color]
 			thememtx.RUnlock()
 
 			if ok {
@@ -284,7 +285,8 @@ func SysObject(object string) string {
 			themeManager.loadTheme(sch.parent)
 			thememtx.RLock()
 			sch = themeManager.themes[sch.parent]
-			obj, okobj = sch.objects[object]
+			// obj, okobj = sch.objects[object]
+			obj, _ = sch.objects[object]
 			thememtx.RUnlock()
 
 			if ok {

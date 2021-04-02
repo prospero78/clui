@@ -262,11 +262,11 @@ func (l *TableView) counterWidth() int {
 func (l *TableView) drawScroll() {
 
 	pos := ThumbPosition(l.selectedRow, l.rowCount, l.height-1)
-	DrawScrollBar(l.x+types.ACoordX(l.width-1), l.y, 1, l.height-1, pos)
+	DrawScrollBar(l.x.Get()+types.ACoordX(l.width-1), l.y, 1, l.height-1, pos)
 
 	pos = ThumbPosition(l.selectedCol, len(l.columns), l.width-1)
-	DrawScrollBar(l.x, l.y+l.height-1, l.width-1, 1, pos)
-	PutChar(l.x+types.ACoordX(l.width-1), l.y+l.height-1, ' ')
+	DrawScrollBar(l.x.Get(), l.y+l.height-1, l.width-1, 1, pos)
+	PutChar(l.x.Get()+types.ACoordX(l.width-1), l.y+l.height-1, ' ')
 }
 
 func (l *TableView) drawCells() {
@@ -295,10 +295,10 @@ func (l *TableView) drawCells() {
 			shift, str := AlignText(s, start, AlignRight)
 			SetTextColor(fg)
 			SetBackColor(bg)
-			DrawText(l.x+types.ACoordX(shift), l.y+dy+idx-1, str)
+			DrawText(l.x.Get()+types.ACoordX(shift), l.y+dy+idx-1, str)
 			if l.showVLines {
 				SetTextColor(fgLine)
-				PutChar(l.x+types.ACoordX(start), l.y+dy+idx-1, parts[1])
+				PutChar(l.x.Get()+types.ACoordX(start), l.y+dy+idx-1, parts[1])
 			}
 		}
 		if l.showVLines {
@@ -337,15 +337,15 @@ func (l *TableView) drawCells() {
 			}
 			SetTextColor(info.Fg)
 			SetBackColor(info.Bg)
-			FillRect(l.x+types.ACoordX(dx), l.y+dy, length, 1, ' ')
+			FillRect(l.x.Get()+types.ACoordX(dx), l.y+dy, length, 1, ' ')
 			shift, text := AlignColorizedText(info.Text, length, info.Alignment)
-			DrawText(l.x+types.ACoordX(dx+shift), l.y+dy, text)
+			DrawText(l.x.Get()+types.ACoordX(dx+shift), l.y+dy, text)
 
 			dx += c.Width
 			if l.showVLines && dx < l.width-1 && colNo < len(l.columns)-1 {
 				SetTextColor(fg)
 				SetBackColor(bg)
-				PutChar(l.x+types.ACoordX(dx), l.y+dy, parts[1])
+				PutChar(l.x.Get()+types.ACoordX(dx), l.y+dy, parts[1])
 				dx++
 			}
 
@@ -680,7 +680,7 @@ func (l *TableView) processMouseClick(ev Event) bool {
 		return false
 	}
 
-	dx := ev.X - l.x
+	dx := ev.X - l.x.Get()
 	dy := ev.Y - l.y
 
 	if l.topRow+dy-2 >= l.rowCount && dy != l.height-1 && int(dx) != l.width-1 {

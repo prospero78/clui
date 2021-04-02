@@ -169,7 +169,7 @@ func (f *Frame) ScrollTo(x types.ACoordX, y int) {
 		return
 	}
 
-	f.x = x
+	f.x.Set(x)
 	f.y = y
 
 	f.ResizeChildren()
@@ -212,7 +212,7 @@ func (f *Frame) ProcessEvent(ev Event) bool {
 		xx = x + delta
 	}
 
-	f.x = xx
+	f.x.Set(xx)
 	f.y = yy
 
 	f.ResizeChildren()

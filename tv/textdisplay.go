@@ -80,7 +80,7 @@ func (l *TextDisplay) drawText() {
 
 		if str != "" {
 			str = SliceColorized(str, 0, l.width)
-			DrawText(l.x, l.y+ind, str)
+			DrawText(l.x.Get(), l.y+ind, str)
 		}
 
 		ind++

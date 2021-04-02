@@ -312,7 +312,7 @@ func DrawRawText(x types.ACoordX, y int, text string) {
 
 	if x < cx {
 		text = xs.Slice(text, int(cx-x), -1)
-		length -= int(cx - x)
+		// length -= int(cx - x)
 		x = cx
 	}
 	text = CutText(text, cw)
@@ -368,7 +368,7 @@ func DrawRawTextVertical(x types.ACoordX, y int, text string) {
 
 	if y < cy {
 		text = xs.Slice(text, cy-y, -1)
-		length -= cy - y
+		// length -= cy - y
 		y = cy
 	}
 	text = CutText(text, ch)
