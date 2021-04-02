@@ -17,12 +17,12 @@ type BaseControl struct {
 	refID         int64
 	title         string
 	x             types.ICoordX
-	y             int
+	y             types.ACoordY
 	width, height int
 	minW, minH    int
 	scale         int
 	padX          types.ACoordX
-	padY          int
+	padY          types.ACoordY
 	gapX, gapY    int
 	fg, bg        term.Attribute
 	fgActive      term.Attribute
@@ -104,11 +104,11 @@ func (c *BaseControl) SetSize(width, height int) {
 	}
 }
 
-func (c *BaseControl) Pos() (x types.ACoordX, y int) {
+func (c *BaseControl) Pos() (x types.ACoordX, y types.ACoordY) {
 	return c.x.Get(), c.y
 }
 
-func (c *BaseControl) SetPos(x types.ACoordX, y int) {
+func (c *BaseControl) SetPos(x types.ACoordX, y types.ACoordY) {
 	if c.clipped && c.clipper != nil {
 		cx, cy, _, _ := c.Clipper()
 		px, py := c.Paddings()
@@ -117,10 +117,10 @@ func (c *BaseControl) SetPos(x types.ACoordX, y int) {
 		distY := cy - c.y
 
 		c.clipper.x = x + px
-		c.clipper.y = y + py
+		c.clipper.y = y + types.ACoordY(py)
 
 		c.x.Set((x - distX) + px)
-		c.y = (y - distY) + py
+		c.y = (y - distY) + types.ACoordY(py)
 	} else {
 		c.x.Set(x)
 		c.y = y
@@ -239,11 +239,11 @@ func (c *BaseControl) SetModal(modal bool) {
 	c.modal = modal
 }
 
-func (c *BaseControl) Paddings() (px types.ACoordX, py int) {
+func (c *BaseControl) Paddings() (px types.ACoordX, py types.ACoordY) {
 	return c.padX, c.padY
 }
 
-func (c *BaseControl) SetPaddings(px types.ACoordX, py int) {
+func (c *BaseControl) SetPaddings(px types.ACoordX, py types.ACoordY) {
 	if px >= 0 {
 		c.padX = px
 	}
@@ -325,7 +325,7 @@ func (c *BaseControl) ResizeChildren() {
 	}
 
 	fullWidth := c.width - int(2*c.padX)
-	fullHeight := c.height - 2*c.padY
+	fullHeight := c.height - int(2*c.padY)
 	if c.pack == Horizontal {
 		fullWidth -= (children - 1) * c.gapX
 	} else {
@@ -483,7 +483,7 @@ func (c *BaseControl) MinimalSize() (w int, h int) {
 	totalY := 2 * c.padY
 
 	if c.pack == Vertical {
-		totalY += (children - 1) * c.gapY
+		totalY += types.ACoordY((children - 1) * c.gapY)
 	} else {
 		totalX += types.ACoordX((children - 1) * c.gapX)
 	}
@@ -498,14 +498,14 @@ func (c *BaseControl) MinimalSize() (w int, h int) {
 		}
 		ww, hh := ctrl.MinimalSize()
 		if c.pack == Vertical {
-			totalY += hh
+			totalY += types.ACoordY(hh)
 			if types.ACoordX(ww)+2*c.padX > totalX {
 				totalX = types.ACoordX(ww) + 2*c.padX
 			}
 		} else {
 			totalX += types.ACoordX(ww)
-			if hh+2*c.padY > totalY {
-				totalY = hh + 2*c.padY
+			if types.ACoordY(hh)+2*c.padY > totalY {
+				totalY = types.ACoordY(hh) + 2*c.padY
 			}
 		}
 	}
@@ -513,11 +513,11 @@ func (c *BaseControl) MinimalSize() (w int, h int) {
 	if totalX < types.ACoordX(c.minW) {
 		totalX = types.ACoordX(c.minW)
 	}
-	if totalY < c.minH {
-		totalY = c.minH
+	if totalY < types.ACoordY(c.minH) {
+		totalY = types.ACoordY(c.minH)
 	}
 
-	return int(totalX), totalY
+	return int(totalX), int(totalY)
 }
 
 func (c *BaseControl) Draw() {
@@ -548,7 +548,7 @@ func (c *BaseControl) DrawChildren() {
 	}
 }
 
-func (c *BaseControl) Clipper() (types.ACoordX, int, int, int) {
+func (c *BaseControl) Clipper() (types.ACoordX, types.ACoordY, int, int) {
 	clipped := ClippedParent(c)
 
 	if clipped == nil || (c.clipped && c.clipper != nil) {
@@ -563,18 +563,18 @@ func (c *BaseControl) setClipper() {
 	c.clipper = &rect{x: x, y: y, w: w, h: h}
 }
 
-func (c *BaseControl) HitTest(x types.ACoordX, y int) HitResult {
+func (c *BaseControl) HitTest(x types.ACoordX, y types.ACoordY) HitResult {
 	if x > c.x.Get() && x < c.x.Get()+types.ACoordX(c.width-1) &&
-		y > c.y && y < c.y+c.height-1 {
+		y > c.y && y < c.y+types.ACoordY(c.height-1) {
 		return HitInside
 	}
 
 	if (x == c.x.Get() || x == c.x.Get()+types.ACoordX(c.width-1)) &&
-		y >= c.y && y < c.y+c.height {
+		y >= c.y && y < c.y+types.ACoordY(c.height) {
 		return HitBorder
 	}
 
-	if (y == c.y || y == c.y+c.height-1) &&
+	if (y == c.y || y == c.y+types.ACoordY(c.height-1)) &&
 		x >= c.x.Get() && x < c.x.Get()+types.ACoordX(c.width) {
 		return HitBorder
 	}
@@ -601,7 +601,7 @@ func (c *BaseControl) PlaceChildren() {
 		ctrl.SetPos(xx, yy)
 		ww, hh := ctrl.Size()
 		if c.pack == Vertical {
-			yy += c.gapY + hh
+			yy += types.ACoordY(c.gapY + hh)
 		} else {
 			xx += types.ACoordX(c.gapX + ww)
 		}

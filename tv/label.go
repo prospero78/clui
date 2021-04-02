@@ -93,7 +93,7 @@ func (l *Label) Draw() {
 		elem := parser.NextElement()
 		xx, yy := l.x, l.y
 		for elem.Type != ElemEndOfText {
-			if xx.Get() >= l.x.Get()+types.ACoordX(l.width) || yy >= l.y+l.height {
+			if xx.Get() >= l.x.Get()+types.ACoordX(l.width) || yy >= l.y+types.ACoordY(l.height) {
 				break
 			}
 
@@ -113,7 +113,7 @@ func (l *Label) Draw() {
 					}
 				} else {
 					yy += 1
-					if yy >= l.y+l.height {
+					if yy >= l.y+types.ACoordY(l.height) {
 						yy = l.y
 						xx.Set(xx.Get() + 1)
 					}
@@ -134,7 +134,7 @@ func (l *Label) Draw() {
 			if str != l.title && l.align != l.textDisplay {
 				shift, str = AlignColorizedText(l.title, l.width, l.textDisplay)
 			}
-			DrawTextVertical(l.x.Get(), l.y+shift, str)
+			DrawTextVertical(l.x.Get(), l.y+types.ACoordY(shift), str)
 		}
 	}
 }

@@ -118,7 +118,7 @@ func (b *ProgressBar) Draw() {
 		sFilled := strings.Repeat(string(cFilled), filled)
 		sEmpty := strings.Repeat(string(cEmpty), w-filled)
 
-		for yy := y; yy < y+h; yy++ {
+		for yy := y; yy < y+types.ACoordY(h); yy++ {
 			SetTextColor(fgOn)
 			SetBackColor(bgOn)
 			DrawRawText(x, yy, sFilled)
@@ -156,12 +156,12 @@ func (b *ProgressBar) Draw() {
 		filled := prc * h / 100
 		sFilled := strings.Repeat(string(cFilled), w)
 		sEmpty := strings.Repeat(string(cEmpty), w)
-		for yy := y; yy < y+h-filled; yy++ {
+		for yy := y; yy < y+types.ACoordY(h-filled); yy++ {
 			SetTextColor(fgOff)
 			SetBackColor(bgOff)
 			DrawRawText(x, yy, sEmpty)
 		}
-		for yy := y + h - filled; yy < y+h; yy++ {
+		for yy := y + types.ACoordY(h - filled); yy < y+types.ACoordY(h); yy++ {
 			SetTextColor(fgOff)
 			SetBackColor(bgOff)
 			DrawRawText(x, yy, sFilled)

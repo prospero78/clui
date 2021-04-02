@@ -79,7 +79,7 @@ type Event struct {
 	// X is used to indicate on/off for events like Activate
 	// Y is used for vertical-based events like ListBox item selection - id of the item
 	X types.ACoordX
-	Y int
+	Y types.ACoordY
 	// Err is error got from termbox library
 	Err error
 	// Key is a pressed key

@@ -3,6 +3,8 @@ package tv
 import (
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+
+	"github.com/prospero78/goTV/tv/types"
 )
 
 type TextDisplay struct {
@@ -80,7 +82,7 @@ func (l *TextDisplay) drawText() {
 
 		if str != "" {
 			str = SliceColorized(str, 0, l.width)
-			DrawText(l.x.Get(), l.y+ind, str)
+			DrawText(l.x.Get(), l.y+types.ACoordY(ind), str)
 		}
 
 		ind++
@@ -164,7 +166,7 @@ func (l *TextDisplay) processMouseClick(ev Event) bool {
 	dy := ev.Y - l.y
 	ww := l.height
 
-	if dy < l.height/2 {
+	if int(dy) < l.height/2 {
 		l.moveUp(ww - 1)
 	} else {
 		l.moveDown(ww - 1)

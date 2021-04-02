@@ -90,7 +90,7 @@ func (l *TextView) drawScrolls() {
 
 	if !l.wordWrap {
 		pos = ThumbPosition(l.leftShift, l.virtualWidth-l.width+1, l.width-1)
-		DrawScrollBar(l.x.Get(), l.y+l.height-1, l.width-1, 1, pos)
+		DrawScrollBar(l.x.Get(), l.y+types.ACoordY(l.height-1), l.width-1, 1, pos)
 	}
 }
 
@@ -124,7 +124,7 @@ func (l *TextView) drawText() {
 				s := SliceColorized(l.lines[lineID], start, start+maxWidth)
 
 				if linePos >= l.topLine {
-					DrawText(l.x.Get(), l.y+y, s)
+					DrawText(l.x.Get(), l.y+types.ACoordY(y), s)
 				}
 
 				remained -= maxWidth
@@ -163,7 +163,7 @@ func (l *TextView) drawText() {
 					str = SliceColorized(str, l.leftShift, maxWidth+l.leftShift)
 				}
 			}
-			DrawText(l.x.Get(), l.y+y, str)
+			DrawText(l.x.Get(), l.y+types.ACoordY(y), str)
 
 			y++
 		}
@@ -268,7 +268,7 @@ func (l *TextView) processMouseClick(ev Event) bool {
 	yy := l.outputHeight()
 
 	// cursor is not on any scrollbar
-	if int(dx) != l.width-1 && dy != l.height-1 {
+	if int(dx) != l.width-1 && int(dy) != l.height-1 {
 		return false
 	}
 	// wordwrap mode does not have horizontal scroll
@@ -276,7 +276,7 @@ func (l *TextView) processMouseClick(ev Event) bool {
 		return false
 	}
 	// corner in not wordwrap mode
-	if !l.wordWrap && int(dx) == l.width-1 && dy == l.height-1 {
+	if !l.wordWrap && int(dx) == l.width-1 && int(dy) == l.height-1 {
 		return false
 	}
 
@@ -285,10 +285,10 @@ func (l *TextView) processMouseClick(ev Event) bool {
 		switch {
 		case dy == 0:
 			l.moveUp(1)
-		case dy == yy-1:
+		case dy == types.ACoordY(yy-1):
 			l.moveDown(1)
 		default:
-			newPos := ItemByThumbPosition(dy, l.virtualHeight-yy+1, yy)
+			newPos := ItemByThumbPosition(int(dy), l.virtualHeight-yy+1, yy)
 			if newPos >= 0 {
 				l.topLine = newPos
 			}

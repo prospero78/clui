@@ -144,7 +144,7 @@ func (b *SparkChart) drawBars() {
 		}
 		SetTextColor(f)
 		SetBackColor(g)
-		FillRect(pos, b.y+h-barH, 1, barH, parts[0])
+		FillRect(pos, b.y+types.ACoordY(h-barH), 1, barH, parts[0])
 
 		pos++
 	}
@@ -169,10 +169,10 @@ func (b *SparkChart) drawValues() {
 		max = b.topValue
 	}
 
-	dy := 0
+	dy := types.ACoordY(0)
 	format := fmt.Sprintf("%%%v.2f", b.valueWidth)
-	for dy < h-1 {
-		v := float64(h-dy) / float64(h) * max
+	for int(dy) < h-1 {
+		v := float64(h-int(dy)) / float64(h) * max
 		s := fmt.Sprintf(format, v)
 		s = CutText(s, b.valueWidth)
 		DrawRawText(b.x.Get(), b.y+dy, s)

@@ -85,8 +85,8 @@ func (l *ListBox) drawItems() {
 
 	maxCurr := len(l.items) - 1
 	curr := l.topLine
-	dy := 0
-	maxDy := l.height - 1
+	dy := types.ACoordY(0)
+	maxDy := types.ACoordY(l.height - 1)
 	maxWidth := l.width - 1
 
 	fg, bg := RealColor(l.fg, l.Style(), ColorEditText), RealColor(l.bg, l.Style(), ColorEditBack)
@@ -146,7 +146,7 @@ func (l *ListBox) home() {
 	l.topLine = 0
 
 	if l.onSelectItem != nil {
-		ev := Event{Y: l.currSelection, Msg: l.SelectedItemText()}
+		ev := Event{Y: types.ACoordY(l.currSelection), Msg: l.SelectedItemText()}
 		l.onSelectItem(ev)
 	}
 }
@@ -164,7 +164,7 @@ func (l *ListBox) end() {
 	}
 
 	if l.onSelectItem != nil {
-		ev := Event{Y: l.currSelection, Msg: l.SelectedItemText()}
+		ev := Event{Y: types.ACoordY(l.currSelection), Msg: l.SelectedItemText()}
 		l.onSelectItem(ev)
 	}
 }
@@ -190,7 +190,7 @@ func (l *ListBox) moveUp(dy int) {
 	l.EnsureVisible()
 
 	if l.onSelectItem != nil {
-		ev := Event{Y: l.currSelection, Msg: l.SelectedItemText()}
+		ev := Event{Y: types.ACoordY(l.currSelection), Msg: l.SelectedItemText()}
 		l.onSelectItem(ev)
 	}
 }
@@ -211,7 +211,7 @@ func (l *ListBox) moveDown(dy int) {
 	l.EnsureVisible()
 
 	if l.onSelectItem != nil {
-		ev := Event{Y: l.currSelection, Msg: l.SelectedItemText()}
+		ev := Event{Y: types.ACoordY(l.currSelection), Msg: l.SelectedItemText()}
 		l.onSelectItem(ev)
 	}
 }
@@ -257,7 +257,7 @@ func (l *ListBox) processMouseClick(ev Event) bool {
 	dy := ev.Y - l.y
 
 	if dx == types.ACoordX(l.width-1) {
-		if dy < 0 || dy >= l.height || len(l.items) < 2 {
+		if dy < 0 || int(dy) >= l.height || len(l.items) < 2 {
 			return true
 		}
 
@@ -265,30 +265,30 @@ func (l *ListBox) processMouseClick(ev Event) bool {
 			l.moveUp(1)
 			return true
 		}
-		if dy == l.height-1 {
+		if int(dy) == l.height-1 {
 			l.moveDown(1)
 			return true
 		}
 
-		l.buttonPos = dy
+		l.buttonPos = int(dy)
 		l.recalcPositionByScroll()
 		return true
 	}
 
-	if dx < 0 || int(dx) >= l.width || dy < 0 || dy >= l.height {
+	if dx < 0 || int(dx) >= l.width || dy < 0 || int(dy) >= l.height {
 		return true
 	}
 
-	if dy >= len(l.items) {
+	if int(dy) >= len(l.items) {
 		return true
 	}
 
-	l.SelectItem(l.topLine + dy)
+	l.SelectItem(l.topLine + int(dy))
 	WindowManager().BeginUpdate()
 	onSelFunc := l.onSelectItem
 	WindowManager().EndUpdate()
 	if onSelFunc != nil {
-		ev := Event{Y: l.topLine + dy, Msg: l.SelectedItemText()}
+		ev := Event{Y: types.ACoordY(l.topLine) + dy, Msg: l.SelectedItemText()}
 		onSelFunc(ev)
 	}
 
@@ -346,7 +346,7 @@ func (l *ListBox) ProcessEvent(event Event) bool {
 			return true
 		case term.KeyCtrlM:
 			if l.currSelection != -1 && l.onSelectItem != nil {
-				ev := Event{Y: l.currSelection, Msg: l.SelectedItemText()}
+				ev := Event{Y: types.ACoordY(l.currSelection), Msg: l.SelectedItemText()}
 				l.onSelectItem(ev)
 			}
 		default:

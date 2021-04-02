@@ -12,7 +12,7 @@ type Window struct {
 	origWidth  int
 	origHeight int
 	origX      types.ACoordX
-	origY      int
+	origY      types.ACoordY
 	buttons    ViewButton
 	maximized  bool
 	// maximization support
@@ -33,7 +33,7 @@ type keyDownCb struct {
 	fn   func(evt Event, data interface{}) bool
 }
 
-func CreateWindow(x types.ACoordX, y, w, h int, title string) *Window {
+func CreateWindow(x types.ACoordX, y types.ACoordY, w, h int, title string) *Window {
 	wnd := new(Window)
 	wnd.BaseControl = NewBaseControl()
 
@@ -180,9 +180,9 @@ func (wnd *Window) Draw() {
 // HitTest returns type of a Window region at a given screen coordinates. The
 // method is used to detect if a mouse cursor on a window border or outside,
 // which window icon is under cursor etc
-func (c *Window) HitTest(x types.ACoordX, y int) HitResult {
+func (c *Window) HitTest(x types.ACoordX, y types.ACoordY) HitResult {
 	if x > c.x.Get() && x < c.x.Get()+types.ACoordX(c.width-1) &&
-		y > c.y && y < c.y+c.height-1 {
+		y > c.y && y < c.y+types.ACoordY(c.height-1) {
 		return HitInside
 	}
 
@@ -193,13 +193,13 @@ func (c *Window) HitTest(x types.ACoordX, y int) HitResult {
 		hResult = HitTopLeft
 	case x == c.x.Get()+types.ACoordX(c.width-1) && y == c.y:
 		hResult = HitTopRight
-	case x == c.x.Get() && y == c.y+c.height-1:
+	case x == c.x.Get() && y == c.y+types.ACoordY(c.height-1):
 		hResult = HitBottomLeft
-	case x == c.x.Get()+types.ACoordX(c.width-1) && y == c.y+c.height-1:
+	case x == c.x.Get()+types.ACoordX(c.width-1) && y == c.y+types.ACoordY(c.height-1):
 		hResult = HitBottomRight
-	case x == c.x.Get() && y > c.y && y < c.y+c.height-1:
+	case x == c.x.Get() && y > c.y && y < c.y+types.ACoordY(c.height-1):
 		hResult = HitLeft
-	case x == c.x.Get()+types.ACoordX(c.width-1) && y > c.y && y < c.y+c.height-1:
+	case x == c.x.Get()+types.ACoordX(c.width-1) && y > c.y && y < c.y+types.ACoordY(c.height-1):
 		hResult = HitRight
 	case y == c.y && x > c.x.Get() && x < c.x.Get()+types.ACoordX(c.width-1):
 		lb, rb := c.buttonCount()
@@ -233,7 +233,7 @@ func (c *Window) HitTest(x types.ACoordX, y int) HitResult {
 				}
 			}
 		}
-	case y == c.y+c.height-1 && x > c.x.Get() && x < c.x.Get()+types.ACoordX(c.width-1):
+	case y == c.y+types.ACoordY(c.height-1) && x > c.x.Get() && x < c.x.Get()+types.ACoordX(c.width-1):
 		hResult = HitBottom
 	}
 

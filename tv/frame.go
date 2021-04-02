@@ -164,7 +164,7 @@ func (f *Frame) Draw() {
 
 // ScrollTo in case of a scrollable frame this api will scroll the content
 // without adjusting the clipper
-func (f *Frame) ScrollTo(x types.ACoordX, y int) {
+func (f *Frame) ScrollTo(x types.ACoordX, y types.ACoordY) {
 	if !f.scrollable {
 		return
 	}
@@ -196,8 +196,8 @@ func (f *Frame) ProcessEvent(ev Event) bool {
 	xx := x
 	yy := y
 
-	if (ty+th)-(py/2) > cy+ch {
-		delta := (ty + th) - (cy + ch)
+	if (ty+types.ACoordY(th))-(py/2) > cy+types.ACoordY(ch) {
+		delta := (ty + types.ACoordY(th)) - (cy + types.ACoordY(ch))
 		yy = y - delta
 	} else if ty < cy {
 		delta := cy - ty

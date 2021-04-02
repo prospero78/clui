@@ -62,7 +62,7 @@ func CreateConfirmationDialog(title, question string, buttons []string, defaultB
 
 	cw, ch := term.Size()
 
-	dlg.View = AddWindow(types.ACoordX(cw/2-12), ch/2-8, 30, 3, title)
+	dlg.View = AddWindow(types.ACoordX(cw/2-12), types.ACoordY(ch/2-8), 30, 3, title)
 	WindowManager().BeginUpdate()
 	defer WindowManager().EndUpdate()
 	dlg.View.SetConstraints(30, 3)
@@ -185,7 +185,7 @@ func CreateSelectDialog(title string, items []string, selectedItem int, typ Sele
 	cw, ch := term.Size()
 
 	dlg.typ = typ
-	dlg.View = AddWindow(types.ACoordX(cw/2-12), ch/2-8, 20, 10, title)
+	dlg.View = AddWindow(types.ACoordX(cw/2-12), types.ACoordY(ch/2-8), 20, 10, title)
 	WindowManager().BeginUpdate()
 	defer WindowManager().EndUpdate()
 	dlg.View.SetModal(true)

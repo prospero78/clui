@@ -19,11 +19,11 @@ type Control interface {
 	// should be unchanged.
 	SetSize(width, height int)
 	// Pos returns the current absolute control position: X and Y.
-	Pos() (x types.ACoordX, y int)
+	Pos() (x types.ACoordX, y types.ACoordY)
 	// SetPos changes contols position. Manual call of the method does not
 	// make sense for any control except for Window because control positions
 	// inside of container always recalculated after its parent resizes
-	SetPos(x types.ACoordX, y int)
+	SetPos(x types.ACoordX, y types.ACoordY)
 	// Constraints return minimal control widht and height
 	Constraints() (minw int, minh int)
 	SetConstraints(minw, minh int)
@@ -57,10 +57,10 @@ type Control interface {
 	// Paddings returns a number of spaces used to auto-arrange children inside
 	// a container: indent from left and right sides, indent from top and bottom
 	// sides.
-	Paddings() (px types.ACoordX, py int)
+	Paddings() (px types.ACoordX, py types.ACoordY)
 	// SetPaddings changes indents for the container. Use KeepValue as a placeholder
 	// if you do not want to touch a parameter
-	SetPaddings(px types.ACoordX, py int)
+	SetPaddings(px types.ACoordX, py types.ACoordY)
 	// Gaps returns number of spaces inserted between child controls. dx is used
 	// by horizontally-packed parents and dy by vertically-packed ones
 	Gaps() (dx int, dy int)
@@ -143,7 +143,7 @@ type Control interface {
 	// HitTest returns the area that corresponds to the clicked
 	// position X, Y (absolute position in console window): title,
 	// internal view area, title button, border or outside the control
-	HitTest(x types.ACoordX, y int) HitResult
+	HitTest(x types.ACoordX, y types.ACoordY) HitResult
 	// ProcessEvent processes all events come from the control parent. If a control
 	// processes an event it should return true. If the method returns false it means
 	// that the control do not want or cannot process the event and the caller sends
@@ -174,5 +174,5 @@ type Control interface {
 	Clipped() bool
 	// Clipper if the component is clipped then return the clipper geometry, however
 	// the size and pos is returned
-	Clipper() (types.ACoordX, int, int, int)
+	Clipper() (types.ACoordX, types.ACoordY, int, int)
 }

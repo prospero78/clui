@@ -59,10 +59,10 @@ func ItemByThumbPosition(position, itemCount, length int) int {
 // ChildAt returns the children of parent control that is at absolute
 // coordinates x, y. Returns nil if x, y are outside parent control and
 // returns parent if no child is at x, y
-func ChildAt(parent Control, x types.ACoordX, y int) Control {
+func ChildAt(parent Control, x types.ACoordX, y types.ACoordY) Control {
 	px, py := parent.Pos()
 	pw, ph := parent.Size()
-	if px > x || py > y || px+types.ACoordX(pw) <= x || py+ph <= y {
+	if px > x || py > y || px+types.ACoordX(pw) <= x || py+types.ACoordY(ph) <= y {
 		return nil
 	}
 
@@ -301,7 +301,7 @@ func SendEventToChild(parent Control, ev Event) bool {
 
 // CalcClipper calculates the clipper size based on the control's size, position
 // and paddings
-func CalcClipper(c Control) (types.ACoordX, int, int, int) {
+func CalcClipper(c Control) (types.ACoordX, types.ACoordY, int, int) {
 	w, h := c.Size()
 	x, y := c.Pos()
 	px, py := c.Paddings()
@@ -309,7 +309,7 @@ func CalcClipper(c Control) (types.ACoordX, int, int, int) {
 	x += px
 	y += py
 	w -= 2 * int(px)
-	h -= 2 * py
+	h -= 2 * int(py)
 
 	return x, y, w, h
 }
@@ -334,10 +334,13 @@ func ClippedParent(c Control) Control {
 }
 
 // ControlInRect returns true if c is within a given rect
-func ControlInRect(c Control, x types.ACoordX, y int, w int, h int) bool {
+func ControlInRect(c Control, x types.ACoordX, y types.ACoordY, w int, h int) bool {
 	xx, yy := c.Pos()
 	ww, hh := c.Size()
 
-	return xx >= x && ww <= int(x)+w && yy <= y+h &&
-		yy+hh <= y+h && yy >= y && yy+h >= y
+	return xx >= x && ww <= int(x)+w &&
+		yy <= y+types.ACoordY(h) &&
+		int(yy)+hh <= int(y)+h &&
+		yy >= y &&
+		yy+types.ACoordY(h) >= y
 }

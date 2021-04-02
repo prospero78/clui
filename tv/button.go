@@ -97,7 +97,7 @@ func (b *Button) Draw() {
 		switch b.shadowType {
 		case ShadowFull:
 			SetBackColor(shadow)
-			FillRect(x+1, y+h-1, w-1, 1, ' ')
+			FillRect(x+1, y+types.ACoordY(h-1), w-1, 1, ' ')
 			FillRect(x+types.ACoordX(w-1), y+1, 1, h-1, ' ')
 		case ShadowHalf:
 			parts := []rune(SysObject(ObjButton))
@@ -108,17 +108,17 @@ func (b *Button) Draw() {
 				bottomCh, rightCh = parts[0], parts[1]
 			}
 			SetTextColor(shadow)
-			FillRect(x+1, y+h-1, w-1, 1, bottomCh)
+			FillRect(x+1, y+types.ACoordY(h-1), w-1, 1, bottomCh)
 			FillRect(x+types.ACoordX(w-1), y+1, 1, h-2, rightCh)
 		}
 		SetTextColor(fg)
 		SetBackColor(bg)
 		FillRect(x, y, w-1, h-1, ' ')
-		DrawText(x+types.ACoordX(shift), y+dy, text)
+		DrawText(x+types.ACoordX(shift), y+types.ACoordY(dy), text)
 	} else {
 		SetBackColor(bg)
 		FillRect(x+1, y+1, w-1, h-1, ' ')
-		DrawText(x+types.ACoordX(1+shift), y+1+dy, b.title)
+		DrawText(x+types.ACoordX(1+shift), y+types.ACoordY(1+dy), b.title)
 	}
 }
 
@@ -169,7 +169,10 @@ func (b *Button) ProcessEvent(event Event) bool {
 			return true
 		} else if event.Key == term.MouseRelease && b.isPressed() != 0 {
 			ReleaseEvents()
-			if event.X >= b.x.Get() && event.Y >= b.y && event.X < b.x.Get()+types.ACoordX(b.width) && event.Y < b.y+b.height {
+			if event.X >= b.x.Get() &&
+				types.ACoordY(event.Y) >= b.y &&
+				event.X < b.x.Get()+types.ACoordX(b.width) &&
+				event.Y < b.y+types.ACoordY(b.height) {
 				if b.onClick != nil {
 					b.onClick(event)
 				}

@@ -23,10 +23,10 @@ type Composer struct {
 	// coordinates when the mouse button was down, e.g to detect
 	// mouse click
 	mdownX types.ACoordX
-	mdownY int
+	mdownY types.ACoordY
 	// last processed coordinates: e.g, for mouse move
 	lastX types.ACoordX
-	lastY int
+	lastY types.ACoordY
 	// Type of dragging
 	dragType DragType
 	// For safe Window manipulations
@@ -69,7 +69,7 @@ func ReleaseEvents() {
 
 func termboxEventToLocal(ev term.Event) Event {
 	e := Event{Type: EventType(ev.Type), Ch: ev.Ch,
-		Key: ev.Key, Err: ev.Err, X: types.ACoordX(ev.MouseX), Y: ev.MouseY,
+		Key: ev.Key, Err: ev.Err, X: types.ACoordX(ev.MouseX), Y: types.ACoordY(ev.MouseY),
 		Mod: ev.Mod, Width: ev.Width, Height: ev.Height}
 	return e
 }
@@ -105,7 +105,7 @@ func RefreshScreen() {
 // posX and posY are top left coordinates of the Window
 // width and height are Window size
 // title is a Window title
-func AddWindow(posX types.ACoordX, posY, width, height int, title string) *Window {
+func AddWindow(posX types.ACoordX, posY types.ACoordY, width, height int, title string) *Window {
 	window := CreateWindow(posX, posY, width, height, title)
 	window.SetBorder(comp.windowBorder)
 
@@ -159,7 +159,7 @@ func (c *Composer) getWindowList() []Control {
 	return arr_copy
 }
 
-func (c *Composer) checkWindowUnderMouse(screenX types.ACoordX, screenY int) (Control, HitResult) {
+func (c *Composer) checkWindowUnderMouse(screenX types.ACoordX, screenY types.ACoordY) (Control, HitResult) {
 	windows := c.getWindowList()
 	if len(windows) == 0 {
 		return nil, HitOutside
@@ -306,7 +306,7 @@ func (c *Composer) resizeTopWindow(ev Event) bool {
 
 	if w1 != w || h1 != h {
 		view.SetSize(w, h)
-		event := Event{Type: EventResize, X: types.ACoordX(w), Y: h}
+		event := Event{Type: EventResize, X: types.ACoordX(w), Y: types.ACoordY(h)}
 		c.sendEventToActiveWindow(event)
 		RefreshScreen()
 	}
@@ -329,7 +329,7 @@ func (c *Composer) moveTopWindow(ev Event) bool {
 		switch {
 		case ev.Key == term.KeyArrowUp && y > 0:
 			y--
-		case ev.Key == term.KeyArrowDown && y+h < cy:
+		case ev.Key == term.KeyArrowDown && int(y)+h < cy:
 			y++
 		case ev.Key == term.KeyArrowLeft && x > 0:
 			x--
@@ -387,7 +387,7 @@ func (c *Composer) processWindowDrag(ev Event) {
 	case DragMove:
 		newX += dx
 		newY += dy
-		if newX >= 0 && newY >= 0 && newX+types.ACoordX(newW) < types.ACoordX(cw) && newY+newH < ch {
+		if newX >= 0 && newY >= 0 && newX+types.ACoordX(newW) < types.ACoordX(cw) && int(newY)+newH < ch {
 			c.lastX = ev.X
 			c.lastY = ev.Y
 
@@ -399,7 +399,7 @@ func (c *Composer) processWindowDrag(ev Event) {
 	case DragResizeLeft:
 		newX += dx
 		newW -= int(dx)
-		if newX >= 0 && newY >= 0 && newX+types.ACoordX(newW) < types.ACoordX(cw) && newY+newH < ch {
+		if newX >= 0 && newY >= 0 && newX+types.ACoordX(newW) < types.ACoordX(cw) && int(newY)+newH < ch {
 			c.lastX = ev.X
 			c.lastY = ev.Y
 
@@ -413,7 +413,7 @@ func (c *Composer) processWindowDrag(ev Event) {
 		}
 	case DragResizeRight:
 		newW += int(dx)
-		if newX >= 0 && newY >= 0 && int(newX)+newW < cw && newY+newH < ch {
+		if newX >= 0 && newY >= 0 && int(newX)+newW < cw && int(newY)+newH < ch {
 			c.lastX = ev.X
 			c.lastY = ev.Y
 
@@ -423,8 +423,8 @@ func (c *Composer) processWindowDrag(ev Event) {
 			RefreshScreen()
 		}
 	case DragResizeBottom:
-		newH += dy
-		if newX >= 0 && newY >= 0 && int(newX)+newW < cw && newY+newH < ch {
+		newH += int(dy)
+		if newX >= 0 && newY >= 0 && int(newX)+newW < cw && int(newY)+newH < ch {
 			c.lastX = ev.X
 			c.lastY = ev.Y
 
@@ -437,8 +437,8 @@ func (c *Composer) processWindowDrag(ev Event) {
 		newX += dx
 		newW -= int(dx)
 		newY += dy
-		newH -= dy
-		if newX >= 0 && newY >= 0 && int(newX)+newW < cw && newY+newH < ch {
+		newH -= int(dy)
+		if newX >= 0 && newY >= 0 && int(newX)+newW < cw && int(newY)+newH < ch {
 			c.lastX = ev.X
 			c.lastY = ev.Y
 
@@ -453,8 +453,8 @@ func (c *Composer) processWindowDrag(ev Event) {
 	case DragResizeBottomLeft:
 		newX += dx
 		newW -= int(dx)
-		newH += dy
-		if newX >= 0 && newY >= 0 && int(newX)+newW < cw && newY+newH < ch {
+		newH += int(dy)
+		if newX >= 0 && newY >= 0 && int(newX)+newW < cw && int(newY)+newH < ch {
 			c.lastX = ev.X
 			c.lastY = ev.Y
 
@@ -468,8 +468,8 @@ func (c *Composer) processWindowDrag(ev Event) {
 		}
 	case DragResizeBottomRight:
 		newW += int(dx)
-		newH += dy
-		if newX >= 0 && newY >= 0 && int(newX)+newW < cw && newY+newH < ch {
+		newH += int(dy)
+		if newX >= 0 && newY >= 0 && int(newX)+newW < cw && int(newY)+newH < ch {
 			c.lastX = ev.X
 			c.lastY = ev.Y
 
@@ -481,8 +481,8 @@ func (c *Composer) processWindowDrag(ev Event) {
 	case DragResizeTopRight:
 		newY += dy
 		newW += int(dx)
-		newH -= dy
-		if newX >= 0 && newY >= 0 && int(newX)+newW < cw && newY+newH < ch {
+		newH -= int(dy)
+		if newX >= 0 && newY >= 0 && int(newX)+newW < cw && int(newY)+newH < ch {
 			c.lastX = ev.X
 			c.lastY = ev.Y
 
