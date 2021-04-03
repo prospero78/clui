@@ -21,8 +21,7 @@ type TBaseControl struct {
 	minW, minH    int
 	scale         int
 	gapX, gapY    int
-	padX          types.ACoordX
-	padY          types.ACoordY
+	posPad        types.IPos
 	fg, bg        term.Attribute
 	fgActive      term.Attribute
 	bgActive      term.Attribute
@@ -54,8 +53,9 @@ func nextRefId() types.AUnicalID {
 
 func NewBaseControl() TBaseControl {
 	return TBaseControl{
-		refID: nextRefId(),
-		pos:   pos.New(),
+		refID:  nextRefId(),
+		pos:    pos.New(),
+		posPad: pos.New(),
 	}
 }
 
@@ -239,15 +239,15 @@ func (sf *TBaseControl) SetModal(modal bool) {
 }
 
 func (sf *TBaseControl) Paddings() (px types.ACoordX, py types.ACoordY) {
-	return sf.padX, sf.padY
+	return sf.posPad.Get()
 }
 
 func (sf *TBaseControl) SetPaddings(px types.ACoordX, py types.ACoordY) {
 	if px >= 0 {
-		sf.padX = px
+		sf.posPad.X().Set(px)
 	}
 	if py >= 0 {
-		sf.padY = py
+		sf.posPad.Y().Set(py)
 	}
 }
 
@@ -323,8 +323,8 @@ func (sf *TBaseControl) ResizeChildren() {
 		return
 	}
 
-	fullWidth := sf.width - int(2*sf.padX)
-	fullHeight := sf.height - int(2*sf.padY)
+	fullWidth := sf.width - int(2*sf.posPad.GetX())
+	fullHeight := sf.height - int(2*sf.posPad.Y().Get())
 	if sf.pack == Horizontal {
 		fullWidth -= (children - 1) * sf.gapX
 	} else {
@@ -478,8 +478,8 @@ func (sf *TBaseControl) MinimalSize() (w int, h int) {
 		return sf.minW, sf.minH
 	}
 
-	totalX := 2 * sf.padX
-	totalY := 2 * sf.padY
+	totalX := 2 * sf.posPad.GetX()
+	totalY := 2 * sf.posPad.GetY()
 
 	if sf.pack == Vertical {
 		totalY += types.ACoordY((children - 1) * sf.gapY)
@@ -498,13 +498,13 @@ func (sf *TBaseControl) MinimalSize() (w int, h int) {
 		ww, hh := ctrl.MinimalSize()
 		if sf.pack == Vertical {
 			totalY += types.ACoordY(hh)
-			if types.ACoordX(ww)+2*sf.padX > totalX {
-				totalX = types.ACoordX(ww) + 2*sf.padX
+			if types.ACoordX(ww)+2*sf.posPad.GetX() > totalX {
+				totalX = types.ACoordX(ww) + 2*sf.posPad.GetX()
 			}
 		} else {
 			totalX += types.ACoordX(ww)
-			if types.ACoordY(hh)+2*sf.padY > totalY {
-				totalY = types.ACoordY(hh) + 2*sf.padY
+			if types.ACoordY(hh)+2*sf.posPad.GetY() > totalY {
+				totalY = types.ACoordY(hh) + 2*sf.posPad.GetY()
 			}
 		}
 	}
@@ -591,7 +591,7 @@ func (sf *TBaseControl) PlaceChildren() {
 		return
 	}
 
-	xx, yy := sf.pos.GetX()+sf.padX, sf.pos.GetY()+sf.padY
+	xx, yy := sf.pos.GetX()+sf.posPad.GetX(), sf.pos.GetY()+sf.posPad.GetY()
 	for _, ctrl := range sf.children {
 		if !ctrl.Visible() {
 			continue

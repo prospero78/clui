@@ -56,9 +56,9 @@ func CreateFrame(parent Control, width, height int, bs BorderStyle, scale int) *
 
 	f.gapX, f.gapY = 0, 0
 	if bs == BorderNone {
-		f.padX, f.padY = 0, 0
+		f.posPad.Set(0, 0)
 	} else {
-		f.padX, f.padY = 1, 1
+		f.posPad.Set(1, 1)
 	}
 
 	if parent != nil {
