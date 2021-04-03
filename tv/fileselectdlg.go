@@ -239,9 +239,9 @@ func CreateFileSelectDialog(title, fileMasks, initPath string, selectDir, mustEx
 	blist := CreateFrame(flist, 1, 1, BorderNone, Fixed)
 	blist.SetPack(Vertical)
 	blist.SetPaddings(1, 1)
-	btnOpen := CreateButton(blist, AutoSize, AutoSize, "Open", Fixed)
-	btnSelect := CreateButton(blist, AutoSize, AutoSize, "Select", Fixed)
-	btnCancel := CreateButton(blist, AutoSize, AutoSize, "Cancel", Fixed)
+	btnOpen := CreateButton(blist, 0, 0, "Open", Fixed, true, true)
+	btnSelect := CreateButton(blist, 0, 0, "Select", Fixed, true, true)
+	btnCancel := CreateButton(blist, 0, 0, "Cancel", Fixed, true, true)
 
 	btnCancel.OnClick(func(ev Event) {
 		WindowManager().DestroyWindow(dlg.View)

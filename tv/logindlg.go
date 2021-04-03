@@ -74,8 +74,8 @@ func CreateLoginDialog(title, userName string) *LoginDialog {
 	blist := CreateFrame(dlg.View, 1, 1, BorderNone, Fixed)
 	blist.SetPack(Horizontal)
 	blist.SetPaddings(1, 1)
-	btnOk := CreateButton(blist, 10, 4, "OK", Fixed)
-	btnCancel := CreateButton(blist, 10, 4, "Cancel", Fixed)
+	btnOk := CreateButton(blist, 10, 4, "OK", Fixed, false, false)
+	btnCancel := CreateButton(blist, 10, 4, "Cancel", Fixed, false, false)
 
 	btnCancel.OnClick(func(ev Event) {
 		WindowManager().DestroyWindow(dlg.View)

@@ -7,6 +7,8 @@ import (
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
 
+	"github.com/prospero78/goTV/tv/autoheight"
+	"github.com/prospero78/goTV/tv/autowidth"
 	"github.com/prospero78/goTV/tv/types"
 )
 
@@ -21,6 +23,8 @@ type Button struct {
 	pressed     int32
 	shadowType  ButtonShadow
 	onClick     func(Event)
+	autoWidth   types.IAutoWidth
+	autoHeight  types.IAutoHight
 }
 
 /*
@@ -32,18 +36,26 @@ title - button title.
 scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 control should keep its original size.
 */
-func CreateButton(parent Control, width, height int, title string, scale int) *Button {
+func CreateButton(parent Control,
+	width, height int,
+	title string,
+	scale int,
+	autoWidth types.AAutoWidth,
+	autoHight types.AAutoHight) *Button {
 	b := &Button{
 		TBaseControl: NewBaseControl(),
+		autoWidth:    autowidth.New(),
+		autoHeight:   autoheight.New(),
 	}
 
 	b.parent = parent
 	b.align = AlignCenter
-
-	if height == AutoSize {
+	b.autoWidth.Change(autoWidth)
+	b.autoHeight.Change(autoHight)
+	if b.autoHeight.Is() {
 		height = 4
 	}
-	if width == AutoSize {
+	if b.autoWidth.Is() {
 		width = xs.Len(title) + 2 + 1
 	}
 

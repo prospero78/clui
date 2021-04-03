@@ -10,7 +10,7 @@ func main() {
 
 	view := ui.AddWindow(0, 0, 10, 7, "Hello World!", false, false)
 
-	btnQuit := ui.CreateButton(view, 15, 4, "Hi", 1)
+	btnQuit := ui.CreateButton(view, 15, 4, "Hi", 1, false, false)
 	btnQuit.OnClick(func(ev ui.Event) {
 		go ui.Stop()
 	})

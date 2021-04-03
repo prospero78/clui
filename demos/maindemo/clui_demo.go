@@ -67,7 +67,7 @@ func createView() {
 	frmTheme := ui.CreateFrame(frmLeft, 8, 1, ui.BorderNone, ui.Fixed)
 	frmTheme.SetGaps(1, ui.KeepValue)
 	checkBox := ui.CreateCheckBox(frmTheme, ui.AutoSize, "Use ListBox", ui.Fixed)
-	btnTheme := ui.CreateButton(frmTheme, ui.AutoSize, 4, "Select theme", ui.Fixed)
+	btnTheme := ui.CreateButton(frmTheme, 0, 4, "Select theme", ui.Fixed, true, false)
 	ui.CreateFrame(frmLeft, 1, 1, ui.BorderNone, 1)
 
 	frmPb := ui.CreateFrame(frmLeft, 8, 1, ui.BorderNone, ui.Fixed)
@@ -82,10 +82,10 @@ func createView() {
 	frmEdit := ui.CreateFrame(frmLeft, 8, 1, ui.BorderNone, ui.Fixed)
 	frmEdit.SetPaddings(1, 1)
 	frmEdit.SetGaps(1, ui.KeepValue)
-	btnSet := ui.CreateButton(frmEdit, ui.AutoSize, 4, "Set", ui.Fixed)
-	btnStep := ui.CreateButton(frmEdit, ui.AutoSize, 4, "Step", ui.Fixed)
+	btnSet := ui.CreateButton(frmEdit, 0, 4, "Set", ui.Fixed, true, false)
+	btnStep := ui.CreateButton(frmEdit, 0, 4, "Step", ui.Fixed, true, false)
 	ui.CreateFrame(frmEdit, 1, 1, ui.BorderNone, 1)
-	btnQuit := ui.CreateButton(frmEdit, ui.AutoSize, 4, "Quit", ui.Fixed)
+	btnQuit := ui.CreateButton(frmEdit, 0, 4, "Quit", ui.Fixed, true, false)
 
 	logBox := ui.CreateListBox(view, 28, 5, ui.Fixed)
 

@@ -81,7 +81,7 @@ func CreateConfirmationDialog(title, question string, buttons []string, defaultB
 	CreateFrame(frm1, 1, 1, BorderNone, 1)
 
 	bText := buttons[0]
-	btn1 := CreateButton(frm1, AutoSize, AutoSize, bText, Fixed)
+	btn1 := CreateButton(frm1, 0, 0, bText, Fixed, true, true)
 	btn1.OnClick(func(ev Event) {
 		dlg.result = DialogButton1
 
@@ -97,7 +97,7 @@ func CreateConfirmationDialog(title, question string, buttons []string, defaultB
 
 	if len(buttons) > 1 {
 		CreateFrame(frm1, 1, 1, BorderNone, 1)
-		btn2 = CreateButton(frm1, AutoSize, AutoSize, buttons[1], Fixed)
+		btn2 = CreateButton(frm1, 0, 0, buttons[1], Fixed, true, true)
 		btn2.OnClick(func(ev Event) {
 			dlg.result = DialogButton2
 			WindowManager().DestroyWindow(dlg.View)
@@ -108,7 +108,7 @@ func CreateConfirmationDialog(title, question string, buttons []string, defaultB
 	}
 	if len(buttons) > 2 {
 		CreateFrame(frm1, 1, 1, BorderNone, 1)
-		btn3 = CreateButton(frm1, AutoSize, AutoSize, buttons[2], Fixed)
+		btn3 = CreateButton(frm1, 0, 0, buttons[2], Fixed, true, true)
 		btn3.OnClick(func(ev Event) {
 			dlg.result = DialogButton3
 			WindowManager().DestroyWindow(dlg.View)
@@ -245,7 +245,7 @@ func CreateSelectDialog(title string, items []string, selectedItem int, typ Sele
 
 	frm1 := CreateFrame(dlg.View, 16, 4, BorderNone, Fixed)
 	CreateFrame(frm1, 1, 1, BorderNone, 1)
-	btn1 := CreateButton(frm1, AutoSize, AutoSize, "OK", Fixed)
+	btn1 := CreateButton(frm1, 0, 0, "OK", Fixed, true, true)
 	btn1.OnClick(func(ev Event) {
 		dlg.result = DialogButton1
 		switch {
@@ -264,7 +264,7 @@ func CreateSelectDialog(title string, items []string, selectedItem int, typ Sele
 	})
 
 	CreateFrame(frm1, 1, 1, BorderNone, 1)
-	btn2 := CreateButton(frm1, AutoSize, AutoSize, "Cancel", Fixed)
+	btn2 := CreateButton(frm1, 0, 0, "Cancel", Fixed, true, true)
 	btn2.OnClick(func(ev Event) {
 		dlg.result = DialogButton2
 		dlg.edtResult = ""

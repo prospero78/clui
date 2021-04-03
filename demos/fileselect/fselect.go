@@ -31,8 +31,8 @@ func createView() {
 
 	frmBtns := ui.CreateFrame(view, 1, 1, ui.BorderNone, ui.Fixed)
 	frmBtns.SetPack(ui.Horizontal)
-	btnSet := ui.CreateButton(frmBtns, ui.AutoSize, 4, "Select", ui.Fixed)
-	btnQuit := ui.CreateButton(frmBtns, ui.AutoSize, 4, "Quit", ui.Fixed)
+	btnSet := ui.CreateButton(frmBtns, 0, 4, "Select", ui.Fixed, true, false)
+	btnQuit := ui.CreateButton(frmBtns, 0, 4, "Quit", ui.Fixed, true, false)
 	ui.CreateFrame(frmBtns, 1, 1, ui.BorderNone, 1)
 
 	ui.ActivateControl(view, edMasks)
