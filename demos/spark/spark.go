@@ -9,7 +9,7 @@ import (
 
 func createView() *ui.SparkChart {
 
-	view := ui.AddWindow(0, 0, 10, 7, "BarChart Demo")
+	view := ui.AddWindow(0, 0, 10, 7, "BarChart Demo", false, false)
 	bch := ui.CreateSparkChart(view, 25, 12, 1)
 	bch.SetTop(20)
 

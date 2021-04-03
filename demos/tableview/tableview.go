@@ -8,7 +8,7 @@ import (
 
 func createView() *ui.TableView {
 
-	view := ui.AddWindow(0, 0, 10, 7, "TableView Demo")
+	view := ui.AddWindow(0, 0, 10, 7, "TableView Demo", false, false)
 	bch := ui.CreateTableView(view, 25, 12, 1)
 	ui.ActivateControl(view, bch)
 
@@ -28,11 +28,11 @@ func mainLoop() {
 	b.SetShowRowNumber(true)
 	b.SetRowCount(rowCount)
 	cols := []ui.Column{
-		ui.Column{Title: "Text", Width: 5, Alignment: ui.AlignLeft},
-		ui.Column{Title: "Number", Width: 10, Alignment: ui.AlignRight},
-		ui.Column{Title: "Misc", Width: 12, Alignment: ui.AlignCenter},
-		ui.Column{Title: "Long", Width: 50, Alignment: ui.AlignLeft},
-		ui.Column{Title: "Last", Width: 8, Alignment: ui.AlignLeft},
+		{Title: "Text", Width: 5, Alignment: ui.AlignLeft},
+		{Title: "Number", Width: 10, Alignment: ui.AlignRight},
+		{Title: "Misc", Width: 12, Alignment: ui.AlignCenter},
+		{Title: "Long", Width: 50, Alignment: ui.AlignLeft},
+		{Title: "Last", Width: 8, Alignment: ui.AlignLeft},
 	}
 	b.SetColumns(cols)
 	colCount := len(cols)
@@ -62,8 +62,7 @@ func mainLoop() {
 				fmt.Sprintf("Editing value: %s", oldVal), "New value", oldVal,
 			)
 			dlg.OnClose(func() {
-				switch dlg.Result() {
-				case ui.DialogButton1:
+				if dlg.Result() == ui.DialogButton1 {
 					newText := dlg.EditResult()
 					values[r*colCount+c] = newText
 					ui.PutEvent(ui.Event{Type: ui.EventRedraw})

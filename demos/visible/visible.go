@@ -8,7 +8,7 @@ func main() {
 	ui.InitLibrary()
 	defer ui.DeinitLibrary()
 
-	view := ui.AddWindow(0, 0, 10, 7, "Hello World!")
+	view := ui.AddWindow(0, 0, 10, 7, "Hello World!", false, false)
 	view.SetPack(ui.Vertical)
 
 	frmResize := ui.CreateFrame(view, 8, 6, ui.BorderNone, ui.Fixed)

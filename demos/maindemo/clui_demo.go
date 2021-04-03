@@ -40,8 +40,7 @@ func changeTheme(lb *ui.ListBox, btn *ui.Button, tp int) {
 
 	selDlg := ui.CreateSelectDialog("Choose a theme", items, curr, dlgType)
 	selDlg.OnClose(func() {
-		switch selDlg.Result() {
-		case ui.DialogButton1:
+		if selDlg.Result() == ui.DialogButton1 {
 			idx := selDlg.Value()
 			lb.AddItem(fmt.Sprintf("Selected item: %v", selDlg.Value()))
 			lb.SelectItem(lb.ItemCount() - 1)
@@ -58,7 +57,7 @@ func changeTheme(lb *ui.ListBox, btn *ui.Button, tp int) {
 
 func createView() {
 
-	view := ui.AddWindow(0, 0, 20, 7, "Theme Manager Demo")
+	view := ui.AddWindow(0, 0, 20, 7, "Theme Manager Demo", false, false)
 
 	frmLeft := ui.CreateFrame(view, 8, 4, ui.BorderNone, 1)
 	frmLeft.SetPack(ui.Vertical)

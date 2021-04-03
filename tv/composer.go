@@ -105,8 +105,11 @@ func RefreshScreen() {
 // posX and posY are top left coordinates of the Window
 // width and height are Window size
 // title is a Window title
-func AddWindow(posX types.ACoordX, posY types.ACoordY, width, height int, title string) *Window {
-	window := CreateWindow(posX, posY, width, height, title)
+func AddWindow(posX types.ACoordX, posY types.ACoordY,
+	width, height int,
+	title string,
+	autoWidth, autoHight types.AAutoSize) *Window {
+	window := NewWindow(posX, posY, width, height, title, autoWidth, autoHight)
 	window.SetBorder(comp.windowBorder)
 
 	comp.BeginUpdate()

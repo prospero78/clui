@@ -5,7 +5,7 @@ import (
 )
 
 func createView() {
-	view := ui.AddWindow(0, 0, 30, 7, "Login dialog")
+	view := ui.AddWindow(0, 0, 30, 7, "Login dialog", false, false)
 	view.SetPack(ui.Vertical)
 	view.SetGaps(0, 1)
 	view.SetPaddings(2, 2)

@@ -5,7 +5,7 @@ import (
 )
 
 func createView() {
-	view := ui.AddWindow(0, 0, 10, 7, "Button` Demo")
+	view := ui.AddWindow(0, 0, 10, 7, "Button` Demo", false, false)
 	view.SetTitleButtons(ui.ButtonMaximize | ui.ButtonClose)
 
 	frmViews := ui.CreateFrame(view, 8, 5, ui.BorderNone, ui.Fixed)

@@ -5,4 +5,5 @@ type (
 	ACoordY   int
 	AUnicalID int64
 	AWidth    int
+	AAutoSize bool
 )

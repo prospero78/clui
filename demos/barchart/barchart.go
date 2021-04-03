@@ -30,8 +30,8 @@ func customColored(d *ui.BarDataCell) {
 
 func createView() *ui.BarChart {
 
-	view := ui.AddWindow(0, 0, 10, 7, "BarChart Demo")
-	bch := ui.CreateBarChart(view, 40, 12, 1)
+	view := ui.AddWindow(0, 0, 10, 7, "BarChart Demo", false, false)
+	bch := ui.CreateBarChart(view, 40, 12, 1, false, false)
 
 	frmChk := ui.CreateFrame(view, 8, 5, ui.BorderNone, ui.Fixed)
 	frmChk.SetPack(ui.Vertical)

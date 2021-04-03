@@ -7,6 +7,7 @@ import (
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
 
+	"github.com/prospero78/goTV/tv/autosize"
 	"github.com/prospero78/goTV/tv/types"
 )
 
@@ -62,7 +63,8 @@ displayed. The same is applied to ValueWidth
 type BarChart struct {
 	TBaseControl
 	data        []BarData
-	autosize    bool
+	autoWidth   types.IAutoSize
+	autoHight   types.IAutoSize
 	gap         int32
 	barWidth    int32
 	legendWidth int32
@@ -80,14 +82,20 @@ w and h - are minimal size of the control.
 scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 control should keep its original size.
 */
-func CreateBarChart(parent Control, w, h int, scale int) *BarChart {
-	c := new(BarChart)
-	c.TBaseControl = NewBaseControl()
+func CreateBarChart(parent Control, w, h int, scale int,
+	autoWidth, autoHight types.AAutoSize) *BarChart {
+	c := &BarChart{
+		TBaseControl: NewBaseControl(),
+		autoWidth:    autosize.New(),
+		autoHight:    autosize.New(),
+	}
+	c.autoWidth.Change(autoWidth)
+	c.autoHight.Change(autoHight)
 
-	if w == AutoSize {
+	if c.autoWidth.Is() {
 		w = 10
 	}
-	if h == AutoSize {
+	if c.autoHight.Is() {
 		h = 5
 	}
 
@@ -346,7 +354,7 @@ func (b *BarChart) calculateBarWidth() int {
 		return 0
 	}
 
-	if !b.autosize {
+	if !b.autoWidth.Is() {
 		return int(b.MinBarWidth())
 	}
 
@@ -432,7 +440,7 @@ func (b *BarChart) SetData(data []BarData) {
 // calculated width that makes all bars fit the
 // bar chart area, and 1
 func (b *BarChart) AutoSize() bool {
-	return b.autosize
+	return bool(b.autoWidth.Is() || b.autoHight.Is())
 }
 
 // SetAutoSize enables or disables automatic bar
@@ -440,8 +448,13 @@ func (b *BarChart) AutoSize() bool {
 func (b *BarChart) SetAutoSize(auto bool) {
 	b.mtx.Lock()
 	defer b.mtx.Unlock()
-
-	b.autosize = auto
+	if auto {
+		b.autoWidth.Set()
+		b.autoHight.Set()
+		return
+	}
+	b.autoWidth.Reset()
+	b.autoHight.Reset()
 }
 
 // BarGap returns width of visual gap between two adjacent bars

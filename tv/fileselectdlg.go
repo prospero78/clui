@@ -211,7 +211,7 @@ func CreateFileSelectDialog(title, fileMasks, initPath string, selectDir, mustEx
 		}
 	}
 
-	dlg.View = AddWindow(10, 4, 20, 16, fmt.Sprintf("%s (%s)", title, fileMasks))
+	dlg.View = AddWindow(10, 4, 20, 16, fmt.Sprintf("%s (%s)", title, fileMasks), false, false)
 	WindowManager().BeginUpdate()
 	defer WindowManager().EndUpdate()
 

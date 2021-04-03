@@ -45,7 +45,7 @@ type LoginDialog struct {
 func CreateLoginDialog(title, userName string) *LoginDialog {
 	dlg := new(LoginDialog)
 
-	dlg.View = AddWindow(15, 8, 10, 4, title)
+	dlg.View = AddWindow(15, 8, 10, 4, title, false, false)
 	WindowManager().BeginUpdate()
 	defer WindowManager().EndUpdate()
 

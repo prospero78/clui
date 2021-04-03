@@ -86,7 +86,7 @@ var (
 )
 
 func createView() *ui.TableView {
-	view = ui.AddWindow(0, 0, 10, 7, "TableView Preload Demo")
+	view = ui.AddWindow(0, 0, 10, 7, "TableView Preload Demo", false, false)
 	bch := ui.CreateTableView(view, 35, 12, 1)
 	ui.ActivateControl(view, bch)
 
@@ -105,12 +105,12 @@ func mainLoop() {
 	b.SetShowRowNumber(true)
 	b.SetRowCount(25)
 	cols := []ui.Column{
-		ui.Column{Title: "First Name", Width: 10, Alignment: ui.AlignLeft},
-		ui.Column{Title: "Last Name", Width: 12, Alignment: ui.AlignLeft},
-		ui.Column{Title: "ID", Width: 12, Alignment: ui.AlignRight},
-		ui.Column{Title: "Post", Width: 12, Alignment: ui.AlignLeft},
-		ui.Column{Title: "Department", Width: 15, Alignment: ui.AlignLeft},
-		ui.Column{Title: "Salary", Width: 12, Alignment: ui.AlignRight},
+		{Title: "First Name", Width: 10, Alignment: ui.AlignLeft},
+		{Title: "Last Name", Width: 12, Alignment: ui.AlignLeft},
+		{Title: "ID", Width: 12, Alignment: ui.AlignRight},
+		{Title: "Post", Width: 12, Alignment: ui.AlignLeft},
+		{Title: "Department", Width: 15, Alignment: ui.AlignLeft},
+		{Title: "Salary", Width: 12, Alignment: ui.AlignRight},
 	}
 	b.SetColumns(cols)
 	b.OnBeforeDraw(func(col, row, colCnt, rowCnt int) {

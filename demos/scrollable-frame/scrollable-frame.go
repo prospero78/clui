@@ -10,7 +10,7 @@ func main() {
 	ui.InitLibrary()
 	defer ui.DeinitLibrary()
 
-	wnd := ui.AddWindow(0, 0, 60, ui.AutoSize, "Scrollable frame")
+	wnd := ui.AddWindow(0, 0, 60, 0, "Scrollable frame", false, true)
 	wnd.SetSizable(false)
 
 	frm := ui.CreateFrame(wnd, 50, 12, ui.BorderNone, ui.Fixed)

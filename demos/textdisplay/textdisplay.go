@@ -8,7 +8,7 @@ import (
 
 func createView() *ui.TextDisplay {
 
-	view := ui.AddWindow(0, 0, 10, 7, "TextDisplay Demo")
+	view := ui.AddWindow(0, 0, 10, 7, "TextDisplay Demo", false, false)
 	bch := ui.CreateTextDisplay(view, 45, 24, 1)
 	ui.ActivateControl(view, bch)
 
