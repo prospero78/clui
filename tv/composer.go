@@ -108,7 +108,8 @@ func RefreshScreen() {
 func AddWindow(posX types.ACoordX, posY types.ACoordY,
 	width, height int,
 	title string,
-	autoWidth, autoHight types.AAutoSize) *Window {
+	autoWidth types.AAutoWidth,
+	autoHight types.AAutoHight) *Window {
 	window := NewWindow(posX, posY, width, height, title, autoWidth, autoHight)
 	window.SetBorder(comp.windowBorder)
 

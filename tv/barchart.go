@@ -49,7 +49,7 @@ One can assign individual color to each bar and even use
 custom drawn bars to display multicolored bars depending
 on bar value.
 All bars have the same width: either constant BarSize - in
-case of AutoSize is false, or automatically calculated but
+case of autoSize is false, or automatically calculated but
 cannot be less than BarSize. Bars that do not fit the chart
 area are not displayed.
 BarChart displays vertical axis with values on the chart left

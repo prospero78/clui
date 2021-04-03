@@ -3,7 +3,9 @@ package tv
 import (
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
-	"github.com/prospero78/goTV/tv/autosize"
+
+	"github.com/prospero78/goTV/tv/autoheight"
+	"github.com/prospero78/goTV/tv/autowidth"
 	"github.com/prospero78/goTV/tv/pos"
 	"github.com/prospero78/goTV/tv/types"
 )
@@ -27,8 +29,8 @@ type Window struct {
 	onScreenResize func(Event)
 
 	onKeyDown  *keyDownCb
-	autoWidth  types.IAutoSize
-	autoHeight types.IAutoSize
+	autoWidth  types.IAutoWidth
+	autoHeight types.IAutoHight
 }
 
 type keyDownCb struct {
@@ -39,11 +41,12 @@ type keyDownCb struct {
 func NewWindow(x types.ACoordX, y types.ACoordY,
 	w, h int,
 	title string,
-	autoWidth, autoHight types.AAutoSize) *Window {
+	autoWidth types.AAutoWidth,
+	autoHight types.AAutoHight) *Window {
 	wnd := &Window{
 		posOrig:    pos.New(),
-		autoWidth:  autosize.New(),
-		autoHeight: autosize.New(),
+		autoWidth:  autowidth.New(),
+		autoHeight: autoheight.New(),
 	}
 	wnd.autoWidth.Change(autoWidth)
 	wnd.autoHeight.Change(autoHight)
