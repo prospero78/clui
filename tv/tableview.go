@@ -417,24 +417,24 @@ func (l *TableView) end() {
 	l.emitSelectionChange()
 }
 
-func (l *TableView) firstRow() {
-	if l.rowCount > 0 {
-		l.selectedRow = 0
-	}
-	l.topRow = 0
-	l.EnsureRowVisible()
-	l.emitSelectionChange()
-}
+// func (l *TableView) firstRow() {
+// 	if l.rowCount > 0 {
+// 		l.selectedRow = 0
+// 	}
+// 	l.topRow = 0
+// 	l.EnsureRowVisible()
+// 	l.emitSelectionChange()
+// }
 
-func (l *TableView) lastRow() {
-	if l.rowCount == 0 {
-		return
-	}
+// func (l *TableView) lastRow() {
+// 	if l.rowCount == 0 {
+// 		return
+// 	}
 
-	l.selectedRow = l.rowCount - 1
-	l.EnsureColVisible()
-	l.emitSelectionChange()
-}
+// 	l.selectedRow = l.rowCount - 1
+// 	l.EnsureColVisible()
+// 	l.emitSelectionChange()
+// }
 
 func (l *TableView) moveUp(dy int) {
 	if l.topRow == 0 && l.selectedRow == 0 {

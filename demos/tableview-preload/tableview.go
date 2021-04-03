@@ -47,10 +47,10 @@ func (d *dbCache) preload(firstRow, rowCount int) {
 	deps := []string{"IT", "Financial", "Support"}
 	salary := []int{40000, 38000, 41000, 32000}
 
-	d.data = make([][]string, rowCount, rowCount)
+	d.data = make([][]string, rowCount)
 	for i := 0; i < rowCount; i++ {
 		absIndex := firstRow + i
-		d.data[i] = make([]string, columnInTable, columnInTable)
+		d.data[i] = make([]string, columnInTable)
 		d.data[i][0] = fNames[absIndex%len(fNames)]
 		d.data[i][1] = lNames[absIndex%len(lNames)]
 		d.data[i][2] = fmt.Sprintf("%08d", 100+absIndex)

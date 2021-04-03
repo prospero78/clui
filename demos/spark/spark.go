@@ -63,12 +63,9 @@ func mainLoop() {
 
 	ticker := time.NewTicker(time.Millisecond * 200).C
 	go func() {
-		for {
-			select {
-			case <-ticker:
-				b.AddData(float64(rand.Int31n(20)))
-				ui.PutEvent(ui.Event{Type: ui.EventRedraw})
-			}
+		for range ticker {
+			b.AddData(float64(rand.Int31n(20)))
+			ui.PutEvent(ui.Event{Type: ui.EventRedraw})
 		}
 	}()
 
