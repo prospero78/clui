@@ -14,7 +14,7 @@ import (
 // Every new control must inherit it or implement
 // the same set of methods
 type TBaseControl struct {
-	refID int64
+	refID types.AUnicalID
 
 	pos           types.IPos
 	width, height int
@@ -47,8 +47,9 @@ var (
 	globalRefId int64
 )
 
-func nextRefId() int64 {
-	return atomic.AddInt64(&globalRefId, 1)
+func nextRefId() types.AUnicalID {
+	id := atomic.AddInt64(&globalRefId, 1)
+	return types.AUnicalID(id)
 }
 
 func NewBaseControl() TBaseControl {
@@ -74,7 +75,7 @@ func (c *TBaseControl) Style() string {
 	return c.style
 }
 
-func (c *TBaseControl) RefID() int64 {
+func (c *TBaseControl) RefID() types.AUnicalID {
 	return c.refID
 }
 

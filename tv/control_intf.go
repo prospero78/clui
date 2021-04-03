@@ -150,7 +150,7 @@ type Control interface {
 	// the event to the control parent
 	ProcessEvent(ev Event) bool
 	// RefID returns the controls internal reference id
-	RefID() int64
+	RefID() types.AUnicalID
 	// removeChild removes a child from a container
 	// It's used to "destroy" controls whenever a control is no longer used
 	// by the user
