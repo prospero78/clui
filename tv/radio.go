@@ -4,6 +4,7 @@ import (
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
 
+	"github.com/prospero78/goTV/tv/autowidth"
 	"github.com/prospero78/goTV/tv/types"
 )
 
@@ -16,7 +17,8 @@ type Radio struct {
 	group    *RadioGroup
 	selected bool
 
-	onChange func(bool)
+	onChange  func(bool)
+	autoWidth types.IAutoWidth
 }
 
 /*
@@ -29,11 +31,14 @@ scale - the way of scaling the control when the parent is resized. Use DoNotScal
 control should keep its original size.
 */
 func CreateRadio(parent Control, width int, title string, scale int) *Radio {
-	c := new(Radio)
-	c.TBaseControl = NewBaseControl()
+	c := &Radio{
+		TBaseControl: NewBaseControl(),
+		autoWidth:    autowidth.New(),
+	}
 
-	if width == AutoSize {
+	if width == 0 {
 		width = xs.Len(title) + 4
+		c.autoWidth.Set()
 	}
 
 	c.parent = parent
