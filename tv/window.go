@@ -3,6 +3,7 @@ package tv
 import (
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
+	"github.com/prospero78/goTV/tv/pos"
 	"github.com/prospero78/goTV/tv/types"
 )
 
@@ -11,8 +12,7 @@ type Window struct {
 	BaseControl
 	origWidth  int
 	origHeight int
-	origX      types.ACoordX
-	origY      types.ACoordY
+	posOrig    types.IPos
 	buttons    ViewButton
 	maximized  bool
 	// maximization support
@@ -34,7 +34,9 @@ type keyDownCb struct {
 }
 
 func CreateWindow(x types.ACoordX, y types.ACoordY, w, h int, title string) *Window {
-	wnd := new(Window)
+	wnd := &Window{
+		posOrig: pos.New(),
+	}
 	wnd.BaseControl = NewBaseControl()
 
 	if w == AutoSize || w < 1 || w > 1000 {
@@ -360,7 +362,9 @@ func (w *Window) SetMaximized(maximize bool) {
 	}
 
 	if maximize {
-		w.origX, w.origY = w.pos.Get()
+		x, y := w.pos.Get()
+		w.posOrig.X().Set(x)
+		w.posOrig.Y().Set(y)
 		w.origWidth, w.origHeight = w.Size()
 		w.maximized = true
 		w.SetPos(0, 0)
@@ -368,7 +372,7 @@ func (w *Window) SetMaximized(maximize bool) {
 		w.SetSize(width, height)
 	} else {
 		w.maximized = false
-		w.SetPos(w.origX, w.origY)
+		w.SetPos(w.posOrig.GetX(), w.posOrig.GetY())
 		w.SetSize(w.origWidth, w.origHeight)
 	}
 	w.ResizeChildren()
