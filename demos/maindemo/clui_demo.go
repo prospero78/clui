@@ -66,7 +66,7 @@ func createView() {
 
 	frmTheme := ui.CreateFrame(frmLeft, 8, 1, ui.BorderNone, ui.Fixed)
 	frmTheme.SetGaps(1, ui.KeepValue)
-	checkBox := ui.CreateCheckBox(frmTheme, ui.AutoSize, "Use ListBox", ui.Fixed)
+	checkBox := ui.CreateCheckBox(frmTheme, 0, "Use ListBox", ui.Fixed, true)
 	btnTheme := ui.CreateButton(frmTheme, 0, 4, "Select theme", ui.Fixed, true, false)
 	ui.CreateFrame(frmLeft, 1, 1, ui.BorderNone, 1)
 

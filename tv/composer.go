@@ -109,8 +109,8 @@ func AddWindow(posX types.ACoordX, posY types.ACoordY,
 	width, height int,
 	title string,
 	autoWidth types.AAutoWidth,
-	autoHight types.AAutoHight) *Window {
-	window := NewWindow(posX, posY, width, height, title, autoWidth, autoHight)
+	autoHeight types.AAutoHeight) *Window {
+	window := NewWindow(posX, posY, width, height, title, autoWidth, autoHeight)
 	window.SetBorder(comp.windowBorder)
 
 	comp.BeginUpdate()

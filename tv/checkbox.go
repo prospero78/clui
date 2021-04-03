@@ -4,6 +4,8 @@ import (
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
 
+	"github.com/prospero78/goTV/tv/autoheight"
+	"github.com/prospero78/goTV/tv/autowidth"
 	"github.com/prospero78/goTV/tv/types"
 )
 
@@ -15,6 +17,8 @@ type CheckBox struct {
 	TBaseControl
 	state       int
 	allow3state bool
+	autoWidth   types.IAutoWidth
+	autoHeight  types.IAutoHeight
 
 	onChange func(int)
 }
@@ -28,9 +32,18 @@ scale - the way of scaling the control when the parent is resized. Use DoNotScal
 control should keep its original size.
 CheckBox state can be changed using mouse or pressing space on keyboard while the control is active
 */
-func CreateCheckBox(parent Control, width int, title string, scale int) *CheckBox {
-	c := new(CheckBox)
-	c.TBaseControl = NewBaseControl()
+func CreateCheckBox(parent Control,
+	width int,
+	title string,
+	scale int,
+	autoWidth types.AAutoWidth) *CheckBox {
+	c := &CheckBox{
+		TBaseControl: NewBaseControl(),
+		autoWidth:    autowidth.New(),
+		autoHeight:   autoheight.New(),
+	}
+	c.autoWidth.Change(autoWidth)
+	c.autoHeight.Change(true)
 	c.parent = parent
 
 	if width == AutoSize {

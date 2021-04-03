@@ -22,8 +22,8 @@ func createView() {
 
 	frmOpts := ui.CreateFrame(view, 1, 1, ui.BorderNone, ui.Fixed)
 	frmOpts.SetPack(ui.Horizontal)
-	cbDir := ui.CreateCheckBox(frmOpts, ui.AutoSize, "Select directory", ui.Fixed)
-	cbMust := ui.CreateCheckBox(frmOpts, ui.AutoSize, "Must exists", ui.Fixed)
+	cbDir := ui.CreateCheckBox(frmOpts, 0, "Select directory", ui.Fixed, true)
+	cbMust := ui.CreateCheckBox(frmOpts, 0, "Must exists", ui.Fixed, true)
 	ui.CreateFrame(frmOpts, 1, 1, ui.BorderNone, 1)
 
 	lblSelected := ui.CreateLabel(view, 30, 5, "Selected:", ui.Fixed)

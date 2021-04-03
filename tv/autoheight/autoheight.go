@@ -9,17 +9,17 @@ import (
 
 // TAutoHeight -- операции с потокобезопасным признаком автоматической высоты
 type TAutoHeight struct {
-	val   types.AAutoHight
+	val   types.AAutoHeight
 	block sync.RWMutex
 }
 
 // New -- возвращает новый IAutoHight
-func New() types.IAutoHight {
+func New() types.IAutoHeight {
 	return &TAutoHeight{}
 }
 
 // Change -- имзеняет хранимый признак авторазмера
-func (sf *TAutoHeight) Change(val types.AAutoHight) {
+func (sf *TAutoHeight) Change(val types.AAutoHeight) {
 	sf.block.Lock()
 	sf.val = val
 	sf.block.Unlock()
@@ -40,7 +40,7 @@ func (sf *TAutoHeight) Reset() {
 }
 
 // Is -- возвращает хранимое значение
-func (sf *TAutoHeight) Is() types.AAutoHight {
+func (sf *TAutoHeight) Is() types.AAutoHeight {
 	sf.block.RLock()
 	defer sf.block.RUnlock()
 	return sf.val

@@ -7,7 +7,8 @@ import (
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
 
-	"github.com/prospero78/goTV/tv/autosize"
+	"github.com/prospero78/goTV/tv/autoheight"
+	"github.com/prospero78/goTV/tv/autowidth"
 	"github.com/prospero78/goTV/tv/types"
 )
 
@@ -63,8 +64,8 @@ displayed. The same is applied to ValueWidth
 type BarChart struct {
 	TBaseControl
 	data        []BarData
-	autoWidth   types.IAutoSize
-	autoHight   types.IAutoSize
+	autoWidth   types.IAutoWidth
+	autoHeight  types.IAutoHeight
 	gap         int32
 	barWidth    int32
 	legendWidth int32
@@ -83,19 +84,19 @@ scale - the way of scaling the control when the parent is resized. Use DoNotScal
 control should keep its original size.
 */
 func CreateBarChart(parent Control, w, h int, scale int,
-	autoWidth, autoHight types.AAutoSize) *BarChart {
+	autoWidth types.AAutoWidth, autoHeight types.AAutoHeight) *BarChart {
 	c := &BarChart{
 		TBaseControl: NewBaseControl(),
-		autoWidth:    autosize.New(),
-		autoHight:    autosize.New(),
+		autoWidth:    autowidth.New(),
+		autoHeight:   autoheight.New(),
 	}
 	c.autoWidth.Change(autoWidth)
-	c.autoHight.Change(autoHight)
+	c.autoHeight.Change(autoHeight)
 
 	if c.autoWidth.Is() {
 		w = 10
 	}
-	if c.autoHight.Is() {
+	if c.autoHeight.Is() {
 		h = 5
 	}
 
@@ -433,14 +434,14 @@ func (b *BarChart) SetData(data []BarData) {
 	copy(b.data, data)
 }
 
-// AutoSize returns whether automatic bar width
-// calculation is on. If AutoSize is false then all
-// bars have width BarWidth. If AutoSize is true then
+// Auto_Size returns whether automatic bar width
+// calculation is on. If Auto_Size is false then all
+// bars have width BarWidth. If Auto_Size is true then
 // bar width is the maximum of three values: BarWidth,
 // calculated width that makes all bars fit the
 // bar chart area, and 1
 func (b *BarChart) AutoSize() bool {
-	return bool(b.autoWidth.Is() || b.autoHight.Is())
+	return bool(bool(b.autoWidth.Is()) || bool(b.autoHeight.Is()))
 }
 
 // SetAutoSize enables or disables automatic bar
@@ -450,11 +451,11 @@ func (b *BarChart) SetAutoSize(auto bool) {
 	defer b.mtx.Unlock()
 	if auto {
 		b.autoWidth.Set()
-		b.autoHight.Set()
+		b.autoHeight.Set()
 		return
 	}
 	b.autoWidth.Reset()
-	b.autoHight.Reset()
+	b.autoHeight.Reset()
 }
 
 // BarGap returns width of visual gap between two adjacent bars

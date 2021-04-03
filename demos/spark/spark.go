@@ -15,11 +15,11 @@ func createView() *ui.SparkChart {
 
 	frmChk := ui.CreateFrame(view, 8, 5, ui.BorderNone, ui.Fixed)
 	frmChk.SetPack(ui.Vertical)
-	chkValues := ui.CreateCheckBox(frmChk, ui.AutoSize, "Show Values", ui.Fixed)
+	chkValues := ui.CreateCheckBox(frmChk, 0, "Show Values", ui.Fixed, true)
 	chkValues.SetState(0)
-	chkHilite := ui.CreateCheckBox(frmChk, ui.AutoSize, "Hilite peaks", ui.Fixed)
+	chkHilite := ui.CreateCheckBox(frmChk, 0, "Hilite peaks", ui.Fixed, true)
 	chkHilite.SetState(1)
-	chkAuto := ui.CreateCheckBox(frmChk, ui.AutoSize, "Auto scale", ui.Fixed)
+	chkAuto := ui.CreateCheckBox(frmChk, 0, "Auto scale", ui.Fixed, true)
 	chkAuto.SetState(1)
 
 	ui.ActivateControl(view, chkValues)
@@ -64,7 +64,7 @@ func mainLoop() {
 	ticker := time.NewTicker(time.Millisecond * 200).C
 	go func() {
 		for range ticker {
-			b.AddData(float64(rand.Int31n(20)))
+			b.AddData(float64(rand.Int31n(20))) //nolint
 			ui.PutEvent(ui.Event{Type: ui.EventRedraw})
 		}
 	}()

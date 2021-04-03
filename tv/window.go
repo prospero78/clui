@@ -30,7 +30,7 @@ type Window struct {
 
 	onKeyDown  *keyDownCb
 	autoWidth  types.IAutoWidth
-	autoHeight types.IAutoHight
+	autoHeight types.IAutoHeight
 }
 
 type keyDownCb struct {
@@ -42,14 +42,14 @@ func NewWindow(x types.ACoordX, y types.ACoordY,
 	w, h int,
 	title string,
 	autoWidth types.AAutoWidth,
-	autoHight types.AAutoHight) *Window {
+	autoHeight types.AAutoHeight) *Window {
 	wnd := &Window{
 		posOrig:    pos.New(),
 		autoWidth:  autowidth.New(),
 		autoHeight: autoheight.New(),
 	}
 	wnd.autoWidth.Change(autoWidth)
-	wnd.autoHeight.Change(autoHight)
+	wnd.autoHeight.Change(autoHeight)
 	wnd.TBaseControl = NewBaseControl()
 
 	if wnd.autoWidth.Is() || w < 1 || w > 1000 {

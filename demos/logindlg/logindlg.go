@@ -12,7 +12,7 @@ func createView() {
 
 	frmOpts := ui.CreateFrame(view, 1, 1, ui.BorderNone, ui.Fixed)
 	frmOpts.SetPack(ui.Horizontal)
-	cbCheck := ui.CreateCheckBox(frmOpts, ui.AutoSize, "Use callback to test data", ui.Fixed)
+	cbCheck := ui.CreateCheckBox(frmOpts, 0, "Use callback to test data", ui.Fixed, true)
 
 	ui.CreateLabel(view, ui.AutoSize, ui.AutoSize, "Correct credentials", ui.Fixed)
 

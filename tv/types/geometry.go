@@ -21,16 +21,16 @@ type IAutoWidth interface {
 	Change(AAutoWidth)
 }
 
-// IAutoHight -- интерфейс к автоматической высоте
-type IAutoHight interface {
+// IAutoHeight -- интерфейс к автоматической высоте
+type IAutoHeight interface {
 	// Is -- возвращает хранимое значение
-	Is() AAutoHight
+	Is() AAutoHeight
 	// Set -- взводит хранимое значение
 	Set()
 	// Reset -- сбрасывает хранимое значение
 	Reset()
 	// Change  -- изменяет состояние заданным образом
-	Change(AAutoHight)
+	Change(AAutoHeight)
 }
 
 // IAutoSize -- интерфейс к автоматической подстройке размера

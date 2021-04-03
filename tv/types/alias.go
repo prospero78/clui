@@ -6,7 +6,7 @@ type (
 	AUnicalID int64
 	AWidth    int
 
-	AAutoWidth bool
-	AAutoHight bool
-	AAutoSize  bool
+	AAutoWidth  bool
+	AAutoHeight bool
+	AAutoSize   bool
 )

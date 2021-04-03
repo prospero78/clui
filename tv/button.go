@@ -24,7 +24,7 @@ type Button struct {
 	shadowType  ButtonShadow
 	onClick     func(Event)
 	autoWidth   types.IAutoWidth
-	autoHeight  types.IAutoHight
+	autoHeight  types.IAutoHeight
 }
 
 /*
@@ -41,7 +41,7 @@ func CreateButton(parent Control,
 	title string,
 	scale int,
 	autoWidth types.AAutoWidth,
-	autoHight types.AAutoHight) *Button {
+	autoHight types.AAutoHeight) *Button {
 	b := &Button{
 		TBaseControl: NewBaseControl(),
 		autoWidth:    autowidth.New(),

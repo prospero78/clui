@@ -15,7 +15,7 @@ func createView() {
 	ui.CreateLabel(frmChk, ui.AutoSize, ui.AutoSize, "Enter password:", ui.Fixed)
 	edFld := ui.CreateEditField(frmChk, 20, "", ui.Fixed)
 	edFld.SetPasswordMode(true)
-	chkPass := ui.CreateCheckBox(frmChk, ui.AutoSize, "Show Password", ui.Fixed)
+	chkPass := ui.CreateCheckBox(frmChk, 0, "Show Password", ui.Fixed, true)
 
 	ui.ActivateControl(view, edFld)
 
