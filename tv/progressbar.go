@@ -7,6 +7,8 @@ import (
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
 
+	"github.com/prospero78/goTV/tv/autoheight"
+	"github.com/prospero78/goTV/tv/autowidth"
 	"github.com/prospero78/goTV/tv/types"
 )
 
@@ -24,6 +26,8 @@ type ProgressBar struct {
 	value            int
 	emptyFg, emptyBg term.Attribute
 	titleFg          term.Attribute
+	autoWidth        types.IAutoWidth
+	autoHeight       types.IAutoHeight
 }
 
 /*
@@ -34,14 +38,19 @@ scale - the way of scaling the control when the parent is resized. Use DoNotScal
 control should keep its original size.
 */
 func CreateProgressBar(parent Control, width, height int, scale int) *ProgressBar {
-	b := new(ProgressBar)
-	b.TBaseControl = NewBaseControl()
-
-	if height == AutoSize {
-		height = 1
+	b := &ProgressBar{
+		TBaseControl: NewBaseControl(),
+		autoWidth:    autowidth.New(),
+		autoHeight:   autoheight.New(),
 	}
-	if width == AutoSize {
+
+	if height == 0 {
+		height = 1
+		b.autoHeight.Set()
+	}
+	if width == 0 {
 		width = 10
+		b.autoWidth.Set()
 	}
 
 	b.SetSize(width, height)
