@@ -56,20 +56,20 @@ func CreateLoginDialog(title, userName string) *LoginDialog {
 	userfrm.SetPaddings(1, 1)
 	userfrm.SetPack(Horizontal)
 	userfrm.SetGaps(1, 0)
-	CreateLabel(userfrm, AutoSize, AutoSize, "User name", Fixed)
+	CreateLabel(userfrm, 0, 0, "User name", Fixed)
 	edUser := CreateEditField(userfrm, 20, userName, 1)
 
 	passfrm := CreateFrame(dlg.View, 1, 1, BorderNone, 1)
 	passfrm.SetPaddings(1, 1)
 	passfrm.SetPack(Horizontal)
 	passfrm.SetGaps(1, 0)
-	CreateLabel(passfrm, AutoSize, AutoSize, "Password", Fixed)
+	CreateLabel(passfrm, 0, 0, "Password", Fixed)
 	edPass := CreateEditField(passfrm, 20, "", 1)
 	edPass.SetPasswordMode(true)
 
 	filler := CreateFrame(dlg.View, 1, 1, BorderNone, 1)
 	filler.SetPack(Horizontal)
-	lbRes := CreateLabel(filler, AutoSize, AutoSize, "", 1)
+	lbRes := CreateLabel(filler, 0, 0, "", 1)
 
 	blist := CreateFrame(dlg.View, 1, 1, BorderNone, Fixed)
 	blist.SetPack(Horizontal)

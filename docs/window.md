@@ -6,7 +6,7 @@ To create a new Window, use function
 ```
 AddWindow(positionX, positionY, minWidth, minHeight, title)
 ```
-instead of `CreateWindow`. All other controls must be create with Create**ControlType** functions. In fact, `CreateWindow` function can be used but it only creates a new Window but does not do anything else. So, a Window created with `CreateWindow` is not dispalyed on the screen and a user cannot manipulate it. `AddWindow` does all the internal job: registers Windows, makes it visible and updates the screen to apply changes. Both minWidth and minHeight can be set to `AutoSize` - in this case minimal width is 10 and heigth is 5.
+instead of `CreateWindow`. All other controls must be create with Create**ControlType** functions. In fact, `CreateWindow` function can be used but it only creates a new Window but does not do anything else. So, a Window created with `CreateWindow` is not dispalyed on the screen and a user cannot manipulate it. `AddWindow` does all the internal job: registers Windows, makes it visible and updates the screen to apply changes. Both minWidth and minHeight can be set to `Auto_Size` - in this case minimal width is 10 and heigth is 5.
 
 ### Window features
 * It is the only control that can be moved or resized manually(using mouse or keyboard). There is a set of predefined hotkeys to do common tasks witout mouse. All hotkeys are key sequences - you have to press the first combination, release it and then press the second key (all default hotkeys are easy to remember, I added info why the keys was used for the certain action):

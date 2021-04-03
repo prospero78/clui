@@ -220,7 +220,7 @@ func CreateFileSelectDialog(title, fileMasks, initPath string, selectDir, mustEx
 
 	dlg.currPath = initPath
 	dlg.detectPath()
-	dlg.curDir = CreateLabel(dlg.View, AutoSize, AutoSize, "", Fixed)
+	dlg.curDir = CreateLabel(dlg.View, 0, 0, "", Fixed)
 	dlg.curDir.SetTextDisplay(AlignRight)
 
 	flist := CreateFrame(dlg.View, 1, 1, BorderNone, 1)
@@ -232,7 +232,7 @@ func CreateFileSelectDialog(title, fileMasks, initPath string, selectDir, mustEx
 	// text + edit field to enter name manually
 	fselected.SetPack(Vertical)
 	fselected.SetPaddings(1, 0)
-	CreateLabel(fselected, AutoSize, AutoSize, "Selected object:", 1)
+	CreateLabel(fselected, 0, 0, "Selected object:", 1)
 	dlg.edFile = CreateEditField(fselected, cw-22, "", 1)
 
 	// buttons at the right

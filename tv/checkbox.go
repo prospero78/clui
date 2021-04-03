@@ -46,7 +46,7 @@ func CreateCheckBox(parent Control,
 	c.autoHeight.Change(true)
 	c.parent = parent
 
-	if width == AutoSize {
+	if c.autoWidth.Is() {
 		width = xs.Len(title) + 4
 	}
 

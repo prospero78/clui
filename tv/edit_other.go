@@ -7,6 +7,7 @@ import (
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
 
+	"github.com/prospero78/goTV/tv/autowidth"
 	"github.com/prospero78/goTV/tv/types"
 )
 
@@ -31,6 +32,8 @@ type EditField struct {
 
 	onChange   func(Event)
 	onKeyPress func(term.Key, rune) bool
+
+	autoWidth types.IAutoWidth
 }
 
 // NewEditField creates a new EditField control
@@ -41,13 +44,17 @@ type EditField struct {
 // scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 //  control should keep its original size.
 func CreateEditField(parent Control, width int, text string, scale int) *EditField {
-	e := new(EditField)
-	e.TBaseControl = NewBaseControl()
+	e := &EditField{
+		TBaseControl: NewBaseControl(),
+		autoWidth:    autowidth.New(),
+	}
+
 	e.onChange = nil
 	e.SetTitle(text)
 	e.SetEnabled(true)
 
-	if width == AutoSize {
+	if width == 0 {
+		e.autoWidth.Set()
 		width = xs.Len(text) + 1
 	}
 

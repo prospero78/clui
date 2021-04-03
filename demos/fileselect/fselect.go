@@ -12,12 +12,12 @@ func createView() {
 
 	frmPath := ui.CreateFrame(view, 1, 1, ui.BorderNone, ui.Fixed)
 	frmPath.SetPack(ui.Horizontal)
-	ui.CreateLabel(frmPath, ui.AutoSize, ui.AutoSize, "Initial path", ui.Fixed)
+	ui.CreateLabel(frmPath, 0, 0, "Initial path", ui.Fixed)
 	edPath := ui.CreateEditField(frmPath, 16, "", 1)
 
 	frmMask := ui.CreateFrame(view, 1, 1, ui.BorderNone, ui.Fixed)
 	frmMask.SetPack(ui.Horizontal)
-	ui.CreateLabel(frmMask, ui.AutoSize, ui.AutoSize, "File masks", ui.Fixed)
+	ui.CreateLabel(frmMask, 0, 0, "File masks", ui.Fixed)
 	edMasks := ui.CreateEditField(frmMask, 16, "*", 1)
 
 	frmOpts := ui.CreateFrame(view, 1, 1, ui.BorderNone, ui.Fixed)

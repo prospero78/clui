@@ -14,17 +14,17 @@ func createView() {
 	frmOpts.SetPack(ui.Horizontal)
 	cbCheck := ui.CreateCheckBox(frmOpts, 0, "Use callback to test data", ui.Fixed, true)
 
-	ui.CreateLabel(view, ui.AutoSize, ui.AutoSize, "Correct credentials", ui.Fixed)
+	ui.CreateLabel(view, 0, 0, "Correct credentials", ui.Fixed)
 
 	frmCreds := ui.CreateFrame(view, 1, 1, ui.BorderNone, ui.Fixed)
 	frmCreds.SetPack(ui.Horizontal)
 	frmCreds.SetGaps(1, 0)
-	ui.CreateLabel(frmCreds, ui.AutoSize, ui.AutoSize, "Username", ui.Fixed)
+	ui.CreateLabel(frmCreds, 0, 0, "Username", ui.Fixed)
 	edUser := ui.CreateEditField(frmCreds, 8, "", 1)
-	ui.CreateLabel(frmCreds, ui.AutoSize, ui.AutoSize, "Password", ui.Fixed)
+	ui.CreateLabel(frmCreds, 0, 0, "Password", ui.Fixed)
 	edPass := ui.CreateEditField(frmCreds, 8, "", 1)
 
-	lbRes := ui.CreateLabel(view, ui.AutoSize, ui.AutoSize, "Result:", ui.Fixed)
+	lbRes := ui.CreateLabel(view, 0, 0, "Result:", ui.Fixed)
 
 	frmBtns := ui.CreateFrame(view, 1, 1, ui.BorderNone, ui.Fixed)
 	frmBtns.SetPack(ui.Horizontal)
