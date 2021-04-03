@@ -5,6 +5,8 @@ import (
 
 	xs "github.com/huandu/xstrings"
 
+	"github.com/prospero78/goTV/tv/autoheight"
+	"github.com/prospero78/goTV/tv/autowidth"
 	"github.com/prospero78/goTV/tv/types"
 )
 
@@ -21,6 +23,8 @@ type Frame struct {
 	// pack           PackType
 	scrollable     bool
 	lastScrollProp int
+	autoWidth      types.IAutoWidth
+	autoHeight     types.IAutoHeight
 }
 
 /*
@@ -33,14 +37,19 @@ scale - the way of scaling the control when the parent is resized. Use DoNotScal
 control should keep its original size.
 */
 func CreateFrame(parent Control, width, height int, bs BorderStyle, scale int) *Frame {
-	f := new(Frame)
-	f.TBaseControl = NewBaseControl()
-
-	if width == AutoSize {
-		width = 5
+	f := &Frame{
+		TBaseControl: NewBaseControl(),
+		autoWidth:    autowidth.New(),
+		autoHeight:   autoheight.New(),
 	}
-	if height == AutoSize {
+
+	if width == 0 {
+		width = 5
+		f.autoWidth.Set()
+	}
+	if height == 0 {
 		height = 3
+		f.autoHeight.Set()
 	}
 
 	if bs == BorderAuto {
