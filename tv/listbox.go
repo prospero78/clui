@@ -103,8 +103,8 @@ func (l *ListBox) drawItems() {
 
 		SetTextColor(f)
 		SetBackColor(b)
-		FillRect(l.pos.GetX(), l.pos.GetY()+dy, l.width-1, 1, ' ')
-		str := SliceColorized(l.items[curr], 0, maxWidth)
+		FillRect(l.pos.GetX(), l.pos.GetY()+dy, int(l.width-1), 1, ' ')
+		str := SliceColorized(l.items[curr], 0, int(maxWidth))
 		DrawText(l.pos.GetX(), l.pos.GetY()+dy, str)
 
 		curr++
@@ -275,7 +275,7 @@ func (l *ListBox) processMouseClick(ev Event) bool {
 		return true
 	}
 
-	if dx < 0 || int(dx) >= l.width || dy < 0 || int(dy) >= l.height {
+	if dx < 0 || int(dx) >= int(l.width) || dy < 0 || int(dy) >= l.height {
 		return true
 	}
 

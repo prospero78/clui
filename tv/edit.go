@@ -65,7 +65,7 @@ func (e *EditField) Draw() {
 
 	var textOut string
 	curOff := 0
-	if e.offset == 0 && xs.Len(e.title) < e.width {
+	if e.offset == 0 && xs.Len(e.title) < int(e.width) {
 		if e.showStars {
 			textOut = strings.Repeat(chStar, xs.Len(e.title))
 		} else {
@@ -85,8 +85,8 @@ func (e *EditField) Draw() {
 		} else {
 			curOff = 1 - e.offset
 			fromIdx = types.ACoordX(e.offset)
-			if e.width-1 <= xs.Len(e.title)-e.offset {
-				toIdx = types.ACoordX(e.offset + e.width - 2)
+			if int(e.width-1) <= xs.Len(e.title)-e.offset {
+				toIdx = types.ACoordX(e.offset + int(e.width) - 2)
 				if e.showStars {
 					textOut = chLeft + strings.Repeat(chStar, int(toIdx-fromIdx)) + chRight
 				} else {
@@ -140,7 +140,7 @@ func (e *EditField) insertRune(ch rune) {
 
 	e.cursorPos++
 
-	if int(e.cursorPos) >= e.width {
+	if int(e.cursorPos) >= int(e.width) {
 		if e.offset == 0 {
 			e.offset = 2
 		} else {
@@ -169,7 +169,7 @@ func (e *EditField) backspace() {
 		e.setTitleInternal(xs.Slice(e.title, 0, int(e.cursorPos)) + xs.Slice(e.title, int(e.cursorPos+1), -1))
 	}
 
-	if length-1 < e.width {
+	if length-1 < int(e.width) {
 		e.offset = 0
 	}
 }
@@ -187,7 +187,7 @@ func (e *EditField) del() {
 		e.setTitleInternal(xs.Slice(e.title, 0, int(e.cursorPos)) + xs.Slice(e.title, int(e.cursorPos+1), -1))
 	}
 
-	if length-1 < e.width {
+	if length-1 < int(e.width) {
 		e.offset = 0
 	}
 }
@@ -211,7 +211,7 @@ func (e *EditField) charRight() {
 	}
 
 	e.cursorPos++
-	if int(e.cursorPos) != length && int(e.cursorPos) >= e.offset+e.width-2 {
+	if int(e.cursorPos) != length && int(e.cursorPos) >= e.offset+int(e.width)-2 {
 		e.offset++
 	}
 }
@@ -225,11 +225,11 @@ func (e *EditField) end() {
 	length := xs.Len(e.title)
 	e.cursorPos = types.ACoordX(length)
 
-	if length < e.width {
+	if length < int(e.width) {
 		return
 	}
 
-	e.offset = length - (e.width - 2)
+	e.offset = length - (int(e.width) - 2)
 }
 
 // Clear empties the EditField and emits OnChange event
@@ -266,7 +266,7 @@ func (e *EditField) SetSize(width, height int) {
 	}
 
 	if width != KeepValue {
-		e.width = width
+		e.width = types.AWidth(width)
 	}
 
 	e.height = 1

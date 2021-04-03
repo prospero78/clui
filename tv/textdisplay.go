@@ -74,14 +74,14 @@ func (l *TextDisplay) drawText() {
 			str = l.onDrawLine(ind + l.topLine)
 		} else {
 			if ind+l.topLine == l.lineCount+5 {
-				str = xs.Center("--- THE END ---", l.width, " ")
+				str = xs.Center("--- THE END ---", int(l.width), " ")
 			} else {
 				str = ""
 			}
 		}
 
 		if str != "" {
-			str = SliceColorized(str, 0, l.width)
+			str = SliceColorized(str, 0, int(l.width))
 			DrawText(l.pos.GetX(), l.pos.GetY()+types.ACoordY(ind), str)
 		}
 

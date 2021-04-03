@@ -124,7 +124,7 @@ func (b *BarChart) Draw() {
 	SetTextColor(fg)
 	SetBackColor(bg)
 
-	FillRect(b.pos.X().Get(), b.pos.Y().Get(), b.width, b.height, ' ')
+	FillRect(b.pos.X().Get(), b.pos.Y().Get(), int(b.width), b.height, ' ')
 
 	if len(b.data) == 0 {
 		return
@@ -232,7 +232,7 @@ func (b *BarChart) drawBars() {
 
 func (b *BarChart) drawLegend() {
 	pos, width := b.calculateBarArea()
-	if pos+width >= b.width-3 {
+	if pos+width >= int(b.width-3) {
 		return
 	}
 
@@ -328,17 +328,17 @@ func (b *BarChart) calculateBarArea() (int, int) {
 	pos := 0
 
 	valVal := int(b.ValueWidth())
-	if valVal < w/2 {
-		w = w - valVal - 1
+	if valVal < int(w/2) {
+		w = w - types.AWidth(valVal) - 1
 		pos = valVal + 1
 	}
 
 	legVal := int(b.LegendWidth())
-	if legVal < w/2 {
-		w -= legVal
+	if legVal < int(w/2) {
+		w -= types.AWidth(legVal)
 	}
 
-	return pos, w
+	return pos, int(w)
 }
 
 func (b *BarChart) calculateBarWidth() int {
@@ -353,22 +353,22 @@ func (b *BarChart) calculateBarWidth() int {
 	w := b.width
 	legVal := int(b.LegendWidth())
 	valVal := int(b.ValueWidth())
-	if valVal < w/2 {
-		w = w - valVal - 1
+	if valVal < int(w/2) {
+		w = w - types.AWidth(valVal) - 1
 	}
-	if legVal < w/2 {
-		w -= legVal
+	if legVal < int(w/2) {
+		w -= types.AWidth(legVal)
 	}
 
 	dataCount := len(b.data)
 	gapVal := int(b.BarGap())
 	barVal := int(b.MinBarWidth())
 	minSize := dataCount*barVal + (dataCount-1)*gapVal
-	if minSize >= w {
+	if minSize >= int(w) {
 		return barVal
 	}
 
-	sz := (w - (dataCount-1)*gapVal) / dataCount
+	sz := (int(w) - (dataCount-1)*gapVal) / dataCount
 	if sz == 0 {
 		sz = 1
 	}

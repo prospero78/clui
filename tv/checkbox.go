@@ -192,7 +192,7 @@ func (c *CheckBox) SetSize(width, height int) {
 	}
 
 	if width != KeepValue {
-		c.width = width
+		c.width = types.AWidth(width)
 	}
 
 	c.height = 1

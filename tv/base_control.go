@@ -16,30 +16,31 @@ import (
 type TBaseControl struct {
 	refID types.AUnicalID
 
-	pos           types.IPos
-	width, height int
-	minW, minH    int
-	scale         int
-	gapX, gapY    int
-	posPad        types.IPos
-	fg, bg        term.Attribute
-	fgActive      term.Attribute
-	bgActive      term.Attribute
-	align         Align
-	parent        Control
-	inactive      bool
-	modal         bool
-	tabSkip       bool
-	disabled      bool
-	hidden        bool
-	clipped       bool
-	clipper       *rect
-	pack          PackType
-	children      []Control
-	mtx           sync.RWMutex
-	onActive      func(active bool)
-	style         string
-	title         string
+	pos        types.IPos
+	width      types.AWidth
+	height     int
+	minW, minH int
+	scale      int
+	gapX, gapY int
+	posPad     types.IPos
+	fg, bg     term.Attribute
+	fgActive   term.Attribute
+	bgActive   term.Attribute
+	align      Align
+	parent     Control
+	inactive   bool
+	modal      bool
+	tabSkip    bool
+	disabled   bool
+	hidden     bool
+	clipped    bool
+	clipper    *rect
+	pack       PackType
+	children   []Control
+	mtx        sync.RWMutex
+	onActive   func(active bool)
+	style      string
+	title      string
 }
 
 var (
@@ -88,7 +89,7 @@ func (sf *TBaseControl) SetTitle(title string) {
 }
 
 func (sf *TBaseControl) Size() (widht int, height int) {
-	return sf.width, sf.height
+	return int(sf.width), sf.height
 }
 
 func (sf *TBaseControl) SetSize(width, height int) {
@@ -99,9 +100,9 @@ func (sf *TBaseControl) SetSize(width, height int) {
 		height = sf.minH
 	}
 
-	if height != sf.height || width != sf.width {
+	if height != sf.height || width != int(sf.width) {
 		sf.height = height
-		sf.width = width
+		sf.width = types.AWidth(width)
 	}
 }
 
@@ -128,14 +129,14 @@ func (sf *TBaseControl) SetPos(x types.ACoordX, y types.ACoordY) {
 
 func (sf *TBaseControl) applyConstraints() {
 	ww, hh := sf.width, sf.height
-	if ww < sf.minW {
-		ww = sf.minW
+	if int(ww) < sf.minW {
+		ww = types.AWidth(sf.minW)
 	}
 	if hh < sf.minH {
 		hh = sf.minH
 	}
 	if hh != sf.height || ww != sf.width {
-		sf.SetSize(ww, hh)
+		sf.SetSize(int(ww), hh)
 	}
 }
 
@@ -323,7 +324,7 @@ func (sf *TBaseControl) ResizeChildren() {
 		return
 	}
 
-	fullWidth := sf.width - int(2*sf.posPad.GetX())
+	fullWidth := int(sf.width) - int(2*sf.posPad.GetX())
 	fullHeight := sf.height - int(2*sf.posPad.Y().Get())
 	if sf.pack == Horizontal {
 		fullWidth -= (children - 1) * sf.gapX

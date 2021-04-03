@@ -82,7 +82,7 @@ func (l *Label) Draw() {
 
 	SetTextColor(fg)
 	SetBackColor(bg)
-	FillRect(l.pos.GetX(), l.pos.GetY(), l.width, l.height, ' ')
+	FillRect(l.pos.GetX(), l.pos.GetY(), int(l.width), l.height, ' ')
 
 	if l.title == "" {
 		return
@@ -124,15 +124,15 @@ func (l *Label) Draw() {
 		}
 	} else {
 		if l.direction == Horizontal {
-			shift, str := AlignColorizedText(l.title, l.width, l.align)
+			shift, str := AlignColorizedText(l.title, int(l.width), l.align)
 			if str != l.title && l.align != l.textDisplay {
-				shift, str = AlignColorizedText(l.title, l.width, l.textDisplay)
+				shift, str = AlignColorizedText(l.title, int(l.width), l.textDisplay)
 			}
 			DrawText(l.pos.GetX()+types.ACoordX(shift), l.pos.GetY(), str)
 		} else {
 			shift, str := AlignColorizedText(l.title, l.height, l.align)
 			if str != l.title && l.align != l.textDisplay {
-				shift, str = AlignColorizedText(l.title, l.width, l.textDisplay)
+				shift, str = AlignColorizedText(l.title, int(l.width), l.textDisplay)
 			}
 			DrawTextVertical(l.pos.GetX(), l.pos.GetY()+types.ACoordY(shift), str)
 		}

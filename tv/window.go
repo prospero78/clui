@@ -91,7 +91,7 @@ func (wnd *Window) drawFrame() {
 		bs = wnd.border
 	}
 
-	DrawFrame(wnd.pos.GetX(), wnd.pos.GetY(), wnd.width, wnd.height, bs)
+	DrawFrame(wnd.pos.GetX(), wnd.pos.GetY(), int(wnd.width), wnd.height, bs)
 }
 
 func (wnd *Window) drawTitle() {
@@ -103,11 +103,11 @@ func (wnd *Window) drawTitle() {
 	xshift := 1
 	if lb > 0 {
 		lbSize := lb + 2 + 1
-		maxw -= lbSize
+		maxw -= types.AWidth(lbSize)
 		xshift += lbSize
 	}
 	if rb > 0 {
-		maxw -= rb + 2
+		maxw -= types.AWidth(rb) + 2
 	}
 	if maxw < 3 {
 		return
@@ -115,8 +115,8 @@ func (wnd *Window) drawTitle() {
 
 	fitTitle := wnd.title
 	rawText := UnColorizeText(fitTitle)
-	if xs.Len(rawText) > maxw {
-		fitTitle = SliceColorized(fitTitle, 0, maxw-3) + "..."
+	if xs.Len(rawText) > int(maxw) {
+		fitTitle = SliceColorized(fitTitle, 0, int(maxw)-3) + "..."
 	}
 	DrawText(wnd.pos.GetX()+types.ACoordX(xshift), wnd.pos.GetY(), fitTitle)
 }
@@ -135,7 +135,7 @@ func (wnd *Window) drawButtons() {
 
 	// draw close button (rb can be either 1 or 0)
 	if rb != 0 {
-		pos := wnd.pos.GetX() + types.ACoordX(wnd.width-rb-2)
+		pos := wnd.pos.GetX() + types.ACoordX(int(wnd.width)-rb-2)
 		putCharUnsafe(pos, wnd.pos.GetY(), cOpenB)
 		putCharUnsafe(pos+1, wnd.pos.GetY(), cClose)
 		putCharUnsafe(pos+2, wnd.pos.GetY(), cCloseB)
@@ -167,7 +167,7 @@ func (wnd *Window) Draw() {
 	fg, bg := RealColor(wnd.fg, wnd.Style(), ColorViewText), RealColor(wnd.bg, wnd.Style(), ColorViewBack)
 	SetBackColor(bg)
 
-	FillRect(wnd.pos.GetX(), wnd.pos.GetY(), wnd.width, wnd.height, ' ')
+	FillRect(wnd.pos.GetX(), wnd.pos.GetY(), int(wnd.width), wnd.height, ' ')
 
 	wnd.DrawChildren()
 
@@ -212,7 +212,7 @@ func (c *Window) HitTest(x types.ACoordX, y types.ACoordY) HitResult {
 		if rb > 0 {
 			fromR += 2
 		}
-		if x > c.pos.GetX()+types.ACoordX(fromL) && x < c.pos.GetX()+types.ACoordX(c.width-fromR) {
+		if x > c.pos.GetX()+types.ACoordX(fromL) && x < c.pos.GetX()+types.ACoordX(int(c.width)-fromR) {
 			hResult = HitTop
 		} else {
 			hResult = HitTop
