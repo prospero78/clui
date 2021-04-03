@@ -235,7 +235,7 @@ func CreateSelectDialog(title string, items []string, selectedItem int, typ Sele
 		fRadio.SetPack(Vertical)
 		dlg.rg = CreateRadioGroup()
 		for _, item := range items {
-			r := CreateRadio(fRadio, AutoSize, item, Fixed)
+			r := CreateRadio(fRadio, 0, item, Fixed)
 			dlg.rg.AddItem(r)
 		}
 		if selectedItem >= 0 && selectedItem < len(items) {
