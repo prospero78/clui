@@ -209,7 +209,7 @@ func CreateSelectDialog(title string, items []string, selectedItem int, typ Sele
 		lb.SetMultiline(true)
 
 		fWidth, _ := dlg.View.Size()
-		dlg.edit = CreateEditField(dlg.View, fWidth-2, items[1], AutoSize)
+		dlg.edit = CreateEditField(dlg.View, fWidth-2, items[1], -1)
 		CreateFrame(dlg.View, 1, 1, BorderNone, Fixed)
 
 		dlg.edit.OnKeyPress(func(key term.Key, r rune) bool {
