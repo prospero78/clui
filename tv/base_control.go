@@ -59,125 +59,125 @@ func NewBaseControl() TBaseControl {
 	}
 }
 
-func (c *TBaseControl) SetClipped(clipped bool) {
-	c.clipped = clipped
+func (sf *TBaseControl) SetClipped(clipped bool) {
+	sf.clipped = clipped
 }
 
-func (c *TBaseControl) Clipped() bool {
-	return c.clipped
+func (sf *TBaseControl) Clipped() bool {
+	return sf.clipped
 }
 
-func (c *TBaseControl) SetStyle(style string) {
-	c.style = style
+func (sf *TBaseControl) SetStyle(style string) {
+	sf.style = style
 }
 
-func (c *TBaseControl) Style() string {
-	return c.style
+func (sf *TBaseControl) Style() string {
+	return sf.style
 }
 
-func (c *TBaseControl) RefID() types.AUnicalID {
-	return c.refID
+func (sf *TBaseControl) RefID() types.AUnicalID {
+	return sf.refID
 }
 
-func (c *TBaseControl) Title() string {
-	return c.title
+func (sf *TBaseControl) Title() string {
+	return sf.title
 }
 
-func (c *TBaseControl) SetTitle(title string) {
-	c.title = title
+func (sf *TBaseControl) SetTitle(title string) {
+	sf.title = title
 }
 
-func (c *TBaseControl) Size() (widht int, height int) {
-	return c.width, c.height
+func (sf *TBaseControl) Size() (widht int, height int) {
+	return sf.width, sf.height
 }
 
-func (c *TBaseControl) SetSize(width, height int) {
-	if width < c.minW {
-		width = c.minW
+func (sf *TBaseControl) SetSize(width, height int) {
+	if width < sf.minW {
+		width = sf.minW
 	}
-	if height < c.minH {
-		height = c.minH
+	if height < sf.minH {
+		height = sf.minH
 	}
 
-	if height != c.height || width != c.width {
-		c.height = height
-		c.width = width
+	if height != sf.height || width != sf.width {
+		sf.height = height
+		sf.width = width
 	}
 }
 
-func (c *TBaseControl) Pos() types.IPos {
-	return c.pos
+func (sf *TBaseControl) Pos() types.IPos {
+	return sf.pos
 }
 
-func (c *TBaseControl) SetPos(x types.ACoordX, y types.ACoordY) {
-	if c.clipped && c.clipper != nil {
-		cx, cy, _, _ := c.Clipper()
-		px, py := c.Paddings()
+func (sf *TBaseControl) SetPos(x types.ACoordX, y types.ACoordY) {
+	if sf.clipped && sf.clipper != nil {
+		cx, cy, _, _ := sf.Clipper()
+		px, py := sf.Paddings()
 
-		distX := cx - c.pos.GetX()
-		distY := cy - c.pos.GetY()
+		distX := cx - sf.pos.GetX()
+		distY := cy - sf.pos.GetY()
 
-		c.clipper.x = x + px
-		c.clipper.y = y + py
+		sf.clipper.x = x + px
+		sf.clipper.y = y + py
 
-		c.pos.Set((x-distX)+px, (y-distY)+py)
+		sf.pos.Set((x-distX)+px, (y-distY)+py)
 	} else {
-		c.pos.Set(x, y)
+		sf.pos.Set(x, y)
 	}
 }
 
-func (c *TBaseControl) applyConstraints() {
-	ww, hh := c.width, c.height
-	if ww < c.minW {
-		ww = c.minW
+func (sf *TBaseControl) applyConstraints() {
+	ww, hh := sf.width, sf.height
+	if ww < sf.minW {
+		ww = sf.minW
 	}
-	if hh < c.minH {
-		hh = c.minH
+	if hh < sf.minH {
+		hh = sf.minH
 	}
-	if hh != c.height || ww != c.width {
-		c.SetSize(ww, hh)
-	}
-}
-
-func (c *TBaseControl) Constraints() (minw int, minh int) {
-	return c.minW, c.minH
-}
-
-func (c *TBaseControl) SetConstraints(minw, minh int) {
-	c.minW = minw
-	c.minH = minh
-	c.applyConstraints()
-}
-
-func (c *TBaseControl) Active() bool {
-	return !c.inactive
-}
-
-func (c *TBaseControl) SetActive(active bool) {
-	c.inactive = !active
-
-	if c.onActive != nil {
-		c.onActive(active)
+	if hh != sf.height || ww != sf.width {
+		sf.SetSize(ww, hh)
 	}
 }
 
-func (c *TBaseControl) OnActive(fn func(active bool)) {
-	c.onActive = fn
+func (sf *TBaseControl) Constraints() (minw int, minh int) {
+	return sf.minW, sf.minH
 }
 
-func (c *TBaseControl) TabStop() bool {
-	return !c.tabSkip
+func (sf *TBaseControl) SetConstraints(minw, minh int) {
+	sf.minW = minw
+	sf.minH = minh
+	sf.applyConstraints()
 }
 
-func (c *TBaseControl) SetTabStop(tabstop bool) {
-	c.tabSkip = !tabstop
+func (sf *TBaseControl) Active() bool {
+	return !sf.inactive
 }
 
-func (c *TBaseControl) Enabled() bool {
-	c.mtx.RLock()
-	defer c.mtx.RUnlock()
+func (sf *TBaseControl) SetActive(active bool) {
+	sf.inactive = !active
 
-	return !c.disabled
+	if sf.onActive != nil {
+		sf.onActive(active)
+	}
+}
+
+func (sf *TBaseControl) OnActive(fn func(active bool)) {
+	sf.onActive = fn
+}
+
+func (sf *TBaseControl) TabStop() bool {
+	return !sf.tabSkip
+}
+
+func (sf *TBaseControl) SetTabStop(tabstop bool) {
+	sf.tabSkip = !tabstop
+}
+
+func (sf *TBaseControl) Enabled() bool {
+	sf.mtx.RLock()
+	defer sf.mtx.RUnlock()
+
+	return !sf.disabled
 }
 
 func (c *TBaseControl) SetEnabled(enabled bool) {
@@ -187,128 +187,128 @@ func (c *TBaseControl) SetEnabled(enabled bool) {
 	c.disabled = !enabled
 }
 
-func (c *TBaseControl) Visible() bool {
-	c.mtx.RLock()
-	defer c.mtx.RUnlock()
+func (sf *TBaseControl) Visible() bool {
+	sf.mtx.RLock()
+	defer sf.mtx.RUnlock()
 
-	return !c.hidden
+	return !sf.hidden
 }
 
-func (c *TBaseControl) SetVisible(visible bool) {
-	c.mtx.Lock()
-	defer c.mtx.Unlock()
+func (sf *TBaseControl) SetVisible(visible bool) {
+	sf.mtx.Lock()
+	defer sf.mtx.Unlock()
 
-	if visible == !c.hidden {
+	if visible == !sf.hidden {
 		return
 	}
 
-	c.hidden = !visible
-	if c.parent == nil {
+	sf.hidden = !visible
+	if sf.parent == nil {
 		return
 	}
 
-	p := c.Parent()
+	p := sf.Parent()
 	for p.Parent() != nil {
 		p = p.Parent()
 	}
 
 	go func() {
-		if FindFirstActiveControl(c) != nil && !c.inactive {
+		if FindFirstActiveControl(sf) != nil && !sf.inactive {
 			PutEvent(Event{Type: EventKey, Key: term.KeyTab})
 		}
 		PutEvent(Event{Type: EventLayout, Target: p})
 	}()
 }
 
-func (c *TBaseControl) Parent() Control {
-	return c.parent
+func (sf *TBaseControl) Parent() Control {
+	return sf.parent
 }
 
-func (c *TBaseControl) SetParent(parent Control) {
-	if c.parent == nil {
-		c.parent = parent
+func (sf *TBaseControl) SetParent(parent Control) {
+	if sf.parent == nil {
+		sf.parent = parent
 	}
 }
 
-func (c *TBaseControl) Modal() bool {
-	return c.modal
+func (sf *TBaseControl) Modal() bool {
+	return sf.modal
 }
 
-func (c *TBaseControl) SetModal(modal bool) {
-	c.modal = modal
+func (sf *TBaseControl) SetModal(modal bool) {
+	sf.modal = modal
 }
 
-func (c *TBaseControl) Paddings() (px types.ACoordX, py types.ACoordY) {
-	return c.padX, c.padY
+func (sf *TBaseControl) Paddings() (px types.ACoordX, py types.ACoordY) {
+	return sf.padX, sf.padY
 }
 
-func (c *TBaseControl) SetPaddings(px types.ACoordX, py types.ACoordY) {
+func (sf *TBaseControl) SetPaddings(px types.ACoordX, py types.ACoordY) {
 	if px >= 0 {
-		c.padX = px
+		sf.padX = px
 	}
 	if py >= 0 {
-		c.padY = py
+		sf.padY = py
 	}
 }
 
-func (c *TBaseControl) Gaps() (dx int, dy int) {
-	return c.gapX, c.gapY
+func (sf *TBaseControl) Gaps() (dx int, dy int) {
+	return sf.gapX, sf.gapY
 }
 
-func (c *TBaseControl) SetGaps(dx, dy int) {
+func (sf *TBaseControl) SetGaps(dx, dy int) {
 	if dx >= 0 {
-		c.gapX = dx
+		sf.gapX = dx
 	}
 	if dy >= 0 {
-		c.gapY = dy
+		sf.gapY = dy
 	}
 }
 
-func (c *TBaseControl) Pack() PackType {
-	return c.pack
+func (sf *TBaseControl) Pack() PackType {
+	return sf.pack
 }
 
-func (c *TBaseControl) SetPack(pack PackType) {
-	c.pack = pack
+func (sf *TBaseControl) SetPack(pack PackType) {
+	sf.pack = pack
 }
 
-func (c *TBaseControl) Scale() int {
-	return c.scale
+func (sf *TBaseControl) Scale() int {
+	return sf.scale
 }
 
-func (c *TBaseControl) SetScale(scale int) {
+func (sf *TBaseControl) SetScale(scale int) {
 	if scale >= 0 {
-		c.scale = scale
+		sf.scale = scale
 	}
 }
 
-func (c *TBaseControl) Align() Align {
-	return c.align
+func (sf *TBaseControl) Align() Align {
+	return sf.align
 }
 
-func (c *TBaseControl) SetAlign(align Align) {
-	c.align = align
+func (sf *TBaseControl) SetAlign(align Align) {
+	sf.align = align
 }
 
-func (c *TBaseControl) TextColor() term.Attribute {
-	return c.fg
+func (sf *TBaseControl) TextColor() term.Attribute {
+	return sf.fg
 }
 
-func (c *TBaseControl) SetTextColor(clr term.Attribute) {
-	c.fg = clr
+func (sf *TBaseControl) SetTextColor(clr term.Attribute) {
+	sf.fg = clr
 }
 
-func (c *TBaseControl) BackColor() term.Attribute {
-	return c.bg
+func (sf *TBaseControl) BackColor() term.Attribute {
+	return sf.bg
 }
 
-func (c *TBaseControl) SetBackColor(clr term.Attribute) {
-	c.bg = clr
+func (sf *TBaseControl) SetBackColor(clr term.Attribute) {
+	sf.bg = clr
 }
 
-func (c *TBaseControl) childCount() int {
+func (sf *TBaseControl) childCount() int {
 	cnt := 0
-	for _, child := range c.children {
+	for _, child := range sf.children {
 		if child.Visible() {
 			cnt++
 		}
@@ -317,30 +317,30 @@ func (c *TBaseControl) childCount() int {
 	return cnt
 }
 
-func (c *TBaseControl) ResizeChildren() {
-	children := c.childCount()
+func (sf *TBaseControl) ResizeChildren() {
+	children := sf.childCount()
 	if children == 0 {
 		return
 	}
 
-	fullWidth := c.width - int(2*c.padX)
-	fullHeight := c.height - int(2*c.padY)
-	if c.pack == Horizontal {
-		fullWidth -= (children - 1) * c.gapX
+	fullWidth := sf.width - int(2*sf.padX)
+	fullHeight := sf.height - int(2*sf.padY)
+	if sf.pack == Horizontal {
+		fullWidth -= (children - 1) * sf.gapX
 	} else {
-		fullHeight -= (children - 1) * c.gapY
+		fullHeight -= (children - 1) * sf.gapY
 	}
 
-	totalSc := c.ChildrenScale()
+	totalSc := sf.ChildrenScale()
 	minWidth := 0
 	minHeight := 0
-	for _, child := range c.children {
+	for _, child := range sf.children {
 		if !child.Visible() {
 			continue
 		}
 
 		cw, ch := child.MinimalSize()
-		if c.pack == Horizontal {
+		if sf.pack == Horizontal {
 			minWidth += cw
 		} else {
 			minHeight += ch
@@ -349,14 +349,14 @@ func (c *TBaseControl) ResizeChildren() {
 
 	aStep := 0
 	diff := fullWidth - minWidth
-	if c.pack == Vertical {
+	if sf.pack == Vertical {
 		diff = fullHeight - minHeight
 	}
 	if totalSc > 0 {
 		aStep = int(float32(diff) / float32(totalSc))
 	}
 
-	for _, ctrl := range c.children {
+	for _, ctrl := range sf.children {
 		if !ctrl.Visible() {
 			continue
 		}
@@ -364,7 +364,7 @@ func (c *TBaseControl) ResizeChildren() {
 		tw, th := ctrl.MinimalSize()
 		sc := ctrl.Scale()
 		d := ctrl.Scale() * aStep
-		if c.pack == Horizontal {
+		if sf.pack == Horizontal {
 			if sc != 0 {
 				if sc == totalSc {
 					tw += diff
@@ -393,21 +393,21 @@ func (c *TBaseControl) ResizeChildren() {
 	}
 }
 
-func (c *TBaseControl) AddChild(control Control) {
-	if c.children == nil {
-		c.children = make([]Control, 1)
-		c.children[0] = control
+func (sf *TBaseControl) AddChild(control Control) {
+	if sf.children == nil {
+		sf.children = make([]Control, 1)
+		sf.children[0] = control
 	} else {
-		if c.ChildExists(control) {
+		if sf.ChildExists(control) {
 			panic("Double adding a child")
 		}
 
-		c.children = append(c.children, control)
+		sf.children = append(sf.children, control)
 	}
 
 	var ctrl Control
 	var mainCtrl Control
-	ctrl = c
+	ctrl = sf
 	for ctrl != nil {
 		ww, hh := ctrl.MinimalSize()
 		cw, ch := ctrl.Size()
@@ -432,23 +432,23 @@ func (c *TBaseControl) AddChild(control Control) {
 		mainCtrl.PlaceChildren()
 	}
 
-	if c.clipped && c.clipper == nil {
-		c.setClipper()
+	if sf.clipped && sf.clipper == nil {
+		sf.setClipper()
 	}
 }
 
-func (c *TBaseControl) Children() []Control {
-	child := make([]Control, len(c.children))
-	copy(child, c.children)
+func (sf *TBaseControl) Children() []Control {
+	child := make([]Control, len(sf.children))
+	copy(child, sf.children)
 	return child
 }
 
-func (c *TBaseControl) ChildExists(control Control) bool {
-	if len(c.children) == 0 {
+func (sf *TBaseControl) ChildExists(control Control) bool {
+	if len(sf.children) == 0 {
 		return false
 	}
 
-	for _, ctrl := range c.children {
+	for _, ctrl := range sf.children {
 		if ctrl == control {
 			return true
 		}
@@ -457,13 +457,13 @@ func (c *TBaseControl) ChildExists(control Control) bool {
 	return false
 }
 
-func (c *TBaseControl) ChildrenScale() int {
-	if c.childCount() == 0 {
-		return c.scale
+func (sf *TBaseControl) ChildrenScale() int {
+	if sf.childCount() == 0 {
+		return sf.scale
 	}
 
 	total := 0
-	for _, ctrl := range c.children {
+	for _, ctrl := range sf.children {
 		if ctrl.Visible() {
 			total += ctrl.Scale()
 		}
@@ -472,22 +472,22 @@ func (c *TBaseControl) ChildrenScale() int {
 	return total
 }
 
-func (c *TBaseControl) MinimalSize() (w int, h int) {
-	children := c.childCount()
+func (sf *TBaseControl) MinimalSize() (w int, h int) {
+	children := sf.childCount()
 	if children == 0 {
-		return c.minW, c.minH
+		return sf.minW, sf.minH
 	}
 
-	totalX := 2 * c.padX
-	totalY := 2 * c.padY
+	totalX := 2 * sf.padX
+	totalY := 2 * sf.padY
 
-	if c.pack == Vertical {
-		totalY += types.ACoordY((children - 1) * c.gapY)
+	if sf.pack == Vertical {
+		totalY += types.ACoordY((children - 1) * sf.gapY)
 	} else {
-		totalX += types.ACoordX((children - 1) * c.gapX)
+		totalX += types.ACoordX((children - 1) * sf.gapX)
 	}
 
-	for _, ctrl := range c.children {
+	for _, ctrl := range sf.children {
 		if ctrl.Clipped() {
 			continue
 		}
@@ -496,45 +496,45 @@ func (c *TBaseControl) MinimalSize() (w int, h int) {
 			continue
 		}
 		ww, hh := ctrl.MinimalSize()
-		if c.pack == Vertical {
+		if sf.pack == Vertical {
 			totalY += types.ACoordY(hh)
-			if types.ACoordX(ww)+2*c.padX > totalX {
-				totalX = types.ACoordX(ww) + 2*c.padX
+			if types.ACoordX(ww)+2*sf.padX > totalX {
+				totalX = types.ACoordX(ww) + 2*sf.padX
 			}
 		} else {
 			totalX += types.ACoordX(ww)
-			if types.ACoordY(hh)+2*c.padY > totalY {
-				totalY = types.ACoordY(hh) + 2*c.padY
+			if types.ACoordY(hh)+2*sf.padY > totalY {
+				totalY = types.ACoordY(hh) + 2*sf.padY
 			}
 		}
 	}
 
-	if totalX < types.ACoordX(c.minW) {
-		totalX = types.ACoordX(c.minW)
+	if totalX < types.ACoordX(sf.minW) {
+		totalX = types.ACoordX(sf.minW)
 	}
-	if totalY < types.ACoordY(c.minH) {
-		totalY = types.ACoordY(c.minH)
+	if totalY < types.ACoordY(sf.minH) {
+		totalY = types.ACoordY(sf.minH)
 	}
 
 	return int(totalX), int(totalY)
 }
 
-func (c *TBaseControl) Draw() {
+func (sf *TBaseControl) Draw() {
 	panic("BaseControl Draw Called")
 }
 
-func (c *TBaseControl) DrawChildren() {
-	if c.hidden {
+func (sf *TBaseControl) DrawChildren() {
+	if sf.hidden {
 		return
 	}
 
 	PushClip()
 	defer PopClip()
 
-	cp := ClippedParent(c)
+	cp := ClippedParent(sf)
 	var cTarget Control
 
-	cTarget = c
+	cTarget = sf
 	if cp != nil {
 		cTarget = cp
 	}
@@ -542,67 +542,67 @@ func (c *TBaseControl) DrawChildren() {
 	x, y, w, h := cTarget.Clipper()
 	SetClipRect(x, y, w, h)
 
-	for _, child := range c.children {
+	for _, child := range sf.children {
 		child.Draw()
 	}
 }
 
-func (c *TBaseControl) Clipper() (types.ACoordX, types.ACoordY, int, int) {
-	clipped := ClippedParent(c)
+func (sf *TBaseControl) Clipper() (types.ACoordX, types.ACoordY, int, int) {
+	clipped := ClippedParent(sf)
 
-	if clipped == nil || (c.clipped && c.clipper != nil) {
-		return c.clipper.x, c.clipper.y, c.clipper.w, c.clipper.h
+	if clipped == nil || (sf.clipped && sf.clipper != nil) {
+		return sf.clipper.x, sf.clipper.y, sf.clipper.w, sf.clipper.h
 	}
 
-	return CalcClipper(c)
+	return CalcClipper(sf)
 }
 
-func (c *TBaseControl) setClipper() {
-	x, y, w, h := CalcClipper(c)
-	c.clipper = &rect{x: x, y: y, w: w, h: h}
+func (sf *TBaseControl) setClipper() {
+	x, y, w, h := CalcClipper(sf)
+	sf.clipper = &rect{x: x, y: y, w: w, h: h}
 }
 
-func (c *TBaseControl) HitTest(x types.ACoordX, y types.ACoordY) HitResult {
-	if x > c.pos.GetX() && x < c.pos.GetX()+types.ACoordX(c.width-1) &&
-		y > c.pos.GetY() && y < c.pos.GetY()+types.ACoordY(c.height-1) {
+func (sf *TBaseControl) HitTest(x types.ACoordX, y types.ACoordY) HitResult {
+	if x > sf.pos.GetX() && x < sf.pos.GetX()+types.ACoordX(sf.width-1) &&
+		y > sf.pos.GetY() && y < sf.pos.GetY()+types.ACoordY(sf.height-1) {
 		return HitInside
 	}
 
-	if (x == c.pos.GetX() || x == c.pos.GetX()+types.ACoordX(c.width-1)) &&
-		y >= c.pos.GetY() && y < c.pos.GetY()+types.ACoordY(c.height) {
+	if (x == sf.pos.GetX() || x == sf.pos.GetX()+types.ACoordX(sf.width-1)) &&
+		y >= sf.pos.GetY() && y < sf.pos.GetY()+types.ACoordY(sf.height) {
 		return HitBorder
 	}
 
-	if (y == c.pos.GetY() || y == c.pos.GetY()+types.ACoordY(c.height-1)) &&
-		x >= c.pos.GetX() && x < c.pos.GetX()+types.ACoordX(c.width) {
+	if (y == sf.pos.GetY() || y == sf.pos.GetY()+types.ACoordY(sf.height-1)) &&
+		x >= sf.pos.GetX() && x < sf.pos.GetX()+types.ACoordX(sf.width) {
 		return HitBorder
 	}
 
 	return HitOutside
 }
 
-func (c *TBaseControl) ProcessEvent(ev Event) bool {
-	return SendEventToChild(c, ev)
+func (sf *TBaseControl) ProcessEvent(ev Event) bool {
+	return SendEventToChild(sf, ev)
 }
 
-func (c *TBaseControl) PlaceChildren() {
-	children := c.childCount()
-	if c.children == nil || children == 0 {
+func (sf *TBaseControl) PlaceChildren() {
+	children := sf.childCount()
+	if sf.children == nil || children == 0 {
 		return
 	}
 
-	xx, yy := c.pos.GetX()+c.padX, c.pos.GetY()+c.padY
-	for _, ctrl := range c.children {
+	xx, yy := sf.pos.GetX()+sf.padX, sf.pos.GetY()+sf.padY
+	for _, ctrl := range sf.children {
 		if !ctrl.Visible() {
 			continue
 		}
 
 		ctrl.SetPos(xx, yy)
 		ww, hh := ctrl.Size()
-		if c.pack == Vertical {
-			yy += types.ACoordY(c.gapY + hh)
+		if sf.pack == Vertical {
+			yy += types.ACoordY(sf.gapY + hh)
 		} else {
-			xx += types.ACoordX(c.gapX + ww)
+			xx += types.ACoordX(sf.gapX + ww)
 		}
 
 		ctrl.PlaceChildren()
@@ -611,39 +611,39 @@ func (c *TBaseControl) PlaceChildren() {
 
 // ActiveColors return the attributes for the controls when it
 // is active: text and background colors
-func (c *TBaseControl) ActiveColors() (term.Attribute, term.Attribute) {
-	return c.fgActive, c.bgActive
+func (sf *TBaseControl) ActiveColors() (term.Attribute, term.Attribute) {
+	return sf.fgActive, sf.bgActive
 }
 
 // SetActiveTextColor changes text color of the active control
-func (c *TBaseControl) SetActiveTextColor(clr term.Attribute) {
-	c.fgActive = clr
+func (sf *TBaseControl) SetActiveTextColor(clr term.Attribute) {
+	sf.fgActive = clr
 }
 
 // SetActiveBackColor changes background color of the active control
-func (c *TBaseControl) SetActiveBackColor(clr term.Attribute) {
-	c.bgActive = clr
+func (sf *TBaseControl) SetActiveBackColor(clr term.Attribute) {
+	sf.bgActive = clr
 }
 
-func (c *TBaseControl) removeChild(control Control) {
+func (sf *TBaseControl) removeChild(control Control) {
 	children := []Control{}
 
-	for _, child := range c.children {
+	for _, child := range sf.children {
 		if child.RefID() == control.RefID() {
 			continue
 		}
 
 		children = append(children, child)
 	}
-	c.children = nil
+	sf.children = nil
 
 	for _, child := range children {
-		c.AddChild(child)
+		sf.AddChild(child)
 	}
 }
 
 // Destroy removes an object from its parental chain
-func (c *TBaseControl) Destroy() {
-	c.parent.removeChild(c)
-	c.parent.SetConstraints(0, 0)
+func (sf *TBaseControl) Destroy() {
+	sf.parent.removeChild(sf)
+	sf.parent.SetConstraints(0, 0)
 }
