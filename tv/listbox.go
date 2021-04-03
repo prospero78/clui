@@ -5,6 +5,8 @@ import (
 
 	term "github.com/nsf/termbox-go"
 
+	"github.com/prospero78/goTV/tv/autoheight"
+	"github.com/prospero78/goTV/tv/autowidth"
 	"github.com/prospero78/goTV/tv/types"
 )
 
@@ -28,6 +30,9 @@ type ListBox struct {
 
 	onSelectItem func(Event)
 	onKeyPress   func(term.Key) bool
+
+	autoWidth  types.IAutoWidth
+	autoHeight types.IAutoHeight
 }
 
 /*
@@ -39,14 +44,19 @@ scale - the way of scaling the control when the parent is resized. Use DoNotScal
 control should keep its original size.
 */
 func CreateListBox(parent Control, width, height int, scale int) *ListBox {
-	l := new(ListBox)
-	l.TBaseControl = NewBaseControl()
-
-	if height == AutoSize {
-		height = 3
+	l := &ListBox{
+		TBaseControl: NewBaseControl(),
+		autoWidth:    autowidth.New(),
+		autoHeight:   autoheight.New(),
 	}
-	if width == AutoSize {
+
+	if height == 0 {
+		height = 3
+		l.autoHeight.Set()
+	}
+	if width == 0 {
 		width = 5
+		l.autoWidth.Set()
 	}
 
 	l.SetSize(width, height)
