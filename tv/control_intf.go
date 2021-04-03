@@ -19,7 +19,7 @@ type Control interface {
 	// should be unchanged.
 	SetSize(width, height int)
 	// Pos returns the current absolute control position: X and Y.
-	Pos() (x types.ACoordX, y types.ACoordY)
+	Pos() types.IPos
 	// SetPos changes contols position. Manual call of the method does not
 	// make sense for any control except for Window because control positions
 	// inside of container always recalculated after its parent resizes

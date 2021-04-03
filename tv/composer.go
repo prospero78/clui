@@ -322,7 +322,7 @@ func (c *Composer) moveTopWindow(ev Event) bool {
 			return false
 		}
 
-		x, y := view.Pos()
+		x, y := view.Pos().Get()
 		w, h := view.Size()
 		x1, y1 := x, y
 		cx, cy := term.Size()
@@ -379,7 +379,7 @@ func (c *Composer) processWindowDrag(ev Event) {
 	}
 
 	w := c.topWindow()
-	newX, newY := w.Pos()
+	newX, newY := w.Pos().Get()
 	newW, newH := w.Size()
 	cw, ch := ScreenSize()
 

@@ -86,11 +86,11 @@ func (l *TextView) outputHeight() int {
 func (l *TextView) drawScrolls() {
 	height := l.outputHeight()
 	pos := ThumbPosition(l.topLine, l.virtualHeight-l.outputHeight(), height)
-	DrawScrollBar(l.x.Get()+types.ACoordX(l.width-1), l.y.Get(), 1, height, pos)
+	DrawScrollBar(l.pos.GetX()+types.ACoordX(l.width-1), l.pos.GetY(), 1, height, pos)
 
 	if !l.wordWrap {
 		pos = ThumbPosition(l.leftShift, l.virtualWidth-l.width+1, l.width-1)
-		DrawScrollBar(l.x.Get(), l.y.Get()+types.ACoordY(l.height-1), l.width-1, 1, pos)
+		DrawScrollBar(l.pos.GetX(), l.pos.GetY()+types.ACoordY(l.height-1), l.width-1, 1, pos)
 	}
 }
 
@@ -124,7 +124,7 @@ func (l *TextView) drawText() {
 				s := SliceColorized(l.lines[lineID], start, start+maxWidth)
 
 				if linePos >= l.topLine {
-					DrawText(l.x.Get(), l.y.Get()+types.ACoordY(y), s)
+					DrawText(l.pos.GetX(), l.pos.GetY()+types.ACoordY(y), s)
 				}
 
 				remained -= maxWidth
@@ -163,7 +163,7 @@ func (l *TextView) drawText() {
 					str = SliceColorized(str, l.leftShift, maxWidth+l.leftShift)
 				}
 			}
-			DrawText(l.x.Get(), l.y.Get()+types.ACoordY(y), str)
+			DrawText(l.pos.GetX(), l.pos.GetY()+types.ACoordY(y), str)
 
 			y++
 		}
@@ -179,7 +179,7 @@ func (l *TextView) Draw() {
 	PushAttributes()
 	defer PopAttributes()
 
-	x, y := l.Pos()
+	x, y := l.pos.Get()
 	w, h := l.Size()
 
 	bg, fg := RealColor(l.bg, l.Style(), ColorEditBack), RealColor(l.fg, l.Style(), ColorEditText)
@@ -263,8 +263,8 @@ func (l *TextView) processMouseClick(ev Event) bool {
 		return false
 	}
 
-	dx := ev.X - l.x.Get()
-	dy := ev.Y - l.y.Get()
+	dx := ev.X - l.pos.GetX()
+	dy := ev.Y - l.pos.GetY()
 	yy := l.outputHeight()
 
 	// cursor is not on any scrollbar

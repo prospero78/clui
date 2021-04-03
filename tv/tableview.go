@@ -175,7 +175,7 @@ func (l *TableView) drawHeader() {
 
 	fg, bg := RealColor(l.fg, l.Style(), ColorTableHeaderText), RealColor(l.bg, l.Style(), ColorTableHeaderBack)
 	fgLine := RealColor(l.fg, l.Style(), ColorTableLineText)
-	x, y := l.Pos()
+	x, y := l.pos.Get()
 	w, _ := l.Size()
 	SetTextColor(fg)
 	SetBackColor(bg)
@@ -262,11 +262,11 @@ func (l *TableView) counterWidth() int {
 func (l *TableView) drawScroll() {
 
 	pos := ThumbPosition(l.selectedRow, l.rowCount, l.height-1)
-	DrawScrollBar(l.x.Get()+types.ACoordX(l.width-1), l.y.Get(), 1, l.height-1, pos)
+	DrawScrollBar(l.pos.GetX()+types.ACoordX(l.width-1), l.pos.GetY(), 1, l.height-1, pos)
 
 	pos = ThumbPosition(l.selectedCol, len(l.columns), l.width-1)
-	DrawScrollBar(l.x.Get(), l.y.Get()+types.ACoordY(l.height-1), l.width-1, 1, pos)
-	PutChar(l.x.Get()+types.ACoordX(l.width-1), l.y.Get()+types.ACoordY(l.height-1), ' ')
+	DrawScrollBar(l.pos.GetX(), l.pos.GetY()+types.ACoordY(l.height-1), l.width-1, 1, pos)
+	PutChar(l.pos.GetX()+types.ACoordX(l.width-1), l.pos.GetY()+types.ACoordY(l.height-1), ' ')
 }
 
 func (l *TableView) drawCells() {
@@ -295,10 +295,10 @@ func (l *TableView) drawCells() {
 			shift, str := AlignText(s, start, AlignRight)
 			SetTextColor(fg)
 			SetBackColor(bg)
-			DrawText(l.x.Get()+types.ACoordX(shift), l.y.Get()+dy+types.ACoordY(idx-1), str)
+			DrawText(l.pos.GetX()+types.ACoordX(shift), l.pos.GetY()+dy+types.ACoordY(idx-1), str)
 			if l.showVLines {
 				SetTextColor(fgLine)
-				PutChar(l.x.Get()+types.ACoordX(start), l.y.Get()+dy+types.ACoordY(idx-1), parts[1])
+				PutChar(l.pos.GetX()+types.ACoordX(start), l.pos.GetY()+dy+types.ACoordY(idx-1), parts[1])
 			}
 		}
 		if l.showVLines {
@@ -337,15 +337,15 @@ func (l *TableView) drawCells() {
 			}
 			SetTextColor(info.Fg)
 			SetBackColor(info.Bg)
-			FillRect(l.x.Get()+types.ACoordX(dx), l.y.Get()+dy, length, 1, ' ')
+			FillRect(l.pos.GetX()+types.ACoordX(dx), l.pos.GetY()+dy, length, 1, ' ')
 			shift, text := AlignColorizedText(info.Text, length, info.Alignment)
-			DrawText(l.x.Get()+types.ACoordX(dx+shift), l.y.Get()+dy, text)
+			DrawText(l.pos.GetX()+types.ACoordX(dx+shift), l.pos.GetY()+dy, text)
 
 			dx += c.Width
 			if l.showVLines && dx < l.width-1 && colNo < len(l.columns)-1 {
 				SetTextColor(fg)
 				SetBackColor(bg)
-				PutChar(l.x.Get()+types.ACoordX(dx), l.y.Get()+dy, parts[1])
+				PutChar(l.pos.GetX()+types.ACoordX(dx), l.pos.GetY()+dy, parts[1])
 				dx++
 			}
 
@@ -368,7 +368,7 @@ func (l *TableView) Draw() {
 	PushAttributes()
 	defer PopAttributes()
 
-	x, y := l.Pos()
+	x, y := l.pos.Get()
 	w, h := l.Size()
 
 	if l.onBeforeDraw != nil {
@@ -680,8 +680,8 @@ func (l *TableView) processMouseClick(ev Event) bool {
 		return false
 	}
 
-	dx := ev.X - l.x.Get()
-	dy := ev.Y - l.y.Get()
+	dx := ev.X - l.pos.GetX()
+	dy := ev.Y - l.pos.GetY()
 
 	if l.topRow+int(dy)-2 >= l.rowCount &&
 		int(dy) != l.height-1 && int(dx) != l.width-1 {

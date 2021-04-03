@@ -60,7 +60,7 @@ func ItemByThumbPosition(position, itemCount, length int) int {
 // coordinates x, y. Returns nil if x, y are outside parent control and
 // returns parent if no child is at x, y
 func ChildAt(parent Control, x types.ACoordX, y types.ACoordY) Control {
-	px, py := parent.Pos()
+	px, py := parent.Pos().Get()
 	pw, ph := parent.Size()
 	if px > x || py > y || px+types.ACoordX(pw) <= x || py+types.ACoordY(ph) <= y {
 		return nil
@@ -303,7 +303,7 @@ func SendEventToChild(parent Control, ev Event) bool {
 // and paddings
 func CalcClipper(c Control) (types.ACoordX, types.ACoordY, int, int) {
 	w, h := c.Size()
-	x, y := c.Pos()
+	x, y := c.Pos().Get()
 	px, py := c.Paddings()
 
 	x += px
@@ -335,7 +335,7 @@ func ClippedParent(c Control) Control {
 
 // ControlInRect returns true if c is within a given rect
 func ControlInRect(c Control, x types.ACoordX, y types.ACoordY, w int, h int) bool {
-	xx, yy := c.Pos()
+	xx, yy := c.Pos().Get()
 	ww, hh := c.Size()
 
 	return xx >= x && ww <= int(x)+w &&

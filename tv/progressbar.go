@@ -110,7 +110,7 @@ func (b *ProgressBar) Draw() {
 		title = strings.ReplaceAll(title, "{{max}}", strconv.Itoa(b.max))
 	}
 
-	x, y := b.Pos()
+	x, y := b.pos.Get()
 	w, h := b.Size()
 
 	if b.direction == Horizontal {

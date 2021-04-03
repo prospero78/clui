@@ -53,7 +53,7 @@ func (e *EditField) Draw() {
 	PushAttributes()
 	defer PopAttributes()
 
-	x, y := e.Pos()
+	x, y := e.Pos().Get()
 	w, _ := e.Size()
 
 	parts := []rune(SysObject(ObjEdit))
@@ -114,7 +114,7 @@ func (e *EditField) Draw() {
 	FillRect(x, y, w, 1, ' ')
 	DrawRawText(x, y, textOut)
 	if e.Active() {
-		SetCursorPos(e.cursorPos+e.x.Get()+types.ACoordX(curOff), e.y.Get())
+		SetCursorPos(e.cursorPos+e.pos.GetX()+types.ACoordX(curOff), e.pos.GetY())
 	}
 }
 

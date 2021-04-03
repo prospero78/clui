@@ -76,7 +76,7 @@ func (b *Button) Draw() {
 	PushAttributes()
 	defer PopAttributes()
 
-	x, y := b.Pos()
+	x, y := b.pos.Get()
 	w, h := b.Size()
 
 	fg, bg := b.fg, b.bg
@@ -169,10 +169,10 @@ func (b *Button) ProcessEvent(event Event) bool {
 			return true
 		} else if event.Key == term.MouseRelease && b.isPressed() != 0 {
 			ReleaseEvents()
-			if event.X >= b.x.Get() &&
-				event.Y >= b.y.Get() &&
-				event.X < b.x.Get()+types.ACoordX(b.width) &&
-				event.Y < b.y.Get()+types.ACoordY(b.height) {
+			if event.X >= b.pos.GetX() &&
+				event.Y >= b.pos.GetY() &&
+				event.X < b.pos.GetX()+types.ACoordX(b.width) &&
+				event.Y < b.pos.GetY()+types.ACoordY(b.height) {
 				if b.onClick != nil {
 					b.onClick(event)
 				}

@@ -82,7 +82,7 @@ func (l *TextDisplay) drawText() {
 
 		if str != "" {
 			str = SliceColorized(str, 0, l.width)
-			DrawText(l.x.Get(), l.y.Get()+types.ACoordY(ind), str)
+			DrawText(l.pos.GetX(), l.pos.GetY()+types.ACoordY(ind), str)
 		}
 
 		ind++
@@ -98,7 +98,7 @@ func (l *TextDisplay) Draw() {
 	PushAttributes()
 	defer PopAttributes()
 
-	x, y := l.Pos()
+	x, y := l.pos.Get()
 	w, h := l.Size()
 
 	bg, fg := RealColor(l.bg, l.Style(), ColorEditBack), RealColor(l.fg, l.Style(), ColorEditText)
@@ -163,7 +163,7 @@ func (l *TextDisplay) processMouseClick(ev Event) bool {
 		return false
 	}
 
-	dy := ev.Y - l.y.Get()
+	dy := ev.Y - l.pos.GetY()
 	ww := l.height
 
 	if int(dy) < l.height/2 {

@@ -102,7 +102,7 @@ func (f *Frame) Draw() {
 	defer PopAttributes()
 
 	x, y, w, h := f.Clipper()
-	fx, fy := f.Pos()
+	fx, fy := f.pos.Get()
 	fw, fh := f.Size()
 
 	if f.scrollable {
@@ -115,7 +115,7 @@ func (f *Frame) Draw() {
 		if ctrl != nil {
 			var frameProp float64
 
-			_, ty := ctrl.Pos()
+			_, ty := ctrl.Pos().Get()
 
 			dist = (float64(fy) + float64(fpy)) - float64(ty)
 			dist = math.Sqrt(dist * dist)
@@ -169,8 +169,7 @@ func (f *Frame) ScrollTo(x types.ACoordX, y types.ACoordY) {
 		return
 	}
 
-	f.x.Set(x)
-	f.y.Set(y)
+	f.pos.Set(x, y)
 
 	f.ResizeChildren()
 	f.PlaceChildren()
@@ -181,13 +180,13 @@ func (f *Frame) ProcessEvent(ev Event) bool {
 		return false
 	}
 
-	x, y := f.Pos()
+	x, y := f.pos.Get()
 	px, py := f.Paddings()
 
 	cx, cy, cw, ch := f.Clipper()
 
 	tw, th := ev.Target.Size()
-	tx, ty := ev.Target.Pos()
+	tx, ty := ev.Target.Pos().Get()
 
 	if ControlInRect(ev.Target, cx, cy, cw, ch) {
 		return false
@@ -212,8 +211,7 @@ func (f *Frame) ProcessEvent(ev Event) bool {
 		xx = x + delta
 	}
 
-	f.x.Set(xx)
-	f.y.Set(yy)
+	f.pos.Set(xx, yy)
 
 	f.ResizeChildren()
 	f.PlaceChildren()

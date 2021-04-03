@@ -82,7 +82,7 @@ func (l *Label) Draw() {
 
 	SetTextColor(fg)
 	SetBackColor(bg)
-	FillRect(l.x.Get(), l.y.Get(), l.width, l.height, ' ')
+	FillRect(l.pos.GetX(), l.pos.GetY(), l.width, l.height, ' ')
 
 	if l.title == "" {
 		return
@@ -91,31 +91,31 @@ func (l *Label) Draw() {
 	if l.multiline {
 		parser := NewColorParser(l.title, fg, bg)
 		elem := parser.NextElement()
-		xx, yy := l.x, l.y
+		xx, yy := l.pos.Get()
 		for elem.Type != ElemEndOfText {
-			if xx.Get() >= l.x.Get()+types.ACoordX(l.width) || yy.Get() >= l.y.Get()+types.ACoordY(l.height) {
+			if xx >= l.pos.GetX()+types.ACoordX(l.width) || yy >= l.pos.GetY()+types.ACoordY(l.height) {
 				break
 			}
 
 			if elem.Type == ElemLineBreak {
-				xx = l.x
-				yy.Set(yy.Get() + 1)
+				xx = l.pos.GetX()
+				yy++
 			} else if elem.Type == ElemPrintable {
 				SetTextColor(elem.Fg)
 				SetBackColor(elem.Bg)
-				putCharUnsafe(xx.Get(), yy.Get(), elem.Ch)
+				putCharUnsafe(xx, yy, elem.Ch)
 
 				if l.direction == Horizontal {
-					xx.Set(xx.Get() + 1)
-					if xx.Get() >= l.x.Get()+types.ACoordX(l.width) {
-						xx.Set(l.x.Get())
-						yy.Set(yy.Get() + 1)
+					xx++
+					if xx >= l.pos.GetX()+types.ACoordX(l.width) {
+						xx = l.pos.GetX()
+						yy++
 					}
 				} else {
-					yy.Set(yy.Get() + 1)
-					if yy.Get() >= l.y.Get()+types.ACoordY(l.height) {
-						yy.Set(l.y.Get())
-						xx.Set(xx.Get() + 1)
+					yy++
+					if yy >= l.pos.GetY()+types.ACoordY(l.height) {
+						yy = l.pos.GetY()
+						xx++
 					}
 				}
 			}
@@ -128,13 +128,13 @@ func (l *Label) Draw() {
 			if str != l.title && l.align != l.textDisplay {
 				shift, str = AlignColorizedText(l.title, l.width, l.textDisplay)
 			}
-			DrawText(l.x.Get()+types.ACoordX(shift), l.y.Get(), str)
+			DrawText(l.pos.GetX()+types.ACoordX(shift), l.pos.GetY(), str)
 		} else {
 			shift, str := AlignColorizedText(l.title, l.height, l.align)
 			if str != l.title && l.align != l.textDisplay {
 				shift, str = AlignColorizedText(l.title, l.width, l.textDisplay)
 			}
-			DrawTextVertical(l.x.Get(), l.y.Get()+types.ACoordY(shift), str)
+			DrawTextVertical(l.pos.GetX(), l.pos.GetY()+types.ACoordY(shift), str)
 		}
 	}
 }

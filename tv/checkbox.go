@@ -65,7 +65,7 @@ func (c *CheckBox) Draw() {
 	PushAttributes()
 	defer PopAttributes()
 
-	x, y := c.Pos()
+	x, y := c.pos.Get()
 	w, h := c.Size()
 
 	fg, bg := RealColor(c.fg, c.Style(), ColorControlText), RealColor(c.bg, c.Style(), ColorControlBack)

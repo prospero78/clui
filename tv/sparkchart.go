@@ -88,7 +88,7 @@ func (b *SparkChart) Draw() {
 	fg, bg := RealColor(b.fg, b.Style(), ColorSparkChartText), RealColor(b.bg, b.Style(), ColorSparkChartBack)
 	SetTextColor(fg)
 	SetBackColor(bg)
-	FillRect(b.x.Get(), b.y.Get(), b.width, b.height, ' ')
+	FillRect(b.pos.GetX(), b.pos.GetY(), b.width, b.height, ' ')
 
 	if len(b.data) == 0 {
 		return
@@ -117,7 +117,7 @@ func (b *SparkChart) drawBars() {
 	defer PopAttributes()
 
 	h := b.height
-	pos := b.x.Get() + types.ACoordX(start)
+	pos := b.pos.GetX() + types.ACoordX(start)
 
 	mxFg, mxBg := RealColor(b.maxFg, b.Style(), ColorSparkChartMaxText), RealColor(b.maxBg, b.Style(), ColorSparkChartMaxBack)
 	brFg, brBg := RealColor(b.fg, b.Style(), ColorSparkChartBarText), RealColor(b.bg, b.Style(), ColorSparkChartBarBack)
@@ -144,7 +144,7 @@ func (b *SparkChart) drawBars() {
 		}
 		SetTextColor(f)
 		SetBackColor(g)
-		FillRect(pos, b.y.Get()+types.ACoordY(h-barH), 1, barH, parts[0])
+		FillRect(pos, b.pos.GetY()+types.ACoordY(h-barH), 1, barH, parts[0])
 
 		pos++
 	}
@@ -175,7 +175,7 @@ func (b *SparkChart) drawValues() {
 		v := float64(h-int(dy)) / float64(h) * max
 		s := fmt.Sprintf(format, v)
 		s = CutText(s, b.valueWidth)
-		DrawRawText(b.x.Get(), b.y.Get()+dy, s)
+		DrawRawText(b.pos.GetX(), b.pos.GetY()+dy, s)
 
 		dy += 2
 	}
