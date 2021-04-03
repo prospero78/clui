@@ -3,6 +3,8 @@ package tv
 import (
 	xs "github.com/huandu/xstrings"
 
+	"github.com/prospero78/goTV/tv/autoheight"
+	"github.com/prospero78/goTV/tv/autowidth"
 	"github.com/prospero78/goTV/tv/types"
 )
 
@@ -19,6 +21,8 @@ type Label struct {
 	direction   Direction
 	multiline   bool
 	textDisplay Align
+	autoWidth   types.IAutoWidth
+	autoHeight  types.IAutoHeight
 }
 
 /*
@@ -31,13 +35,17 @@ scale - the way of scaling the control when the parent is resized. Use DoNotScal
 control should keep its original size.
 */
 func CreateLabel(parent Control, w, h int, title string, scale int) *Label {
-	c := new(Label)
-	c.TBaseControl = NewBaseControl()
-
-	if w == AutoSize {
+	c := &Label{
+		TBaseControl: NewBaseControl(),
+		autoWidth:    autowidth.New(),
+		autoHeight:   autoheight.New(),
+	}
+	if w == 0 {
+		c.autoWidth.Set()
 		w = xs.Len(title)
 	}
-	if h == AutoSize {
+	if h == 0 {
+		c.autoHeight.Set()
 		h = 1
 	}
 

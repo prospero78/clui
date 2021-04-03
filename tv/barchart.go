@@ -441,7 +441,7 @@ func (b *BarChart) SetData(data []BarData) {
 // calculated width that makes all bars fit the
 // bar chart area, and 1
 func (b *BarChart) AutoSize() bool {
-	return bool(bool(b.autoWidth.Is()) || bool(b.autoHeight.Is()))
+	return bool(b.autoWidth.Is()) || bool(b.autoHeight.Is())
 }
 
 // SetAutoSize enables or disables automatic bar
