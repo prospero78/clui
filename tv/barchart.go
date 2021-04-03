@@ -60,7 +60,7 @@ If LegendWidth is greater than half of the chart it is not
 displayed. The same is applied to ValueWidth
 */
 type BarChart struct {
-	BaseControl
+	TBaseControl
 	data        []BarData
 	autosize    bool
 	gap         int32
@@ -82,7 +82,7 @@ control should keep its original size.
 */
 func CreateBarChart(parent Control, w, h int, scale int) *BarChart {
 	c := new(BarChart)
-	c.BaseControl = NewBaseControl()
+	c.TBaseControl = NewBaseControl()
 
 	if w == AutoSize {
 		w = 10

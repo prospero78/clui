@@ -15,7 +15,7 @@ All area inside a frame is transparent. Frame can be used as spacer element
 is required
 */
 type Frame struct {
-	BaseControl
+	TBaseControl
 	border BorderStyle
 	// children       []Control
 	// pack           PackType
@@ -34,7 +34,7 @@ control should keep its original size.
 */
 func CreateFrame(parent Control, width, height int, bs BorderStyle, scale int) *Frame {
 	f := new(Frame)
-	f.BaseControl = NewBaseControl()
+	f.TBaseControl = NewBaseControl()
 
 	if width == AutoSize {
 		width = 5

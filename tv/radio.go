@@ -12,7 +12,7 @@ Radio button control. Unite a few radios in one radio group to
 make a user select one of available choices.
 */
 type Radio struct {
-	BaseControl
+	TBaseControl
 	group    *RadioGroup
 	selected bool
 
@@ -30,7 +30,7 @@ control should keep its original size.
 */
 func CreateRadio(parent Control, width int, title string, scale int) *Radio {
 	c := new(Radio)
-	c.BaseControl = NewBaseControl()
+	c.TBaseControl = NewBaseControl()
 
 	if width == AutoSize {
 		width = xs.Len(title) + 4

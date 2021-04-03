@@ -16,7 +16,7 @@ emits OnClick event. Event has only one valid field Sender.
 Button can be clicked with mouse or using space on keyboard while the Button is active.
 */
 type Button struct {
-	BaseControl
+	TBaseControl
 	shadowColor term.Attribute
 	pressed     int32
 	shadowType  ButtonShadow
@@ -34,7 +34,7 @@ control should keep its original size.
 */
 func CreateButton(parent Control, width, height int, title string, scale int) *Button {
 	b := new(Button)
-	b.BaseControl = NewBaseControl()
+	b.TBaseControl = NewBaseControl()
 
 	b.parent = parent
 	b.align = AlignCenter

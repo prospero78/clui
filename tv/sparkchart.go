@@ -28,7 +28,7 @@ AutoScale to false and Top value to 100.
 Note: negative and zero values are displayed as empty bar
 */
 type SparkChart struct {
-	BaseControl
+	TBaseControl
 	data         []float64
 	valueWidth   int
 	hiliteMax    bool
@@ -47,7 +47,7 @@ control should keep its original size.
 */
 func CreateSparkChart(parent Control, w, h int, scale int) *SparkChart {
 	c := new(SparkChart)
-	c.BaseControl = NewBaseControl()
+	c.TBaseControl = NewBaseControl()
 
 	if w == AutoSize {
 		w = 10

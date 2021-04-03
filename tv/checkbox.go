@@ -12,7 +12,7 @@ CheckBox control. It can be two-state one(on and off) - it is default mode - or 
 State values are 0=off, 1=on, 2=third state
 */
 type CheckBox struct {
-	BaseControl
+	TBaseControl
 	state       int
 	allow3state bool
 
@@ -30,7 +30,7 @@ CheckBox state can be changed using mouse or pressing space on keyboard while th
 */
 func CreateCheckBox(parent Control, width int, title string, scale int) *CheckBox {
 	c := new(CheckBox)
-	c.BaseControl = NewBaseControl()
+	c.TBaseControl = NewBaseControl()
 	c.parent = parent
 
 	if width == AutoSize {

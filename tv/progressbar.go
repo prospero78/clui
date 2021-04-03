@@ -18,7 +18,7 @@ one set: foreground and background colors): for filled part and for
 empty one. By default colors are the same.
 */
 type ProgressBar struct {
-	BaseControl
+	TBaseControl
 	direction        Direction
 	min, max         int
 	value            int
@@ -35,7 +35,7 @@ control should keep its original size.
 */
 func CreateProgressBar(parent Control, width, height int, scale int) *ProgressBar {
 	b := new(ProgressBar)
-	b.BaseControl = NewBaseControl()
+	b.TBaseControl = NewBaseControl()
 
 	if height == AutoSize {
 		height = 1

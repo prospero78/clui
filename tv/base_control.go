@@ -10,10 +10,10 @@ import (
 	"github.com/prospero78/goTV/tv/types"
 )
 
-// BaseControl is a base for all visible controls.
+// TBaseControl is a base for all visible controls.
 // Every new control must inherit it or implement
 // the same set of methods
-type BaseControl struct {
+type TBaseControl struct {
 	refID int64
 
 	pos           types.IPos
@@ -51,46 +51,46 @@ func nextRefId() int64 {
 	return atomic.AddInt64(&globalRefId, 1)
 }
 
-func NewBaseControl() BaseControl {
-	return BaseControl{
+func NewBaseControl() TBaseControl {
+	return TBaseControl{
 		refID: nextRefId(),
 		pos:   pos.New(),
 	}
 }
 
-func (c *BaseControl) SetClipped(clipped bool) {
+func (c *TBaseControl) SetClipped(clipped bool) {
 	c.clipped = clipped
 }
 
-func (c *BaseControl) Clipped() bool {
+func (c *TBaseControl) Clipped() bool {
 	return c.clipped
 }
 
-func (c *BaseControl) SetStyle(style string) {
+func (c *TBaseControl) SetStyle(style string) {
 	c.style = style
 }
 
-func (c *BaseControl) Style() string {
+func (c *TBaseControl) Style() string {
 	return c.style
 }
 
-func (c *BaseControl) RefID() int64 {
+func (c *TBaseControl) RefID() int64 {
 	return c.refID
 }
 
-func (c *BaseControl) Title() string {
+func (c *TBaseControl) Title() string {
 	return c.title
 }
 
-func (c *BaseControl) SetTitle(title string) {
+func (c *TBaseControl) SetTitle(title string) {
 	c.title = title
 }
 
-func (c *BaseControl) Size() (widht int, height int) {
+func (c *TBaseControl) Size() (widht int, height int) {
 	return c.width, c.height
 }
 
-func (c *BaseControl) SetSize(width, height int) {
+func (c *TBaseControl) SetSize(width, height int) {
 	if width < c.minW {
 		width = c.minW
 	}
@@ -104,11 +104,11 @@ func (c *BaseControl) SetSize(width, height int) {
 	}
 }
 
-func (c *BaseControl) Pos() types.IPos {
+func (c *TBaseControl) Pos() types.IPos {
 	return c.pos
 }
 
-func (c *BaseControl) SetPos(x types.ACoordX, y types.ACoordY) {
+func (c *TBaseControl) SetPos(x types.ACoordX, y types.ACoordY) {
 	if c.clipped && c.clipper != nil {
 		cx, cy, _, _ := c.Clipper()
 		px, py := c.Paddings()
@@ -125,7 +125,7 @@ func (c *BaseControl) SetPos(x types.ACoordX, y types.ACoordY) {
 	}
 }
 
-func (c *BaseControl) applyConstraints() {
+func (c *TBaseControl) applyConstraints() {
 	ww, hh := c.width, c.height
 	if ww < c.minW {
 		ww = c.minW
@@ -138,21 +138,21 @@ func (c *BaseControl) applyConstraints() {
 	}
 }
 
-func (c *BaseControl) Constraints() (minw int, minh int) {
+func (c *TBaseControl) Constraints() (minw int, minh int) {
 	return c.minW, c.minH
 }
 
-func (c *BaseControl) SetConstraints(minw, minh int) {
+func (c *TBaseControl) SetConstraints(minw, minh int) {
 	c.minW = minw
 	c.minH = minh
 	c.applyConstraints()
 }
 
-func (c *BaseControl) Active() bool {
+func (c *TBaseControl) Active() bool {
 	return !c.inactive
 }
 
-func (c *BaseControl) SetActive(active bool) {
+func (c *TBaseControl) SetActive(active bool) {
 	c.inactive = !active
 
 	if c.onActive != nil {
@@ -160,40 +160,40 @@ func (c *BaseControl) SetActive(active bool) {
 	}
 }
 
-func (c *BaseControl) OnActive(fn func(active bool)) {
+func (c *TBaseControl) OnActive(fn func(active bool)) {
 	c.onActive = fn
 }
 
-func (c *BaseControl) TabStop() bool {
+func (c *TBaseControl) TabStop() bool {
 	return !c.tabSkip
 }
 
-func (c *BaseControl) SetTabStop(tabstop bool) {
+func (c *TBaseControl) SetTabStop(tabstop bool) {
 	c.tabSkip = !tabstop
 }
 
-func (c *BaseControl) Enabled() bool {
+func (c *TBaseControl) Enabled() bool {
 	c.mtx.RLock()
 	defer c.mtx.RUnlock()
 
 	return !c.disabled
 }
 
-func (c *BaseControl) SetEnabled(enabled bool) {
+func (c *TBaseControl) SetEnabled(enabled bool) {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
 	c.disabled = !enabled
 }
 
-func (c *BaseControl) Visible() bool {
+func (c *TBaseControl) Visible() bool {
 	c.mtx.RLock()
 	defer c.mtx.RUnlock()
 
 	return !c.hidden
 }
 
-func (c *BaseControl) SetVisible(visible bool) {
+func (c *TBaseControl) SetVisible(visible bool) {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
@@ -219,29 +219,29 @@ func (c *BaseControl) SetVisible(visible bool) {
 	}()
 }
 
-func (c *BaseControl) Parent() Control {
+func (c *TBaseControl) Parent() Control {
 	return c.parent
 }
 
-func (c *BaseControl) SetParent(parent Control) {
+func (c *TBaseControl) SetParent(parent Control) {
 	if c.parent == nil {
 		c.parent = parent
 	}
 }
 
-func (c *BaseControl) Modal() bool {
+func (c *TBaseControl) Modal() bool {
 	return c.modal
 }
 
-func (c *BaseControl) SetModal(modal bool) {
+func (c *TBaseControl) SetModal(modal bool) {
 	c.modal = modal
 }
 
-func (c *BaseControl) Paddings() (px types.ACoordX, py types.ACoordY) {
+func (c *TBaseControl) Paddings() (px types.ACoordX, py types.ACoordY) {
 	return c.padX, c.padY
 }
 
-func (c *BaseControl) SetPaddings(px types.ACoordX, py types.ACoordY) {
+func (c *TBaseControl) SetPaddings(px types.ACoordX, py types.ACoordY) {
 	if px >= 0 {
 		c.padX = px
 	}
@@ -250,11 +250,11 @@ func (c *BaseControl) SetPaddings(px types.ACoordX, py types.ACoordY) {
 	}
 }
 
-func (c *BaseControl) Gaps() (dx int, dy int) {
+func (c *TBaseControl) Gaps() (dx int, dy int) {
 	return c.gapX, c.gapY
 }
 
-func (c *BaseControl) SetGaps(dx, dy int) {
+func (c *TBaseControl) SetGaps(dx, dy int) {
 	if dx >= 0 {
 		c.gapX = dx
 	}
@@ -263,49 +263,49 @@ func (c *BaseControl) SetGaps(dx, dy int) {
 	}
 }
 
-func (c *BaseControl) Pack() PackType {
+func (c *TBaseControl) Pack() PackType {
 	return c.pack
 }
 
-func (c *BaseControl) SetPack(pack PackType) {
+func (c *TBaseControl) SetPack(pack PackType) {
 	c.pack = pack
 }
 
-func (c *BaseControl) Scale() int {
+func (c *TBaseControl) Scale() int {
 	return c.scale
 }
 
-func (c *BaseControl) SetScale(scale int) {
+func (c *TBaseControl) SetScale(scale int) {
 	if scale >= 0 {
 		c.scale = scale
 	}
 }
 
-func (c *BaseControl) Align() Align {
+func (c *TBaseControl) Align() Align {
 	return c.align
 }
 
-func (c *BaseControl) SetAlign(align Align) {
+func (c *TBaseControl) SetAlign(align Align) {
 	c.align = align
 }
 
-func (c *BaseControl) TextColor() term.Attribute {
+func (c *TBaseControl) TextColor() term.Attribute {
 	return c.fg
 }
 
-func (c *BaseControl) SetTextColor(clr term.Attribute) {
+func (c *TBaseControl) SetTextColor(clr term.Attribute) {
 	c.fg = clr
 }
 
-func (c *BaseControl) BackColor() term.Attribute {
+func (c *TBaseControl) BackColor() term.Attribute {
 	return c.bg
 }
 
-func (c *BaseControl) SetBackColor(clr term.Attribute) {
+func (c *TBaseControl) SetBackColor(clr term.Attribute) {
 	c.bg = clr
 }
 
-func (c *BaseControl) childCount() int {
+func (c *TBaseControl) childCount() int {
 	cnt := 0
 	for _, child := range c.children {
 		if child.Visible() {
@@ -316,7 +316,7 @@ func (c *BaseControl) childCount() int {
 	return cnt
 }
 
-func (c *BaseControl) ResizeChildren() {
+func (c *TBaseControl) ResizeChildren() {
 	children := c.childCount()
 	if children == 0 {
 		return
@@ -392,7 +392,7 @@ func (c *BaseControl) ResizeChildren() {
 	}
 }
 
-func (c *BaseControl) AddChild(control Control) {
+func (c *TBaseControl) AddChild(control Control) {
 	if c.children == nil {
 		c.children = make([]Control, 1)
 		c.children[0] = control
@@ -436,13 +436,13 @@ func (c *BaseControl) AddChild(control Control) {
 	}
 }
 
-func (c *BaseControl) Children() []Control {
+func (c *TBaseControl) Children() []Control {
 	child := make([]Control, len(c.children))
 	copy(child, c.children)
 	return child
 }
 
-func (c *BaseControl) ChildExists(control Control) bool {
+func (c *TBaseControl) ChildExists(control Control) bool {
 	if len(c.children) == 0 {
 		return false
 	}
@@ -456,7 +456,7 @@ func (c *BaseControl) ChildExists(control Control) bool {
 	return false
 }
 
-func (c *BaseControl) ChildrenScale() int {
+func (c *TBaseControl) ChildrenScale() int {
 	if c.childCount() == 0 {
 		return c.scale
 	}
@@ -471,7 +471,7 @@ func (c *BaseControl) ChildrenScale() int {
 	return total
 }
 
-func (c *BaseControl) MinimalSize() (w int, h int) {
+func (c *TBaseControl) MinimalSize() (w int, h int) {
 	children := c.childCount()
 	if children == 0 {
 		return c.minW, c.minH
@@ -518,11 +518,11 @@ func (c *BaseControl) MinimalSize() (w int, h int) {
 	return int(totalX), int(totalY)
 }
 
-func (c *BaseControl) Draw() {
+func (c *TBaseControl) Draw() {
 	panic("BaseControl Draw Called")
 }
 
-func (c *BaseControl) DrawChildren() {
+func (c *TBaseControl) DrawChildren() {
 	if c.hidden {
 		return
 	}
@@ -546,7 +546,7 @@ func (c *BaseControl) DrawChildren() {
 	}
 }
 
-func (c *BaseControl) Clipper() (types.ACoordX, types.ACoordY, int, int) {
+func (c *TBaseControl) Clipper() (types.ACoordX, types.ACoordY, int, int) {
 	clipped := ClippedParent(c)
 
 	if clipped == nil || (c.clipped && c.clipper != nil) {
@@ -556,12 +556,12 @@ func (c *BaseControl) Clipper() (types.ACoordX, types.ACoordY, int, int) {
 	return CalcClipper(c)
 }
 
-func (c *BaseControl) setClipper() {
+func (c *TBaseControl) setClipper() {
 	x, y, w, h := CalcClipper(c)
 	c.clipper = &rect{x: x, y: y, w: w, h: h}
 }
 
-func (c *BaseControl) HitTest(x types.ACoordX, y types.ACoordY) HitResult {
+func (c *TBaseControl) HitTest(x types.ACoordX, y types.ACoordY) HitResult {
 	if x > c.pos.GetX() && x < c.pos.GetX()+types.ACoordX(c.width-1) &&
 		y > c.pos.GetY() && y < c.pos.GetY()+types.ACoordY(c.height-1) {
 		return HitInside
@@ -580,11 +580,11 @@ func (c *BaseControl) HitTest(x types.ACoordX, y types.ACoordY) HitResult {
 	return HitOutside
 }
 
-func (c *BaseControl) ProcessEvent(ev Event) bool {
+func (c *TBaseControl) ProcessEvent(ev Event) bool {
 	return SendEventToChild(c, ev)
 }
 
-func (c *BaseControl) PlaceChildren() {
+func (c *TBaseControl) PlaceChildren() {
 	children := c.childCount()
 	if c.children == nil || children == 0 {
 		return
@@ -610,21 +610,21 @@ func (c *BaseControl) PlaceChildren() {
 
 // ActiveColors return the attributes for the controls when it
 // is active: text and background colors
-func (c *BaseControl) ActiveColors() (term.Attribute, term.Attribute) {
+func (c *TBaseControl) ActiveColors() (term.Attribute, term.Attribute) {
 	return c.fgActive, c.bgActive
 }
 
 // SetActiveTextColor changes text color of the active control
-func (c *BaseControl) SetActiveTextColor(clr term.Attribute) {
+func (c *TBaseControl) SetActiveTextColor(clr term.Attribute) {
 	c.fgActive = clr
 }
 
 // SetActiveBackColor changes background color of the active control
-func (c *BaseControl) SetActiveBackColor(clr term.Attribute) {
+func (c *TBaseControl) SetActiveBackColor(clr term.Attribute) {
 	c.bgActive = clr
 }
 
-func (c *BaseControl) removeChild(control Control) {
+func (c *TBaseControl) removeChild(control Control) {
 	children := []Control{}
 
 	for _, child := range c.children {
@@ -642,7 +642,7 @@ func (c *BaseControl) removeChild(control Control) {
 }
 
 // Destroy removes an object from its parental chain
-func (c *BaseControl) Destroy() {
+func (c *TBaseControl) Destroy() {
 	c.parent.removeChild(c)
 	c.parent.SetConstraints(0, 0)
 }

@@ -23,7 +23,7 @@ and horizontal. The latter one is available only if WordWrap
 mode is off).
 */
 type TextView struct {
-	BaseControl
+	TBaseControl
 	// own listbox members
 	lines   []string
 	lengths []int
@@ -49,7 +49,7 @@ control should keep its original size.
 */
 func CreateTextView(parent Control, width, height int, scale int) *TextView {
 	l := new(TextView)
-	l.BaseControl = NewBaseControl()
+	l.TBaseControl = NewBaseControl()
 
 	if height == AutoSize {
 		height = 3

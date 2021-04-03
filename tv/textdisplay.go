@@ -8,7 +8,7 @@ import (
 )
 
 type TextDisplay struct {
-	BaseControl
+	TBaseControl
 	// colorized bool
 	topLine   int
 	lineCount int
@@ -27,7 +27,7 @@ func CreateTextReader(parent Control, width, height int, scale int) *TextDisplay
 
 func CreateTextDisplay(parent Control, width, height int, scale int) *TextDisplay {
 	l := new(TextDisplay)
-	l.BaseControl = NewBaseControl()
+	l.TBaseControl = NewBaseControl()
 
 	if height == AutoSize {
 		height = 10

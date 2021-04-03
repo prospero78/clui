@@ -9,7 +9,7 @@ import (
 
 // Window is an implementation of View managed by Composer.
 type Window struct {
-	BaseControl
+	TBaseControl
 	origWidth  int
 	origHeight int
 	posOrig    types.IPos
@@ -37,7 +37,7 @@ func CreateWindow(x types.ACoordX, y types.ACoordY, w, h int, title string) *Win
 	wnd := &Window{
 		posOrig: pos.New(),
 	}
-	wnd.BaseControl = NewBaseControl()
+	wnd.TBaseControl = NewBaseControl()
 
 	if w == AutoSize || w < 1 || w > 1000 {
 		w = 10

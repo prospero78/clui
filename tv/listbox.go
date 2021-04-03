@@ -19,7 +19,7 @@ Y - selected item number in list(-1 if nothing is selected),
 Msg - text of the selected item.
 */
 type ListBox struct {
-	BaseControl
+	TBaseControl
 	// own listbox members
 	items         []string
 	currSelection int
@@ -40,7 +40,7 @@ control should keep its original size.
 */
 func CreateListBox(parent Control, width, height int, scale int) *ListBox {
 	l := new(ListBox)
-	l.BaseControl = NewBaseControl()
+	l.TBaseControl = NewBaseControl()
 
 	if height == AutoSize {
 		height = 3

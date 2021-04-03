@@ -49,7 +49,7 @@ Events:
         number of visible columns, number of visible rows.
 */
 type TableView struct {
-	BaseControl
+	TBaseControl
 	// own TableView members
 	topRow        int
 	topCol        int
@@ -136,7 +136,7 @@ control should keep its original size.
 */
 func CreateTableView(parent Control, width, height int, scale int) *TableView {
 	l := new(TableView)
-	l.BaseControl = NewBaseControl()
+	l.TBaseControl = NewBaseControl()
 
 	if height == AutoSize {
 		height = 3

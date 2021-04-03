@@ -15,7 +15,7 @@ of alignment feature: if text is longer than Label width the text
 is always left aligned
 */
 type Label struct {
-	BaseControl
+	TBaseControl
 	direction   Direction
 	multiline   bool
 	textDisplay Align
@@ -32,7 +32,7 @@ control should keep its original size.
 */
 func CreateLabel(parent Control, w, h int, title string, scale int) *Label {
 	c := new(Label)
-	c.BaseControl = NewBaseControl()
+	c.TBaseControl = NewBaseControl()
 
 	if w == AutoSize {
 		w = xs.Len(title)
