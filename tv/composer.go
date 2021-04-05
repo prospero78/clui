@@ -82,7 +82,7 @@ func RefreshScreen() {
 
 	windows := comp.getWindowList()
 	for _, wnd := range windows {
-		v := wnd.(*Window)
+		v := wnd.(*TWindow)
 		if v.Visible() {
 			wnd.Draw()
 
@@ -109,7 +109,7 @@ func AddWindow(posX types.ACoordX, posY types.ACoordY,
 	width, height int,
 	title string,
 	autoWidth types.AAutoWidth,
-	autoHeight types.AAutoHeight) *Window {
+	autoHeight types.AAutoHeight) *TWindow {
 	window := NewWindow(posX, posY, width, height, title, autoWidth, autoHeight)
 	window.SetBorder(comp.windowBorder)
 
@@ -225,7 +225,7 @@ func (c *Composer) moveActiveWindowToBottom() bool {
 
 	anyVisible := false
 	for _, w := range windows {
-		v := w.(*Window)
+		v := w.(*TWindow)
 		if v.Visible() {
 			anyVisible = true
 			break
@@ -247,7 +247,7 @@ func (c *Composer) moveActiveWindowToBottom() bool {
 		c.windows[0] = last
 		c.EndUpdate()
 
-		v := c.topWindow().(*Window)
+		v := c.topWindow().(*TWindow)
 		if v.Visible() {
 			if !c.activateWindow(c.topWindow()) {
 				return false
@@ -289,7 +289,7 @@ func (c *Composer) resizeTopWindow(ev Event) bool {
 		return false
 	}
 
-	topwindow, ok := view.(*Window)
+	topwindow, ok := view.(*TWindow)
 	if ok && !topwindow.Sizable() {
 		return false
 	}
@@ -321,7 +321,7 @@ func (c *Composer) resizeTopWindow(ev Event) bool {
 func (c *Composer) moveTopWindow(ev Event) bool {
 	view := c.topWindow()
 	if view != nil {
-		topwindow, ok := view.(*Window)
+		topwindow, ok := view.(*TWindow)
 		if ok && !topwindow.Movable() {
 			return false
 		}
@@ -539,7 +539,7 @@ func (c *Composer) processMouse(ev Event) {
 			case HitButtonBottom:
 				c.moveActiveWindowToBottom()
 			case HitButtonMaximize:
-				v := c.topWindow().(*Window)
+				v := c.topWindow().(*TWindow)
 				maximized := v.Maximized()
 				v.SetMaximized(!maximized)
 			case HitTop:
@@ -683,7 +683,7 @@ func (c *Composer) processKey(ev Event) {
 		case term.KeyCtrlH:
 			c.moveActiveWindowToBottom()
 		case term.KeyCtrlM:
-			w := c.topWindow().(*Window)
+			w := c.topWindow().(*TWindow)
 			if w.Sizable() && (w.TitleButtons()&ButtonMaximize == ButtonMaximize) {
 				maxxed := w.Maximized()
 				w.SetMaximized(!maxxed)
@@ -714,7 +714,7 @@ func ProcessEvent(ev Event) {
 	case EventResize:
 		SetScreenSize(ev.Width, ev.Height)
 		for _, c := range comp.windows {
-			wnd := c.(*Window)
+			wnd := c.(*TWindow)
 			if wnd.Maximized() {
 				wnd.SetSize(ev.Width, ev.Height)
 				wnd.ResizeChildren()

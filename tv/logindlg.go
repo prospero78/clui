@@ -17,7 +17,7 @@ const (
 //         only in case of callback is used and button "OK" is clicked
 //         while entered username or password is incorrect
 type LoginDialog struct {
-	View     *Window
+	View     *TWindow
 	Username string
 	Password string
 	Action   int

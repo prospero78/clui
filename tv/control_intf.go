@@ -175,4 +175,6 @@ type Control interface {
 	// Clipper if the component is clipped then return the clipper geometry, however
 	// the size and pos is returned
 	Clipper() (types.ACoordX, types.ACoordY, int, int)
+	// End -- что-то там завершает
+	End()
 }

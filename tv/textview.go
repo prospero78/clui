@@ -198,7 +198,7 @@ func (l *TextView) home() {
 	l.topLine = 0
 }
 
-func (l *TextView) end() {
+func (l *TextView) End() {
 	height := l.outputHeight()
 
 	if l.virtualHeight <= height {
@@ -334,7 +334,7 @@ func (l *TextView) ProcessEvent(event Event) bool {
 			l.home()
 			return true
 		case term.KeyEnd:
-			l.end()
+			l.End()
 			return true
 		case term.KeyArrowUp:
 			l.moveUp(1)
@@ -400,7 +400,7 @@ func (l *TextView) SetText(text []string) {
 	l.calculateVirtualSize()
 
 	if l.autoscroll {
-		l.end()
+		l.End()
 	}
 }
 
@@ -494,7 +494,7 @@ func (l *TextView) LoadFile(filename string) bool {
 	l.calculateVirtualSize()
 
 	if l.autoscroll {
-		l.end()
+		l.End()
 	}
 
 	return true
@@ -521,7 +521,7 @@ func (l *TextView) AddText(text []string) {
 	l.calculateVirtualSize()
 
 	if l.autoscroll {
-		l.end()
+		l.End()
 	}
 }
 
@@ -556,6 +556,6 @@ func (l *TextView) applyLimit() {
 	l.lines = l.lines[delta:]
 	l.calculateVirtualSize()
 	if l.topLine+l.outputHeight() < len(l.lines) {
-		l.end()
+		l.End()
 	}
 }

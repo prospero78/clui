@@ -122,7 +122,7 @@ func (l *TextDisplay) home() {
 	}
 }
 
-func (l *TextDisplay) end() {
+func (l *TextDisplay) End() {
 	if l.lineCount > 0 && l.topLine != l.lineCount-1 {
 		l.topLine = l.lineCount - 1
 
@@ -193,7 +193,7 @@ func (l *TextDisplay) ProcessEvent(event Event) bool {
 			l.home()
 			return true
 		case term.KeyEnd:
-			l.end()
+			l.End()
 			return true
 		case term.KeyArrowUp:
 			l.moveUp(1)

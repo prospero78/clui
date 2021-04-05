@@ -19,7 +19,7 @@ import (
 //   * Exists - if the selected object exists or a user entered manually a
 //         name of the object
 type FileSelectDialog struct {
-	View     *Window
+	View     *TWindow
 	FilePath string
 
 	fileMasks []string
@@ -29,7 +29,7 @@ type FileSelectDialog struct {
 	onClose func()
 
 	listBox *ListBox
-	edFile  *EditField
+	edFile  *TEditField
 	curDir  *Label
 
 	Exists    bool

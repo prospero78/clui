@@ -161,7 +161,7 @@ func (l *ListBox) home() {
 	}
 }
 
-func (l *ListBox) end() {
+func (l *ListBox) End() {
 	length := len(l.items)
 
 	if length == 0 || l.currSelection == length-1 {
@@ -340,7 +340,7 @@ func (l *ListBox) ProcessEvent(event Event) bool {
 			l.home()
 			return true
 		case term.KeyEnd:
-			l.end()
+			l.End()
 			return true
 		case term.KeyArrowUp:
 			l.moveUp(1)

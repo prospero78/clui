@@ -648,3 +648,7 @@ func (sf *TBaseControl) Destroy() {
 	sf.parent.removeChild(sf)
 	sf.parent.SetConstraints(0, 0)
 }
+
+// End -- заглушка для интерфейса
+func (sf *TBaseControl) End() {
+}

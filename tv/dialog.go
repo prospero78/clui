@@ -13,7 +13,7 @@ import (
 // The dialog is modal, so a user cannot interact other
 // Views until the user closes the dialog
 type ConfirmationDialog struct {
-	View    *Window
+	View    *TWindow
 	result  int
 	onClose func()
 }
@@ -24,13 +24,13 @@ type ConfirmationDialog struct {
 // The dialog is modal, so a user cannot interact other
 // Views until the user closes the dialog
 type SelectDialog struct {
-	View      *Window
+	View      *TWindow
 	result    int
 	value     int
 	edtResult string
 	rg        *RadioGroup
 	list      *ListBox
-	edit      *EditField
+	edit      *TEditField
 	typ       SelectDialogType
 	onClose   func()
 }

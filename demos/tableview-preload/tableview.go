@@ -82,7 +82,7 @@ func (d *dbCache) value(row, col int) string {
 }
 
 var (
-	view *ui.Window
+	view *ui.TWindow
 )
 
 func createView() *ui.TableView {

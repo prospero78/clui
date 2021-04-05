@@ -405,7 +405,7 @@ func (l *TableView) home() {
 	l.emitSelectionChange()
 }
 
-func (l *TableView) end() {
+func (l *TableView) End() {
 	length := len(l.columns)
 
 	if length == 0 {
@@ -794,7 +794,7 @@ func (l *TableView) ProcessEvent(event Event) bool {
 				l.EnsureRowVisible()
 				l.emitSelectionChange()
 			} else {
-				l.end()
+				l.End()
 			}
 			return true
 		case term.KeyArrowUp:

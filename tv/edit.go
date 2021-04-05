@@ -10,7 +10,7 @@ import (
 )
 
 // OnChange sets the callback that is called when EditField content is changed
-func (e *EditField) OnChange(fn func(Event)) {
+func (e *TEditField) OnChange(fn func(Event)) {
 	e.onChange = fn
 }
 
@@ -18,18 +18,18 @@ func (e *EditField) OnChange(fn func(Event)) {
 // the controls is active. If a handler processes the key it should return
 // true. If handler returns false it means that the default handler will
 // process the key
-func (e *EditField) OnKeyPress(fn func(term.Key, rune) bool) {
+func (e *TEditField) OnKeyPress(fn func(term.Key, rune) bool) {
 	e.onKeyPress = fn
 }
 
 // SetTitle changes the EditField content and emits OnChage eventif the new value does not equal to old one
-func (e *EditField) SetTitle(title string) {
+func (e *TEditField) SetTitle(title string) {
 	e.setTitleInternal(title)
 	e.offset = 0
-	e.end()
+	e.End()
 }
 
-func (e *EditField) setTitleInternal(title string) {
+func (e *TEditField) setTitleInternal(title string) {
 	if e.title != title {
 		e.title = title
 
@@ -45,7 +45,7 @@ func (e *EditField) setTitleInternal(title string) {
 }
 
 // Repaint draws the control on its View surface
-func (e *EditField) Draw() {
+func (e *TEditField) Draw() {
 	if e.hidden {
 		return
 	}
@@ -118,7 +118,7 @@ func (e *EditField) Draw() {
 	}
 }
 
-func (e *EditField) insertRune(ch rune) {
+func (e *TEditField) InsertRune(ch rune) {
 	if e.readonly {
 		return
 	}
@@ -149,7 +149,7 @@ func (e *EditField) insertRune(ch rune) {
 	}
 }
 
-func (e *EditField) backspace() {
+func (e *TEditField) Backspace() {
 	if e.title == "" || e.cursorPos == 0 || e.readonly {
 		return
 	}
@@ -174,7 +174,7 @@ func (e *EditField) backspace() {
 	}
 }
 
-func (e *EditField) del() {
+func (e *TEditField) Del() {
 	length := xs.Len(e.title)
 
 	if e.title == "" || int(e.cursorPos) == length || e.readonly {
@@ -192,7 +192,7 @@ func (e *EditField) del() {
 	}
 }
 
-func (e *EditField) charLeft() {
+func (e *TEditField) CharLeft() {
 	if e.cursorPos == 0 || e.title == "" {
 		return
 	}
@@ -204,7 +204,7 @@ func (e *EditField) charLeft() {
 	e.cursorPos--
 }
 
-func (e *EditField) charRight() {
+func (e *TEditField) CharRight() {
 	length := xs.Len(e.title)
 	if int(e.cursorPos) == length || e.title == "" {
 		return
@@ -216,12 +216,12 @@ func (e *EditField) charRight() {
 	}
 }
 
-func (e *EditField) home() {
+func (e *TEditField) Home() {
 	e.offset = 0
 	e.cursorPos = 0
 }
 
-func (e *EditField) end() {
+func (e *TEditField) End() {
 	length := xs.Len(e.title)
 	e.cursorPos = types.ACoordX(length)
 
@@ -233,22 +233,22 @@ func (e *EditField) end() {
 }
 
 // Clear empties the EditField and emits OnChange event
-func (e *EditField) Clear() {
-	e.home()
+func (e *TEditField) Clear() {
+	e.Home()
 	e.setTitleInternal("")
 }
 
 // SetMaxWidth sets the maximum lenght of the EditField text. If the current text is longer it is truncated
-func (e *EditField) SetMaxWidth(w int) {
+func (e *TEditField) SetMaxWidth(w int) {
 	e.maxWidth = w
 	if w > 0 && xs.Len(e.title) > w {
 		e.title = xs.Slice(e.title, 0, w)
-		e.end()
+		e.End()
 	}
 }
 
 // MaxWidth returns the current maximum text length. Zero means no limit
-func (e *EditField) MaxWidth() int {
+func (e *TEditField) MaxWidth() int {
 	return e.maxWidth
 }
 
@@ -257,7 +257,7 @@ func (e *EditField) MaxWidth() int {
 // should be unchanged.
 // Method does nothing if new size is less than minimal size
 // EditField height cannot be changed - it equals 1 always
-func (e *EditField) SetSize(width, height int) {
+func (e *TEditField) SetSize(width, height int) {
 	if width != KeepValue && (width > 1000 || width < e.minW) {
 		return
 	}
@@ -273,7 +273,7 @@ func (e *EditField) SetSize(width, height int) {
 }
 
 // PasswordMode returns whether password mode is enabled for the control
-func (e *EditField) PasswordMode() bool {
+func (e *TEditField) PasswordMode() bool {
 	return e.showStars
 }
 
@@ -281,6 +281,6 @@ func (e *EditField) PasswordMode() bool {
 // If PasswordMode is false then the EditField works as regular text entry
 // control. If PasswordMode is true then the EditField shows its content hidden
 // with star characters ('*' by default)
-func (e *EditField) SetPasswordMode(pass bool) {
+func (e *TEditField) SetPasswordMode(pass bool) {
 	e.showStars = pass
 }

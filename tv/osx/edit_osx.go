@@ -1,11 +1,14 @@
 // +build darwin
 
-package tv
+package ocx
 
 import (
+	"time"
+
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
-	"time"
+
+	"github.com/prospero78/goTV/tv"
 )
 
 const charInvervalMs = 20
@@ -20,7 +23,8 @@ maximun then the text is automatically truncated.
 EditField calls onChage in case of its text is changed. Event field Msg contains the new text
 */
 type EditField struct {
-	BaseControl
+	// tv.TBaseControl
+	*tv.TEditField
 	// cursor position in edit text
 	cursorPos int
 	// the number of the first displayed text character - it is used in case of text is longer than edit width
@@ -29,7 +33,7 @@ type EditField struct {
 	maxWidth  int
 	showStars bool
 
-	onChange   func(Event)
+	onChange   func(tv.Event)
 	onKeyPress func(term.Key, rune) bool
 
 	lastEvent time.Time
@@ -42,28 +46,28 @@ type EditField struct {
 // text - text to edit.
 // scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 //  control should keep its original size.
-func CreateEditField(parent Control, width int, text string, scale int) *EditField {
+func CreateEditField(parent tv.Control, width int, text string, scale int) *EditField {
 	e := new(EditField)
-	e.BaseControl = NewBaseControl()
+	e.TBaseControl = tv.NewBaseControl()
 	e.onChange = nil
 	e.SetTitle(text)
 	e.SetEnabled(true)
 
-	if width == AutoSize {
+	if width == tv.AutoSize {
 		width = xs.Len(text) + 1
 	}
 
 	e.SetSize(width, 1)
 	e.cursorPos = xs.Len(text)
 	e.offset = 0
-	e.parent = parent
+	e.SetParent(parent)
 	e.readonly = false
 	e.SetScale(scale)
 	e.lastEvent = time.Now()
 
 	e.SetConstraints(width, 1)
 
-	e.end()
+	e.End()
 
 	if parent != nil {
 		parent.AddChild(e)
@@ -78,20 +82,20 @@ processes an event it should return true. If the method returns false it means
 that the control do not want or cannot process the event and the caller sends
 the event to the control parent
 */
-func (e *EditField) ProcessEvent(event Event) bool {
+func (e *EditField) ProcessEvent(event tv.Event) bool {
 	if !e.Active() || !e.Enabled() {
 		return false
 	}
 
-	if event.Type == EventActivate && event.X == 0 {
+	if event.Type == tv.EventActivate && event.X == 0 {
 		term.HideCursor()
 	}
 
-	if event.Type == EventMouse && event.Key == term.MouseLeft {
+	if event.Type == tv.EventMouse && event.Key == term.MouseLeft {
 		e.lastEvent = time.Now()
 	}
 
-	if event.Type == EventKey && event.Key != term.KeyTab {
+	if event.Type == tv.EventKey && event.Key != term.KeyTab {
 		if e.onKeyPress != nil {
 			res := e.onKeyPress(event.Key, event.Ch)
 			if res {
@@ -103,22 +107,22 @@ func (e *EditField) ProcessEvent(event Event) bool {
 		case term.KeyEnter:
 			return false
 		case term.KeySpace:
-			e.insertRune(' ')
+			e.InsertRune(' ')
 			return true
 		case term.KeyBackspace, term.KeyBackspace2:
-			e.backspace()
+			e.Backspace()
 			return true
 		case term.KeyDelete:
-			e.del()
+			e.Del()
 			return true
 		case term.KeyArrowLeft:
-			e.charLeft()
+			e.CharLeft()
 			return true
 		case term.KeyHome:
-			e.home()
+			e.Home()
 			return true
 		case term.KeyEnd:
-			e.end()
+			e.End()
 			return true
 		case term.KeyCtrlR:
 			if !e.readonly {
@@ -126,13 +130,13 @@ func (e *EditField) ProcessEvent(event Event) bool {
 			}
 			return true
 		case term.KeyArrowRight:
-			e.charRight()
+			e.CharRight()
 			return true
 		default:
 			if event.Ch != 0 {
 				elapsed := time.Now().Sub(e.lastEvent)
 				if elapsed > time.Duration(charInvervalMs)*time.Millisecond {
-					e.insertRune(event.Ch)
+					e.InsertRune(event.Ch)
 					e.lastEvent = time.Now()
 				}
 				return true

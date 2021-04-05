@@ -12,15 +12,15 @@ import (
 )
 
 /*
-EditField is a single-line text edit contol. Edit field consumes some keyboard
+TEditField is a single-line text edit contol. Edit field consumes some keyboard
 events when it is active: all printable charaters; Delete, BackSpace, Home,
-End, left and right arrows; Ctrl+R to clear EditField.
+End, left and right arrows; Ctrl+R to clear TEditField.
 Edit text can be limited. By default a user can enter text of any length.
 Use SetMaxWidth to limit the maximum text length. If the text is longer than
 maximun then the text is automatically truncated.
-EditField calls onChage in case of its text is changed. Event field Msg contains the new text
+TEditField calls onChage in case of its text is changed. Event field Msg contains the new text
 */
-type EditField struct {
+type TEditField struct {
 	TBaseControl
 	// cursor position in edit text
 	cursorPos types.ACoordX
@@ -43,8 +43,8 @@ type EditField struct {
 // text - text to edit.
 // scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 //  control should keep its original size.
-func CreateEditField(parent Control, width int, text string, scale int) *EditField {
-	e := &EditField{
+func CreateEditField(parent Control, width int, text string, scale int) *TEditField {
+	e := &TEditField{
 		TBaseControl: NewBaseControl(),
 		autoWidth:    autowidth.New(),
 	}
@@ -67,7 +67,7 @@ func CreateEditField(parent Control, width int, text string, scale int) *EditFie
 
 	e.SetConstraints(width, 1)
 
-	e.end()
+	e.End()
 
 	if parent != nil {
 		parent.AddChild(e)
@@ -82,7 +82,7 @@ processes an event it should return true. If the method returns false it means
 that the control do not want or cannot process the event and the caller sends
 the event to the control parent
 */
-func (e *EditField) ProcessEvent(event Event) bool {
+func (e *TEditField) ProcessEvent(event Event) bool {
 	if !e.Active() || !e.Enabled() {
 		return false
 	}
@@ -103,22 +103,22 @@ func (e *EditField) ProcessEvent(event Event) bool {
 		case term.KeyEnter:
 			return false
 		case term.KeySpace:
-			e.insertRune(' ')
+			e.InsertRune(' ')
 			return true
 		case term.KeyBackspace, term.KeyBackspace2:
-			e.backspace()
+			e.Backspace()
 			return true
 		case term.KeyDelete:
-			e.del()
+			e.Del()
 			return true
 		case term.KeyArrowLeft:
-			e.charLeft()
+			e.CharLeft()
 			return true
 		case term.KeyHome:
-			e.home()
+			e.Home()
 			return true
 		case term.KeyEnd:
-			e.end()
+			e.End()
 			return true
 		case term.KeyCtrlR:
 			if !e.readonly {
@@ -126,7 +126,7 @@ func (e *EditField) ProcessEvent(event Event) bool {
 			}
 			return true
 		case term.KeyArrowRight:
-			e.charRight()
+			e.CharRight()
 			return true
 		case term.KeyCtrlC:
 			if !e.showStars {
@@ -137,12 +137,12 @@ func (e *EditField) ProcessEvent(event Event) bool {
 			if !e.readonly {
 				s, _ := clipboard.ReadAll()
 				e.SetTitle(s)
-				e.end()
+				e.End()
 			}
 			return true
 		default:
 			if event.Ch != 0 {
-				e.insertRune(event.Ch)
+				e.InsertRune(event.Ch)
 				return true
 			}
 		}
