@@ -5,6 +5,8 @@ import (
 	// xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
 
+	"github.com/prospero78/goTV/tv/autoheight"
+	"github.com/prospero78/goTV/tv/autowidth"
 	"github.com/prospero78/goTV/tv/types"
 )
 
@@ -34,7 +36,8 @@ type SparkChart struct {
 	hiliteMax    bool
 	maxFg, maxBg term.Attribute
 	topValue     float64
-	autosize     bool
+	autoWidth    types.IAutoWidth
+	autoHeight   types.IAutoHeight
 }
 
 /*
@@ -46,14 +49,19 @@ scale - the way of scaling the control when the parent is resized. Use DoNotScal
 control should keep its original size.
 */
 func CreateSparkChart(parent Control, w, h int, scale int) *SparkChart {
-	c := new(SparkChart)
-	c.TBaseControl = NewBaseControl()
-
-	if w == AutoSize {
-		w = 10
+	c := &SparkChart{
+		TBaseControl: NewBaseControl(),
+		autoWidth:    autowidth.New(),
+		autoHeight:   autoheight.New(),
 	}
-	if h == AutoSize {
+
+	if w == 0 {
+		w = 10
+		c.autoWidth.Change(true)
+	}
+	if h == 0 {
 		h = 5
+		c.autoHeight.Change(true)
 	}
 
 	c.parent = parent
@@ -62,7 +70,8 @@ func CreateSparkChart(parent Control, w, h int, scale int) *SparkChart {
 	c.SetConstraints(w, h)
 	c.tabSkip = true
 	c.hiliteMax = true
-	c.autosize = true
+	c.autoHeight.Set()
+	c.autoWidth.Set()
 	c.data = make([]float64, 0)
 	c.SetScale(scale)
 
@@ -165,7 +174,7 @@ func (b *SparkChart) drawValues() {
 	if max == coeff {
 		return
 	}
-	if !b.autosize || b.topValue == 0 {
+	if !(bool(b.autoHeight.Is()) || bool(b.autoWidth.Is())) || b.topValue == 0 {
 		max = b.topValue
 	}
 
@@ -214,7 +223,7 @@ func (b *SparkChart) calculateMultiplier() (float64, float64) {
 		return 0, 0
 	}
 
-	if b.autosize || b.topValue == 0 {
+	if (bool(b.autoHeight.Is()) || bool(b.autoWidth.Is())) || b.topValue == 0 {
 		return float64(h) / max, max
 	}
 	return float64(h) / b.topValue, max
@@ -288,7 +297,7 @@ func (b *SparkChart) SetTop(top float64) {
 // AutoScale returns whether spark chart scales automatically
 // depending on displayed data or it scales using Top value
 func (b *SparkChart) AutoScale() bool {
-	return b.autosize
+	return bool(b.autoHeight.Is()) || bool(b.autoWidth.Is())
 }
 
 // SetAutoScale changes the way of scaling the data flow
@@ -296,7 +305,8 @@ func (b *SparkChart) SetAutoScale(auto bool) {
 	b.mtx.Lock()
 	defer b.mtx.Unlock()
 
-	b.autosize = auto
+	b.autoHeight.Set()
+	b.autoWidth.Set()
 }
 
 // HilitePeaks returns whether chart draws maximum peaks
