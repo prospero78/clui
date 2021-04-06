@@ -5,6 +5,7 @@ type (
 	ACoordY   int
 	AUnicalID int64
 	AWidth    int
+	AHeight   int
 
 	AAutoWidth  bool
 	AAutoHeight bool

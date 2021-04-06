@@ -513,7 +513,7 @@ func DrawScrollBar(x types.ACoordX, y types.ACoordY, w, h, pos int) {
 }
 
 // FillRect paints the area with r character using the current colors
-func FillRect(x types.ACoordX, y types.ACoordY, w, h int, r rune) {
+func FillRect(x types.ACoordX, y types.ACoordY, w int, h int, r rune) {
 	x, y, w, h = clip(x, y, w, h)
 	if w < 1 || y < -1 {
 		return

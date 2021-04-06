@@ -104,7 +104,7 @@ func (wnd *TWindow) drawFrame() {
 		bs = wnd.border
 	}
 
-	DrawFrame(wnd.pos.GetX(), wnd.pos.GetY(), int(wnd.width), wnd.height, bs)
+	DrawFrame(wnd.pos.GetX(), wnd.pos.GetY(), int(wnd.width), int(wnd.height), bs)
 }
 
 func (wnd *TWindow) drawTitle() {
@@ -180,7 +180,7 @@ func (wnd *TWindow) Draw() {
 	fg, bg := RealColor(wnd.fg, wnd.Style(), ColorViewText), RealColor(wnd.bg, wnd.Style(), ColorViewBack)
 	SetBackColor(bg)
 
-	FillRect(wnd.pos.GetX(), wnd.pos.GetY(), int(wnd.width), wnd.height, ' ')
+	FillRect(wnd.pos.GetX(), wnd.pos.GetY(), int(wnd.width), int(wnd.height), ' ')
 
 	wnd.DrawChildren()
 
