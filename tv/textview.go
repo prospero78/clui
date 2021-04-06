@@ -96,11 +96,11 @@ func (l *TextView) outputHeight() int {
 func (l *TextView) drawScrolls() {
 	height := l.outputHeight()
 	pos := ThumbPosition(l.topLine, l.virtualHeight-l.outputHeight(), height)
-	DrawScrollBar(l.pos.GetX()+types.ACoordX(l.width-1), l.pos.GetY(), 1, height, pos)
+	DrawScrollBar(l.pos.GetX()+types.ACoordX(l.width.Get()-1), l.pos.GetY(), 1, height, pos)
 
 	if !l.wordWrap {
-		pos = ThumbPosition(l.leftShift, l.virtualWidth-int(l.width)+1, int(l.width)-1)
-		DrawScrollBar(l.pos.GetX(), l.pos.GetY()+types.ACoordY(l.height-1), int(l.width)-1, 1, pos)
+		pos = ThumbPosition(l.leftShift, l.virtualWidth-int(l.width.Get())+1, int(l.width.Get())-1)
+		DrawScrollBar(l.pos.GetX(), l.pos.GetY()+types.ACoordY(l.height-1), int(l.width.Get())-1, 1, pos)
 	}
 }
 
@@ -108,7 +108,7 @@ func (l *TextView) drawText() {
 	PushAttributes()
 	defer PopAttributes()
 
-	maxWidth := l.width - 1
+	maxWidth := l.width.Get() - 1
 	maxHeight := l.outputHeight()
 
 	bg, fg := RealColor(l.bg, l.Style(), ColorEditBack), RealColor(l.fg, l.Style(), ColorEditText)
@@ -261,7 +261,7 @@ func (l *TextView) moveRight() {
 		return
 	}
 
-	if l.leftShift+int(l.width)-1 >= l.virtualWidth {
+	if l.leftShift+int(l.width.Get())-1 >= l.virtualWidth {
 		return
 	}
 
@@ -278,23 +278,23 @@ func (l *TextView) processMouseClick(ev Event) bool {
 	yy := l.outputHeight()
 
 	// cursor is not on any scrollbar
-	if int(dx) != int(l.width-1) && int(dy) != int(l.height)-1 {
+	if int(dx) != int(l.width.Get()-1) && int(dy) != int(l.height)-1 {
 		return false
 	}
 	// wordwrap mode does not have horizontal scroll
 	if l.wordWrap &&
-		int(dx) != int(l.width)-1 {
+		int(dx) != int(l.width.Get())-1 {
 		return false
 	}
 	// corner in not wordwrap mode
 	if !l.wordWrap &&
-		int(dx) == int(l.width)-1 &&
+		int(dx) == int(l.width.Get())-1 &&
 		int(dy) == int(l.height)-1 {
 		return false
 	}
 
 	// vertical scroll bar
-	if int(dx) == int(l.width-1) {
+	if int(dx) == int(l.width.Get()-1) {
 		switch {
 		case dy == 0:
 			l.moveUp(1)
@@ -314,10 +314,10 @@ func (l *TextView) processMouseClick(ev Event) bool {
 	switch {
 	case dx == 0:
 		l.moveLeft()
-	case int(dx) == int(l.width)-2:
+	case int(dx) == int(l.width.Get())-2:
 		l.moveRight()
 	default:
-		newPos := ItemByThumbPosition(int(dx), l.virtualWidth-int(l.width)+2, int(l.width)-1)
+		newPos := ItemByThumbPosition(int(dx), l.virtualWidth-int(l.width.Get())+2, int(l.width.Get())-1)
 		if newPos >= 0 {
 			l.leftShift = newPos
 		}
@@ -375,8 +375,8 @@ func (l *TextView) ProcessEvent(event Event) bool {
 // own methods
 
 func (l *TextView) calculateVirtualSize() {
-	w := l.width - 1
-	l.virtualWidth = int(l.width) - 1
+	w := l.width.Get() - 1
+	l.virtualWidth = int(l.width.Get()) - 1
 	l.virtualHeight = 0
 
 	l.lengths = make([]int, len(l.lines))

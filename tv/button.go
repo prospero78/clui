@@ -184,7 +184,7 @@ func (b *Button) ProcessEvent(event Event) bool {
 			ReleaseEvents()
 			if event.X >= b.pos.GetX() &&
 				event.Y >= b.pos.GetY() &&
-				event.X < b.pos.GetX()+types.ACoordX(b.width) &&
+				event.X < b.pos.GetX()+types.ACoordX(b.width.Get()) &&
 				event.Y < b.pos.GetY()+types.ACoordY(b.height) {
 				if b.onClick != nil {
 					b.onClick(event)

@@ -8,6 +8,7 @@ import (
 
 	"github.com/prospero78/goTV/tv/pos"
 	"github.com/prospero78/goTV/tv/types"
+	"github.com/prospero78/goTV/tv/width"
 )
 
 // TBaseControl is a base for all visible controls.
@@ -17,7 +18,7 @@ type TBaseControl struct {
 	refID types.AUnicalID
 
 	pos        types.IPos
-	width      types.AWidth
+	width      types.IWidth
 	height     types.AHeight
 	minW, minH int
 	scale      int
@@ -57,6 +58,7 @@ func NewBaseControl() TBaseControl {
 		refID:  nextRefId(),
 		pos:    pos.New(),
 		posPad: pos.New(),
+		width:  width.New(),
 	}
 }
 
@@ -89,7 +91,7 @@ func (sf *TBaseControl) SetTitle(title string) {
 }
 
 func (sf *TBaseControl) Size() (widht int, height int) {
-	return int(sf.width), int(sf.height)
+	return int(sf.width.Get()), int(sf.height)
 }
 
 func (sf *TBaseControl) SetSize(width, height int) {
@@ -100,9 +102,9 @@ func (sf *TBaseControl) SetSize(width, height int) {
 		height = sf.minH
 	}
 
-	if height != int(sf.height) || width != int(sf.width) {
+	if height != int(sf.height) || width != int(sf.width.Get()) {
 		sf.height = types.AHeight(height)
-		sf.width = types.AWidth(width)
+		sf.width.Set(types.AWidth(width))
 	}
 }
 
@@ -129,14 +131,14 @@ func (sf *TBaseControl) SetPos(x types.ACoordX, y types.ACoordY) {
 
 func (sf *TBaseControl) applyConstraints() {
 	ww, hh := sf.width, sf.height
-	if int(ww) < sf.minW {
-		ww = types.AWidth(sf.minW)
+	if int(ww.Get()) < sf.minW {
+		ww.Set(types.AWidth(sf.minW))
 	}
 	if int(hh) < sf.minH {
 		hh = types.AHeight(sf.minH)
 	}
 	if hh != sf.height || ww != sf.width {
-		sf.SetSize(int(ww), int(hh))
+		sf.SetSize(int(ww.Get()), int(hh))
 	}
 }
 
@@ -324,7 +326,7 @@ func (sf *TBaseControl) ResizeChildren() {
 		return
 	}
 
-	fullWidth := int(sf.width) - int(2*sf.posPad.GetX())
+	fullWidth := int(sf.width.Get()) - int(2*sf.posPad.GetX())
 	fullHeight := int(sf.height) - int(2*sf.posPad.Y().Get())
 	if sf.pack == Horizontal {
 		fullWidth -= (children - 1) * sf.gapX
@@ -564,18 +566,18 @@ func (sf *TBaseControl) setClipper() {
 }
 
 func (sf *TBaseControl) HitTest(x types.ACoordX, y types.ACoordY) HitResult {
-	if x > sf.pos.GetX() && x < sf.pos.GetX()+types.ACoordX(sf.width-1) &&
+	if x > sf.pos.GetX() && x < sf.pos.GetX()+types.ACoordX(sf.width.Get()-1) &&
 		y > sf.pos.GetY() && y < sf.pos.GetY()+types.ACoordY(sf.height-1) {
 		return HitInside
 	}
 
-	if (x == sf.pos.GetX() || x == sf.pos.GetX()+types.ACoordX(sf.width-1)) &&
+	if (x == sf.pos.GetX() || x == sf.pos.GetX()+types.ACoordX(sf.width.Get()-1)) &&
 		y >= sf.pos.GetY() && y < sf.pos.GetY()+types.ACoordY(sf.height) {
 		return HitBorder
 	}
 
 	if (y == sf.pos.GetY() || y == sf.pos.GetY()+types.ACoordY(sf.height-1)) &&
-		x >= sf.pos.GetX() && x < sf.pos.GetX()+types.ACoordX(sf.width) {
+		x >= sf.pos.GetX() && x < sf.pos.GetX()+types.ACoordX(sf.width.Get()) {
 		return HitBorder
 	}
 

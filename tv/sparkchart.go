@@ -97,7 +97,7 @@ func (b *SparkChart) Draw() {
 	fg, bg := RealColor(b.fg, b.Style(), ColorSparkChartText), RealColor(b.bg, b.Style(), ColorSparkChartBack)
 	SetTextColor(fg)
 	SetBackColor(bg)
-	FillRect(b.pos.GetX(), b.pos.GetY(), int(b.width), int(b.height), ' ')
+	FillRect(b.pos.GetX(), b.pos.GetY(), int(b.width.Get()), int(b.height), ' ')
 
 	if len(b.data) == 0 {
 		return
@@ -191,7 +191,7 @@ func (b *SparkChart) drawValues() {
 }
 
 func (b *SparkChart) calculateBarArea() (int, int) {
-	w := int(b.width)
+	w := int(b.width.Get())
 	pos := 0
 
 	if b.valueWidth < w/2 {

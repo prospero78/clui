@@ -104,7 +104,7 @@ func (wnd *TWindow) drawFrame() {
 		bs = wnd.border
 	}
 
-	DrawFrame(wnd.pos.GetX(), wnd.pos.GetY(), int(wnd.width), int(wnd.height), bs)
+	DrawFrame(wnd.pos.GetX(), wnd.pos.GetY(), int(wnd.width.Get()), int(wnd.height), bs)
 }
 
 func (wnd *TWindow) drawTitle() {
@@ -112,7 +112,7 @@ func (wnd *TWindow) drawTitle() {
 	defer PopAttributes()
 
 	lb, rb := wnd.buttonCount()
-	maxw := wnd.width - 2
+	maxw := wnd.width.Get() - 2
 	xshift := 1
 	if lb > 0 {
 		lbSize := lb + 2 + 1
@@ -148,7 +148,7 @@ func (wnd *TWindow) drawButtons() {
 
 	// draw close button (rb can be either 1 or 0)
 	if rb != 0 {
-		pos := wnd.pos.GetX() + types.ACoordX(int(wnd.width)-rb-2)
+		pos := wnd.pos.GetX() + types.ACoordX(int(wnd.width.Get())-rb-2)
 		putCharUnsafe(pos, wnd.pos.GetY(), cOpenB)
 		putCharUnsafe(pos+1, wnd.pos.GetY(), cClose)
 		putCharUnsafe(pos+2, wnd.pos.GetY(), cCloseB)
@@ -180,7 +180,7 @@ func (wnd *TWindow) Draw() {
 	fg, bg := RealColor(wnd.fg, wnd.Style(), ColorViewText), RealColor(wnd.bg, wnd.Style(), ColorViewBack)
 	SetBackColor(bg)
 
-	FillRect(wnd.pos.GetX(), wnd.pos.GetY(), int(wnd.width), int(wnd.height), ' ')
+	FillRect(wnd.pos.GetX(), wnd.pos.GetY(), int(wnd.width.Get()), int(wnd.height), ' ')
 
 	wnd.DrawChildren()
 
@@ -196,7 +196,7 @@ func (wnd *TWindow) Draw() {
 // method is used to detect if a mouse cursor on a window border or outside,
 // which window icon is under cursor etc
 func (c *TWindow) HitTest(x types.ACoordX, y types.ACoordY) HitResult {
-	if x > c.pos.GetX() && x < c.pos.GetX()+types.ACoordX(c.width-1) &&
+	if x > c.pos.GetX() && x < c.pos.GetX()+types.ACoordX(c.width.Get()-1) &&
 		y > c.pos.GetY() && y < c.pos.GetY()+types.ACoordY(c.height-1) {
 		return HitInside
 	}
@@ -206,17 +206,17 @@ func (c *TWindow) HitTest(x types.ACoordX, y types.ACoordY) HitResult {
 	switch {
 	case x == c.pos.GetX() && y == c.pos.GetY():
 		hResult = HitTopLeft
-	case x == c.pos.GetX()+types.ACoordX(c.width-1) && y == c.pos.GetY():
+	case x == c.pos.GetX()+types.ACoordX(c.width.Get()-1) && y == c.pos.GetY():
 		hResult = HitTopRight
 	case x == c.pos.GetX() && y == c.pos.GetY()+types.ACoordY(c.height-1):
 		hResult = HitBottomLeft
-	case x == c.pos.GetX()+types.ACoordX(c.width-1) && y == c.pos.GetY()+types.ACoordY(c.height-1):
+	case x == c.pos.GetX()+types.ACoordX(c.width.Get()-1) && y == c.pos.GetY()+types.ACoordY(c.height-1):
 		hResult = HitBottomRight
 	case x == c.pos.GetX() && y > c.pos.GetY() && y < c.pos.GetY()+types.ACoordY(c.height-1):
 		hResult = HitLeft
-	case x == c.pos.GetX()+types.ACoordX(c.width-1) && y > c.pos.GetY() && y < c.pos.GetY()+types.ACoordY(c.height-1):
+	case x == c.pos.GetX()+types.ACoordX(c.width.Get()-1) && y > c.pos.GetY() && y < c.pos.GetY()+types.ACoordY(c.height-1):
 		hResult = HitRight
-	case y == c.pos.GetY() && x > c.pos.GetX() && x < c.pos.GetX()+types.ACoordX(c.width-1):
+	case y == c.pos.GetY() && x > c.pos.GetX() && x < c.pos.GetX()+types.ACoordX(c.width.Get()-1):
 		lb, rb := c.buttonCount()
 		fromL, fromR := lb, rb
 		if lb > 0 {
@@ -225,11 +225,11 @@ func (c *TWindow) HitTest(x types.ACoordX, y types.ACoordY) HitResult {
 		if rb > 0 {
 			fromR += 2
 		}
-		if x > c.pos.GetX()+types.ACoordX(fromL) && x < c.pos.GetX()+types.ACoordX(int(c.width)-fromR) {
+		if x > c.pos.GetX()+types.ACoordX(fromL) && x < c.pos.GetX()+types.ACoordX(int(c.width.Get())-fromR) {
 			hResult = HitTop
 		} else {
 			hResult = HitTop
-			if c.buttons&ButtonClose == ButtonClose && rb != 0 && x == c.pos.GetX()+types.ACoordX(c.width-2) {
+			if c.buttons&ButtonClose == ButtonClose && rb != 0 && x == c.pos.GetX()+types.ACoordX(c.width.Get()-2) {
 				hResult = HitButtonClose
 			} else if lb != 0 && x > c.pos.GetX()+1 && x < c.pos.GetX()+types.ACoordX(2+lb) {
 				dx := x - c.pos.GetX() - 2
@@ -248,7 +248,9 @@ func (c *TWindow) HitTest(x types.ACoordX, y types.ACoordY) HitResult {
 				}
 			}
 		}
-	case y == c.pos.GetY()+types.ACoordY(c.height-1) && x > c.pos.GetX() && x < c.pos.GetX()+types.ACoordX(c.width-1):
+	case y == c.pos.GetY()+types.ACoordY(c.height-1) &&
+		x > c.pos.GetX() &&
+		x < c.pos.GetX()+types.ACoordX(c.width.Get()-1):
 		hResult = HitBottom
 	}
 

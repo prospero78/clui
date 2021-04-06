@@ -90,7 +90,7 @@ func (l *Label) Draw() {
 
 	SetTextColor(fg)
 	SetBackColor(bg)
-	FillRect(l.pos.GetX(), l.pos.GetY(), int(l.width), int(l.height), ' ')
+	FillRect(l.pos.GetX(), l.pos.GetY(), int(l.width.Get()), int(l.height), ' ')
 
 	if l.title == "" {
 		return
@@ -101,7 +101,7 @@ func (l *Label) Draw() {
 		elem := parser.NextElement()
 		xx, yy := l.pos.Get()
 		for elem.Type != ElemEndOfText {
-			if xx >= l.pos.GetX()+types.ACoordX(l.width) || yy >= l.pos.GetY()+types.ACoordY(l.height) {
+			if xx >= l.pos.GetX()+types.ACoordX(l.width.Get()) || yy >= l.pos.GetY()+types.ACoordY(l.height) {
 				break
 			}
 
@@ -115,7 +115,7 @@ func (l *Label) Draw() {
 
 				if l.direction == Horizontal {
 					xx++
-					if xx >= l.pos.GetX()+types.ACoordX(l.width) {
+					if xx >= l.pos.GetX()+types.ACoordX(l.width.Get()) {
 						xx = l.pos.GetX()
 						yy++
 					}
@@ -132,15 +132,15 @@ func (l *Label) Draw() {
 		}
 	} else {
 		if l.direction == Horizontal {
-			shift, str := AlignColorizedText(l.title, int(l.width), l.align)
+			shift, str := AlignColorizedText(l.title, int(l.width.Get()), l.align)
 			if str != l.title && l.align != l.textDisplay {
-				shift, str = AlignColorizedText(l.title, int(l.width), l.textDisplay)
+				shift, str = AlignColorizedText(l.title, int(l.width.Get()), l.textDisplay)
 			}
 			DrawText(l.pos.GetX()+types.ACoordX(shift), l.pos.GetY(), str)
 		} else {
 			shift, str := AlignColorizedText(l.title, int(l.height), l.align)
 			if str != l.title && l.align != l.textDisplay {
-				shift, str = AlignColorizedText(l.title, int(l.width), l.textDisplay)
+				shift, str = AlignColorizedText(l.title, int(l.width.Get()), l.textDisplay)
 			}
 			DrawTextVertical(l.pos.GetX(), l.pos.GetY()+types.ACoordY(shift), str)
 		}
