@@ -4,6 +4,8 @@ import (
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
 
+	"github.com/prospero78/goTV/tv/autoheight"
+	"github.com/prospero78/goTV/tv/autowidth"
 	"github.com/prospero78/goTV/tv/types"
 )
 
@@ -15,6 +17,9 @@ type TextDisplay struct {
 
 	onDrawLine        func(int) string
 	onPositionChanged func(int, int)
+
+	autoHeight types.IAutoHeight
+	autoWidth  types.IAutoWidth
 }
 
 // TextReader is deprecated due to its confusing name. Use TextDisplay instead.
@@ -26,14 +31,19 @@ func CreateTextReader(parent Control, width, height int, scale int) *TextDisplay
 }
 
 func CreateTextDisplay(parent Control, width, height int, scale int) *TextDisplay {
-	l := new(TextDisplay)
-	l.TBaseControl = NewBaseControl()
-
-	if height == AutoSize {
-		height = 10
+	l := &TextDisplay{
+		TBaseControl: NewBaseControl(),
+		autoHeight:   autoheight.New(),
+		autoWidth:    autowidth.New(),
 	}
-	if width == AutoSize {
+
+	if height == 0 {
+		height = 10
+		l.autoHeight.Set()
+	}
+	if width == 0 {
 		width = 20
+		l.autoWidth.Set()
 	}
 
 	l.SetSize(width, height)
