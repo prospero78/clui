@@ -5,6 +5,8 @@ import (
 
 	term "github.com/nsf/termbox-go"
 
+	"github.com/prospero78/goTV/tv/autoheight"
+	"github.com/prospero78/goTV/tv/autowidth"
 	"github.com/prospero78/goTV/tv/types"
 )
 
@@ -71,6 +73,9 @@ type TableView struct {
 	// in case of current cell is unchanged
 	lastEventCol int
 	lastEventRow int
+
+	autoHeight types.IAutoHeight
+	autoWidth  types.IAutoWidth
 }
 
 // Column is a information about a table column.
@@ -135,14 +140,19 @@ scale - the way of scaling the control when the parent is resized. Use DoNotScal
 control should keep its original size.
 */
 func CreateTableView(parent Control, width, height int, scale int) *TableView {
-	l := new(TableView)
-	l.TBaseControl = NewBaseControl()
-
-	if height == AutoSize {
-		height = 3
+	l := &TableView{
+		TBaseControl: NewBaseControl(),
+		autoWidth:    autowidth.New(),
+		autoHeight:   autoheight.New(),
 	}
-	if width == AutoSize {
+
+	if height == 0 {
+		height = 3
+		l.autoHeight.Set()
+	}
+	if width == 0 {
 		width = 10
+		l.autoWidth.Set()
 	}
 
 	l.SetSize(width, height)
