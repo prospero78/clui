@@ -83,10 +83,10 @@ func (l *ListBox) drawScroll() {
 	PushAttributes()
 	defer PopAttributes()
 
-	pos := ThumbPosition(l.currSelection, len(l.items), int(l.height))
+	pos := ThumbPosition(l.currSelection, len(l.items), int(l.height.Get()))
 	l.buttonPos = pos
 
-	DrawScrollBar(l.pos.GetX()+types.ACoordX(l.width.Get()-1), l.pos.GetY(), 1, int(l.height), pos)
+	DrawScrollBar(l.pos.GetX()+types.ACoordX(l.width.Get()-1), l.pos.GetY(), 1, int(l.height.Get()), pos)
 }
 
 func (l *ListBox) drawItems() {
@@ -96,7 +96,7 @@ func (l *ListBox) drawItems() {
 	maxCurr := len(l.items) - 1
 	curr := l.topLine
 	dy := types.ACoordY(0)
-	maxDy := types.ACoordY(l.height - 1)
+	maxDy := types.ACoordY(l.height.Get() - 1)
 	maxWidth := l.width.Get() - 1
 
 	fg, bg := RealColor(l.fg, l.Style(), ColorEditText), RealColor(l.bg, l.Style(), ColorEditBack)
@@ -169,8 +169,8 @@ func (l *ListBox) End() {
 	}
 
 	l.currSelection = length - 1
-	if length > int(l.height) {
-		l.topLine = length - int(l.height)
+	if length > int(l.height.Get()) {
+		l.topLine = length - int(l.height.Get())
 	}
 
 	if l.onSelectItem != nil {
@@ -230,23 +230,23 @@ func (l *ListBox) moveDown(dy int) {
 func (l *ListBox) EnsureVisible() {
 	length := len(l.items)
 
-	if length <= int(l.height) || l.currSelection == -1 {
+	if length <= int(l.height.Get()) || l.currSelection == -1 {
 		return
 	}
 
 	diff := l.currSelection - l.topLine
-	if diff >= 0 && diff < int(l.height) {
+	if diff >= 0 && diff < int(l.height.Get()) {
 		return
 	}
 
 	if diff < 0 {
 		l.topLine = l.currSelection
 	} else {
-		top := l.currSelection - int(l.height) + 1
-		if length-top > int(l.height) {
+		top := l.currSelection - int(l.height.Get()) + 1
+		if length-top > int(l.height.Get()) {
 			l.topLine = top
 		} else {
-			l.topLine = length - int(l.height)
+			l.topLine = length - int(l.height.Get())
 		}
 	}
 }
@@ -267,7 +267,7 @@ func (l *ListBox) processMouseClick(ev Event) bool {
 	dy := ev.Y - l.pos.GetY()
 
 	if dx == types.ACoordX(l.width.Get()-1) {
-		if dy < 0 || int(dy) >= int(l.height) || len(l.items) < 2 {
+		if dy < 0 || int(dy) >= int(l.height.Get()) || len(l.items) < 2 {
 			return true
 		}
 
@@ -275,7 +275,7 @@ func (l *ListBox) processMouseClick(ev Event) bool {
 			l.moveUp(1)
 			return true
 		}
-		if int(dy) == int(l.height)-1 {
+		if int(dy) == int(l.height.Get())-1 {
 			l.moveDown(1)
 			return true
 		}
@@ -285,7 +285,7 @@ func (l *ListBox) processMouseClick(ev Event) bool {
 		return true
 	}
 
-	if dx < 0 || int(dx) >= int(l.width.Get()) || dy < 0 || int(dy) >= int(l.height) {
+	if dx < 0 || int(dx) >= int(l.width.Get()) || dy < 0 || int(dy) >= int(l.height.Get()) {
 		return true
 	}
 
@@ -306,7 +306,7 @@ func (l *ListBox) processMouseClick(ev Event) bool {
 }
 
 func (l *ListBox) recalcPositionByScroll() {
-	newPos := ItemByThumbPosition(l.buttonPos, len(l.items), int(l.height))
+	newPos := ItemByThumbPosition(l.buttonPos, len(l.items), int(l.height.Get()))
 	if newPos < 1 {
 		return
 	}
@@ -349,10 +349,10 @@ func (l *ListBox) ProcessEvent(event Event) bool {
 			l.moveDown(1)
 			return true
 		case term.KeyPgdn:
-			l.moveDown(int(l.height))
+			l.moveDown(int(l.height.Get()))
 			return true
 		case term.KeyPgup:
-			l.moveUp(int(l.height))
+			l.moveUp(int(l.height.Get()))
 			return true
 		case term.KeyCtrlM:
 			if l.currSelection != -1 && l.onSelectItem != nil {

@@ -133,7 +133,7 @@ func (b *BarChart) Draw() {
 	SetTextColor(fg)
 	SetBackColor(bg)
 
-	FillRect(b.pos.X().Get(), b.pos.Y().Get(), int(b.width.Get()), int(b.height), ' ')
+	FillRect(b.pos.X().Get(), b.pos.Y().Get(), int(b.width.Get()), int(b.height.Get()), ' ')
 
 	if len(b.data) == 0 {
 		return
@@ -147,9 +147,9 @@ func (b *BarChart) Draw() {
 
 func (b *BarChart) barHeight() int {
 	if b.showTitles {
-		return int(b.height) - 2
+		return int(b.height.Get()) - 2
 	}
-	return int(b.height)
+	return int(b.height.Get())
 }
 
 func (b *BarChart) drawBars() {
@@ -252,7 +252,7 @@ func (b *BarChart) drawLegend() {
 	parts := []rune(SysObject(ObjBarChart))
 	defRune := parts[0]
 	for idx, d := range b.data {
-		if idx >= int(b.height) {
+		if idx >= int(b.height.Get()) {
 			break
 		}
 

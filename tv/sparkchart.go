@@ -97,7 +97,7 @@ func (b *SparkChart) Draw() {
 	fg, bg := RealColor(b.fg, b.Style(), ColorSparkChartText), RealColor(b.bg, b.Style(), ColorSparkChartBack)
 	SetTextColor(fg)
 	SetBackColor(bg)
-	FillRect(b.pos.GetX(), b.pos.GetY(), int(b.width.Get()), int(b.height), ' ')
+	FillRect(b.pos.GetX(), b.pos.GetY(), int(b.width.Get()), int(b.height.Get()), ' ')
 
 	if len(b.data) == 0 {
 		return
@@ -153,7 +153,7 @@ func (b *SparkChart) drawBars() {
 		}
 		SetTextColor(f)
 		SetBackColor(g)
-		FillRect(pos, b.pos.GetY()+types.ACoordY(int(h)-barH), 1, barH, parts[0])
+		FillRect(pos, b.pos.GetY()+types.ACoordY(int(h.Get())-barH), 1, barH, parts[0])
 
 		pos++
 	}
@@ -180,8 +180,8 @@ func (b *SparkChart) drawValues() {
 
 	dy := types.ACoordY(0)
 	format := fmt.Sprintf("%%%v.2f", b.valueWidth)
-	for int(dy) < int(h)-1 {
-		v := float64(int(h)-int(dy)) / float64(h) * max
+	for int(dy) < int(h.Get())-1 {
+		v := float64(int(h.Get())-int(dy)) / float64(h.Get()) * max
 		s := fmt.Sprintf(format, v)
 		s = CutText(s, b.valueWidth)
 		DrawRawText(b.pos.GetX(), b.pos.GetY()+dy, s)
@@ -208,7 +208,7 @@ func (b *SparkChart) calculateMultiplier() (float64, float64) {
 	}
 
 	h := b.height
-	if h <= 1 {
+	if h.Get() <= 1 {
 		return 0, 0
 	}
 
@@ -224,9 +224,9 @@ func (b *SparkChart) calculateMultiplier() (float64, float64) {
 	}
 
 	if (bool(b.autoHeight.Is()) || bool(b.autoWidth.Is())) || b.topValue == 0 {
-		return float64(h) / max, max
+		return float64(h.Get()) / max, max
 	}
-	return float64(h) / b.topValue, max
+	return float64(h.Get()) / b.topValue, max
 }
 
 // AddData appends a new bar to a chart

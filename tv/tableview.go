@@ -271,12 +271,12 @@ func (l *TableView) counterWidth() int {
 
 func (l *TableView) drawScroll() {
 
-	pos := ThumbPosition(l.selectedRow, l.rowCount, int(l.height)-1)
-	DrawScrollBar(l.pos.GetX()+types.ACoordX(l.width.Get()-1), l.pos.GetY(), 1, int(l.height-1), pos)
+	pos := ThumbPosition(l.selectedRow, l.rowCount, int(l.height.Get())-1)
+	DrawScrollBar(l.pos.GetX()+types.ACoordX(l.width.Get()-1), l.pos.GetY(), 1, int(l.height.Get()-1), pos)
 
 	pos = ThumbPosition(l.selectedCol, len(l.columns), int(l.width.Get())-1)
-	DrawScrollBar(l.pos.GetX(), l.pos.GetY()+types.ACoordY(l.height-1), int(l.width.Get())-1, 1, pos)
-	PutChar(l.pos.GetX()+types.ACoordX(l.width.Get()-1), l.pos.GetY()+types.ACoordY(l.height-1), ' ')
+	DrawScrollBar(l.pos.GetX(), l.pos.GetY()+types.ACoordY(l.height.Get()-1), int(l.width.Get())-1, 1, pos)
+	PutChar(l.pos.GetX()+types.ACoordX(l.width.Get()-1), l.pos.GetY()+types.ACoordY(l.height.Get()-1), ' ')
 }
 
 func (l *TableView) drawCells() {
@@ -286,7 +286,7 @@ func (l *TableView) drawCells() {
 	maxRow := l.rowCount - 1
 	rowNo := l.topRow
 	dy := types.ACoordY(2)
-	maxDy := types.ACoordY(l.height - 2)
+	maxDy := types.ACoordY(l.height.Get() - 2)
 
 	fg, bg := RealColor(l.fg, l.Style(), ColorTableText), RealColor(l.bg, l.Style(), ColorTableBack)
 	fgRow, bgRow := RealColor(l.fg, l.Style(), ColorTableSelectedText), RealColor(l.bg, l.Style(), ColorTableSelectedBack)
@@ -297,7 +297,7 @@ func (l *TableView) drawCells() {
 	start := 0
 	if l.showRowNo {
 		start = l.counterWidth()
-		for idx := 1; idx < int(l.height)-2; idx++ {
+		for idx := 1; idx < int(l.height.Get())-2; idx++ {
 			if l.topRow+idx > l.rowCount {
 				break
 			}
@@ -597,7 +597,7 @@ END_FOR:
 func (l *TableView) EnsureRowVisible() {
 	length := l.rowCount
 
-	hgt := l.height - 3
+	hgt := l.height.Get() - 3
 
 	if length <= int(hgt) || l.selectedRow == -1 {
 		return
@@ -673,14 +673,14 @@ func (l *TableView) verticalScrollClick(dy types.ACoordY) {
 	switch {
 	case dy == 0:
 		l.moveUp(1)
-	case int(dy) == int(l.height)-2:
+	case int(dy) == int(l.height.Get())-2:
 		l.moveDown(1)
-	case dy > 0 && int(dy) < int(l.height)-2:
-		pos := ThumbPosition(l.selectedRow, l.rowCount, int(l.height)-1)
+	case dy > 0 && int(dy) < int(l.height.Get())-2:
+		pos := ThumbPosition(l.selectedRow, l.rowCount, int(l.height.Get())-1)
 		if pos > int(dy) {
-			l.moveUp(int(l.height) - 3)
+			l.moveUp(int(l.height.Get()) - 3)
 		} else if pos < int(dy) {
-			l.moveDown(int(l.height) - 3)
+			l.moveDown(int(l.height.Get()) - 3)
 		}
 	}
 }
@@ -694,17 +694,17 @@ func (l *TableView) processMouseClick(ev Event) bool {
 	dy := ev.Y - l.pos.GetY()
 
 	if l.topRow+int(dy)-2 >= l.rowCount &&
-		int(dy) != int(l.height)-1 && int(dx) != int(l.width.Get())-1 {
+		int(dy) != int(l.height.Get())-1 && int(dx) != int(l.width.Get())-1 {
 		return false
 	}
 
-	if int(dy) == int(l.height)-1 && int(dx) == int(l.width.Get())-1 {
+	if int(dy) == int(l.height.Get())-1 && int(dx) == int(l.width.Get())-1 {
 		l.selectedRow = l.rowCount - 1
 		l.selectedCol = len(l.columns) - 1
 		return true
 	}
 
-	if int(dy) == int(l.height)-1 {
+	if int(dy) == int(l.height.Get())-1 {
 		l.horizontalScrollClick(dx)
 		return true
 	}
@@ -820,10 +820,10 @@ func (l *TableView) ProcessEvent(event Event) bool {
 			l.moveRight(1)
 			return true
 		case term.KeyPgdn:
-			l.moveDown(int(l.height) - 3)
+			l.moveDown(int(l.height.Get()) - 3)
 			return true
 		case term.KeyPgup:
-			l.moveUp(int(l.height) - 3)
+			l.moveUp(int(l.height.Get()) - 3)
 			return true
 		case term.KeyCtrlM, term.KeyF2:
 			if l.selectedRow != -1 && l.selectedCol != -1 && l.onAction != nil {
@@ -1051,7 +1051,7 @@ func (l *TableView) OnBeforeDraw(fn func(int, int, int, int)) {
 // * rowCount - the number of visible rows
 func (l *TableView) VisibleArea() (firstCol, firstRow, colCount, rowCount int) {
 	firstRow = l.topRow
-	maxDy := l.height - 3
+	maxDy := l.height.Get() - 3
 	if firstRow+int(maxDy) < l.rowCount {
 		rowCount = int(maxDy)
 	} else {

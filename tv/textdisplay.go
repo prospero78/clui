@@ -78,7 +78,7 @@ func (l *TextDisplay) drawText() {
 	SetBackColor(bg)
 
 	ind := 0
-	for ind < int(l.height) {
+	for ind < int(l.height.Get()) {
 		var str string
 		if ind+l.topLine < l.lineCount {
 			str = l.onDrawLine(ind + l.topLine)
@@ -176,10 +176,10 @@ func (l *TextDisplay) processMouseClick(ev Event) bool {
 	dy := ev.Y - l.pos.GetY()
 	ww := l.height
 
-	if int(dy) < int(l.height)/2 {
-		l.moveUp(int(ww) - 1)
+	if int(dy) < int(l.height.Get())/2 {
+		l.moveUp(int(ww.Get()) - 1)
 	} else {
-		l.moveDown(int(ww) - 1)
+		l.moveDown(int(ww.Get()) - 1)
 	}
 
 	return true
@@ -212,10 +212,10 @@ func (l *TextDisplay) ProcessEvent(event Event) bool {
 			l.moveDown(1)
 			return true
 		case term.KeyPgup:
-			l.moveUp(int(l.height) - 1)
+			l.moveUp(int(l.height.Get()) - 1)
 			return true
 		case term.KeyPgdn, term.KeySpace:
-			l.moveDown(int(l.height) - 1)
+			l.moveDown(int(l.height.Get()) - 1)
 			return true
 		}
 
@@ -227,10 +227,10 @@ func (l *TextDisplay) ProcessEvent(event Event) bool {
 			l.moveDown(1)
 			return true
 		case 'u', 'U':
-			l.moveUp(int(l.height) - 1)
+			l.moveUp(int(l.height.Get()) - 1)
 			return true
 		case 'd', 'D':
-			l.moveDown(int(l.height) - 1)
+			l.moveDown(int(l.height.Get()) - 1)
 			return true
 		default:
 			return false

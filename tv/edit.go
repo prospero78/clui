@@ -269,7 +269,7 @@ func (e *TEditField) SetSize(width, height int) {
 		e.width.Set(types.AWidth(width))
 	}
 
-	e.height = 1
+	e.height.Set(1)
 }
 
 // PasswordMode returns whether password mode is enabled for the control

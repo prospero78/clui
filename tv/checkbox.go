@@ -208,7 +208,7 @@ func (c *CheckBox) SetSize(width, height int) {
 		c.width.Set(types.AWidth(width))
 	}
 
-	c.height = 1
+	c.height.Set(1)
 }
 
 // OnChange sets the callback that is called whenever the state

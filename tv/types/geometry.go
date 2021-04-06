@@ -9,6 +9,14 @@ type IWidth interface {
 	Set(AWidth) error
 }
 
+// IHeight -- интерфейс высоты
+type IHeight interface {
+	// Get -- возвращает хранимую высоту
+	Get() AHeight
+	// Set -- устанавливает хранимую высоту
+	Set(AHeight) error
+}
+
 // IAutoWidth -- интерфейс к автоматической ширине
 type IAutoWidth interface {
 	// Is -- возвращает хранимое значение

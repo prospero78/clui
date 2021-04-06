@@ -104,7 +104,7 @@ func (sf *TWindow) drawFrame() {
 		bs = sf.border
 	}
 
-	DrawFrame(sf.pos.GetX(), sf.pos.GetY(), int(sf.width.Get()), int(sf.height), bs)
+	DrawFrame(sf.pos.GetX(), sf.pos.GetY(), int(sf.width.Get()), int(sf.height.Get()), bs)
 }
 
 func (sf *TWindow) drawTitle() {
@@ -180,7 +180,7 @@ func (sf *TWindow) Draw() {
 	fg, bg := RealColor(sf.fg, sf.Style(), ColorViewText), RealColor(sf.bg, sf.Style(), ColorViewBack)
 	SetBackColor(bg)
 
-	FillRect(sf.pos.GetX(), sf.pos.GetY(), int(sf.width.Get()), int(sf.height), ' ')
+	FillRect(sf.pos.GetX(), sf.pos.GetY(), int(sf.width.Get()), int(sf.height.Get()), ' ')
 
 	sf.DrawChildren()
 
@@ -197,7 +197,7 @@ func (sf *TWindow) Draw() {
 // which window icon is under cursor etc
 func (sf *TWindow) HitTest(x types.ACoordX, y types.ACoordY) HitResult {
 	if x > sf.pos.GetX() && x < sf.pos.GetX()+types.ACoordX(sf.width.Get()-1) &&
-		y > sf.pos.GetY() && y < sf.pos.GetY()+types.ACoordY(sf.height-1) {
+		y > sf.pos.GetY() && y < sf.pos.GetY()+types.ACoordY(sf.height.Get()-1) {
 		return HitInside
 	}
 
@@ -208,13 +208,13 @@ func (sf *TWindow) HitTest(x types.ACoordX, y types.ACoordY) HitResult {
 		hResult = HitTopLeft
 	case x == sf.pos.GetX()+types.ACoordX(sf.width.Get()-1) && y == sf.pos.GetY():
 		hResult = HitTopRight
-	case x == sf.pos.GetX() && y == sf.pos.GetY()+types.ACoordY(sf.height-1):
+	case x == sf.pos.GetX() && y == sf.pos.GetY()+types.ACoordY(sf.height.Get()-1):
 		hResult = HitBottomLeft
-	case x == sf.pos.GetX()+types.ACoordX(sf.width.Get()-1) && y == sf.pos.GetY()+types.ACoordY(sf.height-1):
+	case x == sf.pos.GetX()+types.ACoordX(sf.width.Get()-1) && y == sf.pos.GetY()+types.ACoordY(sf.height.Get()-1):
 		hResult = HitBottomRight
-	case x == sf.pos.GetX() && y > sf.pos.GetY() && y < sf.pos.GetY()+types.ACoordY(sf.height-1):
+	case x == sf.pos.GetX() && y > sf.pos.GetY() && y < sf.pos.GetY()+types.ACoordY(sf.height.Get()-1):
 		hResult = HitLeft
-	case x == sf.pos.GetX()+types.ACoordX(sf.width.Get()-1) && y > sf.pos.GetY() && y < sf.pos.GetY()+types.ACoordY(sf.height-1):
+	case x == sf.pos.GetX()+types.ACoordX(sf.width.Get()-1) && y > sf.pos.GetY() && y < sf.pos.GetY()+types.ACoordY(sf.height.Get()-1):
 		hResult = HitRight
 	case y == sf.pos.GetY() && x > sf.pos.GetX() && x < sf.pos.GetX()+types.ACoordX(sf.width.Get()-1):
 		lb, rb := sf.buttonCount()
@@ -248,7 +248,7 @@ func (sf *TWindow) HitTest(x types.ACoordX, y types.ACoordY) HitResult {
 				}
 			}
 		}
-	case y == sf.pos.GetY()+types.ACoordY(sf.height-1) &&
+	case y == sf.pos.GetY()+types.ACoordY(sf.height.Get()-1) &&
 		x > sf.pos.GetX() &&
 		x < sf.pos.GetX()+types.ACoordX(sf.width.Get()-1):
 		hResult = HitBottom

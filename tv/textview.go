@@ -88,9 +88,9 @@ func CreateTextView(parent IControl, width, height int, scale int) *TextView {
 func (l *TextView) outputHeight() int {
 	h := l.height
 	if !l.wordWrap {
-		h--
+		h.Set(h.Get() - 1)
 	}
-	return int(h)
+	return int(h.Get())
 }
 
 func (l *TextView) drawScrolls() {
@@ -100,7 +100,7 @@ func (l *TextView) drawScrolls() {
 
 	if !l.wordWrap {
 		pos = ThumbPosition(l.leftShift, l.virtualWidth-int(l.width.Get())+1, int(l.width.Get())-1)
-		DrawScrollBar(l.pos.GetX(), l.pos.GetY()+types.ACoordY(l.height-1), int(l.width.Get())-1, 1, pos)
+		DrawScrollBar(l.pos.GetX(), l.pos.GetY()+types.ACoordY(l.height.Get()-1), int(l.width.Get())-1, 1, pos)
 	}
 }
 
@@ -278,7 +278,7 @@ func (l *TextView) processMouseClick(ev Event) bool {
 	yy := l.outputHeight()
 
 	// cursor is not on any scrollbar
-	if int(dx) != int(l.width.Get()-1) && int(dy) != int(l.height)-1 {
+	if int(dx) != int(l.width.Get()-1) && int(dy) != int(l.height.Get())-1 {
 		return false
 	}
 	// wordwrap mode does not have horizontal scroll
@@ -289,7 +289,7 @@ func (l *TextView) processMouseClick(ev Event) bool {
 	// corner in not wordwrap mode
 	if !l.wordWrap &&
 		int(dx) == int(l.width.Get())-1 &&
-		int(dy) == int(l.height)-1 {
+		int(dy) == int(l.height.Get())-1 {
 		return false
 	}
 
