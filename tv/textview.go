@@ -8,6 +8,8 @@ import (
 	xs "github.com/huandu/xstrings"
 	term "github.com/nsf/termbox-go"
 
+	"github.com/prospero78/goTV/tv/autoheight"
+	"github.com/prospero78/goTV/tv/autowidth"
 	"github.com/prospero78/goTV/tv/types"
 )
 
@@ -37,6 +39,9 @@ type TextView struct {
 	virtualWidth  int
 	autoscroll    bool
 	maxLines      int
+
+	autoWidth  types.IAutoWidth
+	autoHeight types.IAutoHeight
 }
 
 /*
@@ -48,14 +53,19 @@ scale - the way of scaling the control when the parent is resized. Use DoNotScal
 control should keep its original size.
 */
 func CreateTextView(parent Control, width, height int, scale int) *TextView {
-	l := new(TextView)
-	l.TBaseControl = NewBaseControl()
-
-	if height == AutoSize {
-		height = 3
+	l := &TextView{
+		TBaseControl: NewBaseControl(),
+		autoWidth:    autowidth.New(),
+		autoHeight:   autoheight.New(),
 	}
-	if width == AutoSize {
+
+	if height == 0 {
+		height = 3
+		l.autoWidth.Set()
+	}
+	if width == 0 {
 		width = 5
+		l.autoHeight.Set()
 	}
 
 	l.SetSize(width, height)
