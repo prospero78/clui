@@ -48,7 +48,7 @@ w and h - are minimal size of the control.
 scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 control should keep its original size.
 */
-func CreateSparkChart(parent Control, w, h int, scale int) *SparkChart {
+func CreateSparkChart(parent IControl, w, h int, scale int) *SparkChart {
 	c := &SparkChart{
 		TBaseControl: NewBaseControl(),
 		autoWidth:    autowidth.New(),

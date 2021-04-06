@@ -27,7 +27,7 @@ type TBaseControl struct {
 	fgActive   term.Attribute
 	bgActive   term.Attribute
 	align      Align
-	parent     Control
+	parent     IControl
 	inactive   bool
 	modal      bool
 	tabSkip    bool
@@ -36,7 +36,7 @@ type TBaseControl struct {
 	clipped    bool
 	clipper    *rect
 	pack       PackType
-	children   []Control
+	children   []IControl
 	mtx        sync.RWMutex
 	onActive   func(active bool)
 	style      string
@@ -221,11 +221,11 @@ func (sf *TBaseControl) SetVisible(visible bool) {
 	}()
 }
 
-func (sf *TBaseControl) Parent() Control {
+func (sf *TBaseControl) Parent() IControl {
 	return sf.parent
 }
 
-func (sf *TBaseControl) SetParent(parent Control) {
+func (sf *TBaseControl) SetParent(parent IControl) {
 	if sf.parent == nil {
 		sf.parent = parent
 	}
@@ -394,9 +394,9 @@ func (sf *TBaseControl) ResizeChildren() {
 	}
 }
 
-func (sf *TBaseControl) AddChild(control Control) {
+func (sf *TBaseControl) AddChild(control IControl) {
 	if sf.children == nil {
-		sf.children = make([]Control, 1)
+		sf.children = make([]IControl, 1)
 		sf.children[0] = control
 	} else {
 		if sf.ChildExists(control) {
@@ -406,8 +406,8 @@ func (sf *TBaseControl) AddChild(control Control) {
 		sf.children = append(sf.children, control)
 	}
 
-	var ctrl Control
-	var mainCtrl Control
+	var ctrl IControl
+	var mainCtrl IControl
 	ctrl = sf
 	for ctrl != nil {
 		ww, hh := ctrl.MinimalSize()
@@ -438,13 +438,13 @@ func (sf *TBaseControl) AddChild(control Control) {
 	}
 }
 
-func (sf *TBaseControl) Children() []Control {
-	child := make([]Control, len(sf.children))
+func (sf *TBaseControl) Children() []IControl {
+	child := make([]IControl, len(sf.children))
 	copy(child, sf.children)
 	return child
 }
 
-func (sf *TBaseControl) ChildExists(control Control) bool {
+func (sf *TBaseControl) ChildExists(control IControl) bool {
 	if len(sf.children) == 0 {
 		return false
 	}
@@ -533,7 +533,7 @@ func (sf *TBaseControl) DrawChildren() {
 	defer PopClip()
 
 	cp := ClippedParent(sf)
-	var cTarget Control
+	var cTarget IControl
 
 	cTarget = sf
 	if cp != nil {
@@ -626,8 +626,8 @@ func (sf *TBaseControl) SetActiveBackColor(clr term.Attribute) {
 	sf.bgActive = clr
 }
 
-func (sf *TBaseControl) removeChild(control Control) {
-	children := []Control{}
+func (sf *TBaseControl) removeChild(control IControl) {
+	children := []IControl{}
 
 	for _, child := range sf.children {
 		if child.RefID() == control.RefID() {

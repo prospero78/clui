@@ -26,11 +26,11 @@ type TextDisplay struct {
 // In next major library version TextReader will be removed
 type TextReader = TextDisplay
 
-func CreateTextReader(parent Control, width, height int, scale int) *TextDisplay {
+func CreateTextReader(parent IControl, width, height int, scale int) *TextDisplay {
 	return CreateTextDisplay(parent, width, height, scale)
 }
 
-func CreateTextDisplay(parent Control, width, height int, scale int) *TextDisplay {
+func CreateTextDisplay(parent IControl, width, height int, scale int) *TextDisplay {
 	l := &TextDisplay{
 		TBaseControl: NewBaseControl(),
 		autoHeight:   autoheight.New(),

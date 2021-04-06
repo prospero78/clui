@@ -36,7 +36,7 @@ bs - type of border: no border, single or double.
 scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 control should keep its original size.
 */
-func CreateFrame(parent Control, width, height int, bs BorderStyle, scale int) *Frame {
+func CreateFrame(parent IControl, width, height int, bs BorderStyle, scale int) *Frame {
 	f := &Frame{
 		TBaseControl: NewBaseControl(),
 		autoWidth:    autowidth.New(),

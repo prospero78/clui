@@ -37,7 +37,7 @@ width and heigth - are minimal size of the control.
 scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 control should keep its original size.
 */
-func CreateProgressBar(parent Control, width, height int, scale int) *ProgressBar {
+func CreateProgressBar(parent IControl, width, height int, scale int) *ProgressBar {
 	b := &ProgressBar{
 		TBaseControl: NewBaseControl(),
 		autoWidth:    autowidth.New(),

@@ -52,7 +52,7 @@ width and height - are minimal size of the control.
 scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 control should keep its original size.
 */
-func CreateTextView(parent Control, width, height int, scale int) *TextView {
+func CreateTextView(parent IControl, width, height int, scale int) *TextView {
 	l := &TextView{
 		TBaseControl: NewBaseControl(),
 		autoWidth:    autowidth.New(),

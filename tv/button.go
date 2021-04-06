@@ -36,7 +36,7 @@ title - button title.
 scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 control should keep its original size.
 */
-func CreateButton(parent Control,
+func CreateButton(parent IControl,
 	width, height int,
 	title string,
 	scale int,

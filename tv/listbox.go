@@ -43,7 +43,7 @@ width and height - are minimal size of the control.
 scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 control should keep its original size.
 */
-func CreateListBox(parent Control, width, height int, scale int) *ListBox {
+func CreateListBox(parent IControl, width, height int, scale int) *ListBox {
 	l := &ListBox{
 		TBaseControl: NewBaseControl(),
 		autoWidth:    autowidth.New(),

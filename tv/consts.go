@@ -89,7 +89,7 @@ type Event struct {
 	// For resize event - new terminal size
 	Width  int
 	Height int
-	Target Control
+	Target IControl
 }
 
 // BorderStyle constants

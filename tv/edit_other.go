@@ -43,7 +43,7 @@ type TEditField struct {
 // text - text to edit.
 // scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 //  control should keep its original size.
-func CreateEditField(parent Control, width int, text string, scale int) *TEditField {
+func CreateEditField(parent IControl, width int, text string, scale int) *TEditField {
 	e := &TEditField{
 		TBaseControl: NewBaseControl(),
 		autoWidth:    autowidth.New(),

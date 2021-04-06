@@ -6,8 +6,8 @@ import (
 	"github.com/prospero78/goTV/tv/types"
 )
 
-// Control is an interface that every visible control should implement
-type Control interface {
+// IControl is an interface that every visible control should implement
+type IControl interface {
 	// Title returns the current title or text of the control
 	Title() string
 	// SetTitle changes control text or title
@@ -45,10 +45,10 @@ type Control interface {
 	SetVisible(enabled bool)
 	// Parent return control's container or nil if there is no parent container
 	// that is true for Windows
-	Parent() Control
+	Parent() IControl
 	// The function should not be called manually. It is for internal use by
 	// library
-	SetParent(parent Control)
+	SetParent(parent IControl)
 	// Modal returns if a control is always on top and does not allow to
 	// change the current control. Used only by Windows, for other kind of
 	// controls it does nothing
@@ -111,12 +111,12 @@ type Control interface {
 	// AddChild adds a new child to a container
 	// The method should not be called manually. It is automatically called
 	// if parent is not nil in Create* function
-	AddChild(control Control)
+	AddChild(control IControl)
 	// Children returns the copy of the list of container child controls
-	Children() []Control
+	Children() []IControl
 	// ChildExists returns true if a control has argument as one of its
 	// children or child of one of the children
-	ChildExists(control Control) bool
+	ChildExists(control IControl) bool
 	// MinimalSize returns the minimal size required by a control to show
 	// it and all its children.
 	MinimalSize() (w int, h int)
@@ -154,7 +154,7 @@ type Control interface {
 	// removeChild removes a child from a container
 	// It's used to "destroy" controls whenever a control is no longer used
 	// by the user
-	removeChild(control Control)
+	removeChild(control IControl)
 	// Destroy is the public interface to remove an object from its parental chain
 	// it implies this control will stop receiving events and will not be drawn nor
 	// will impact on other objects position and size calculation

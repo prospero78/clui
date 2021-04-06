@@ -32,7 +32,7 @@ scale - the way of scaling the control when the parent is resized. Use DoNotScal
 control should keep its original size.
 CheckBox state can be changed using mouse or pressing space on keyboard while the control is active
 */
-func CreateCheckBox(parent Control,
+func CreateCheckBox(parent IControl,
 	width int,
 	title string,
 	scale int,

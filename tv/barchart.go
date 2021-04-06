@@ -83,7 +83,7 @@ w and h - are minimal size of the control.
 scale - the way of scaling the control when the parent is resized. Use DoNotScale constant if the
 control should keep its original size.
 */
-func CreateBarChart(parent Control, w, h int, scale int,
+func CreateBarChart(parent IControl, w, h int, scale int,
 	autoWidth types.AAutoWidth, autoHeight types.AAutoHeight) *BarChart {
 	c := &BarChart{
 		TBaseControl: NewBaseControl(),

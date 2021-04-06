@@ -64,7 +64,7 @@ func NewWindow(x types.ACoordX, y types.ACoordY,
 	wnd.SetPos(x, y)
 	wnd.SetTitle(title)
 	wnd.buttons = ButtonClose | ButtonBottom | ButtonMaximize
-	wnd.children = make([]Control, 0)
+	wnd.children = make([]IControl, 0)
 	wnd.SetPaddings(1, 1)
 	wnd.SetGaps(1, 0)
 	wnd.SetScale(1)
@@ -291,7 +291,7 @@ func (c *TWindow) ProcessEvent(ev Event) bool {
 			aC := ActiveControl(c)
 			nC := NextControl(c, aC, ev.Key != term.KeyArrowUp)
 
-			var clipped Control
+			var clipped IControl
 
 			if aC != nil && aC.Clipped() {
 				clipped = aC
