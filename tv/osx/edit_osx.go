@@ -53,7 +53,7 @@ func CreateEditField(parent tv.Control, width int, text string, scale int) *Edit
 	e.SetTitle(text)
 	e.SetEnabled(true)
 
-	if width == tv.AutoSize {
+	if width == 0 {
 		width = xs.Len(text) + 1
 	}
 
